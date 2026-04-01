@@ -10,7 +10,18 @@ class AdhanService {
     final adhanTimes = PrayerTimes.today(coordinates, params);
     
     // Determine the next prayer
-    final next = adhanTimes.nextPrayer();
+    var next = adhanTimes.nextPrayer();
+    
+    // If next is none, it means Isha has passed. Get next day's Fajr.
+    if (next == Prayer.none) {
+      final tomorrow = DateTime.now().add(const Duration(days: 1));
+      final tomorrowTimes = PrayerTimes(
+        coordinates,
+        DateComponents(tomorrow.year, tomorrow.month, tomorrow.day),
+        params,
+      );
+      return PrayerTimesModel.fromAdhan(tomorrowTimes, Prayer.fajr);
+    }
     
     return PrayerTimesModel.fromAdhan(adhanTimes, next);
   }

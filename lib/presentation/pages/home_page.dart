@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 import 'package:barakah_time/presentation/pages/profile_page.dart';
 import 'package:barakah_time/presentation/pages/quran_page.dart';
@@ -11,6 +12,14 @@ import '../blocs/prayer_bloc.dart';
 import '../blocs/pulse_bloc.dart';
 import '../widgets/glass_box.dart';
 import 'names_all_page.dart';
+import 'prayer_times_page.dart';
+import 'duas_page.dart';
+import 'tools_grid_page.dart';
+import 'qibla_page.dart';
+import 'zakat_calculator_page.dart';
+import 'islamic_calendar_page.dart';
+import 'mosque_finder_page.dart';
+import 'hajj_guide_page.dart';
 import 'tasbeeh_page.dart';
 import 'pulse_page.dart';
 
@@ -195,11 +204,20 @@ class HomePage extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        Text(
-                          'See All',
-                          style: TextStyle(
-                            color: AppColors.secondaryGold,
-                            fontSize: 13.sp,
+                        GestureDetector(
+                          onTap:
+                              () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const ToolsGridPage(),
+                                ),
+                              ),
+                          child: Text(
+                            'See All',
+                            style: TextStyle(
+                              color: AppColors.secondaryGold,
+                              fontSize: 13.sp,
+                            ),
                           ),
                         ),
                       ],
@@ -378,67 +396,124 @@ class HomePage extends StatelessWidget {
   }
 }
 
-class _PrayerTimesCard extends StatelessWidget {
+class _PrayerTimesCard extends StatefulWidget {
   const _PrayerTimesCard({required this.prayerTimes});
   final dynamic prayerTimes;
 
   @override
+  State<_PrayerTimesCard> createState() => _PrayerTimesCardState();
+}
+
+class _PrayerTimesCardState extends State<_PrayerTimesCard> {
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _startTimer();
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  void _startTimer() {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (mounted) setState(() {});
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final prayer = prayerTimes;
-    return GlassBox(
-      height: 180.h,
-      width: double.infinity,
-      child: Stack(
-        children: [
-          Positioned(
-            right: -20,
-            bottom: -20,
-            child: Opacity(
-              opacity: 0.1,
-              child: Icon(Icons.mosque, size: 200.sp, color: Colors.white),
+    final prayer = widget.prayerTimes;
+
+    // Find the actual DateTime for the next prayer for dynamic countdown
+    DateTime nextPrayerTime;
+    switch (prayer.currentPrayerName) {
+      case 'Fajr':
+        nextPrayerTime = prayer.fajr;
+        break;
+      case 'Dhuhr':
+        nextPrayerTime = prayer.dhuhr;
+        break;
+      case 'Asr':
+        nextPrayerTime = prayer.asr;
+        break;
+      case 'Maghrib':
+        nextPrayerTime = prayer.maghrib;
+        break;
+      case 'Isha':
+        nextPrayerTime = prayer.isha;
+        break;
+      default:
+        nextPrayerTime = DateTime.now();
+    }
+
+    final timeUntil = nextPrayerTime.difference(DateTime.now());
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const PrayerTimesPage()),
+        );
+      },
+      child: GlassBox(
+        height: 180.h,
+        width: double.infinity,
+        child: Stack(
+          children: [
+            Positioned(
+              right: -20,
+              bottom: -20,
+              child: Opacity(
+                opacity: 0.1,
+                child: Icon(Icons.mosque, size: 200.sp, color: Colors.white),
+              ),
             ),
-          ),
-          Padding(
-            padding: EdgeInsets.all(20.w),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  '${prayer.currentPrayerName} In',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodyMedium?.copyWith(color: Colors.white70),
-                ),
-                Text(
-                  _formatDuration(prayer.timeUntilNextPrayer),
-                  style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                    color: AppColors.secondaryGold,
-                    letterSpacing: 2,
-                    fontSize: 48.sp,
+            Padding(
+              padding: EdgeInsets.all(20.w),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    '${prayer.currentPrayerName} In',
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodyMedium?.copyWith(color: Colors.white70),
                   ),
-                ),
-                SizedBox(height: 8.h),
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.location_on,
-                      size: 14,
+                  Text(
+                    _formatDuration(timeUntil),
+                    style: Theme.of(context).textTheme.displayLarge?.copyWith(
                       color: AppColors.secondaryGold,
+                      letterSpacing: 2,
+                      fontSize: 48.sp,
                     ),
-                    SizedBox(width: 4.w),
-                    Text(
-                      'Islamabad, Pakistan',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppColors.textSecondary,
+                  ),
+                  SizedBox(height: 8.h),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.location_on,
+                        size: 14,
+                        color: AppColors.secondaryGold,
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                      SizedBox(width: 4.w),
+                      Text(
+                        'Islamabad, Pakistan',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -484,56 +559,45 @@ class _QuickActionIcon extends StatelessWidget {
         );
         break;
       case 'Prayer':
-        showModalBottomSheet(
-          context: context,
-          backgroundColor: AppColors.backgroundSlate,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(50.r),
-          ),
-          builder:
-              (context) => Container(
-                padding: EdgeInsets.all(24.sp),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 40.w,
-                      height: 4.h,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                    SizedBox(height: 24.h),
-                    Text(
-                      'Prayer Times Detail',
-                      style: TextStyle(
-                        color: AppColors.textMain,
-                        fontSize: 20.sp,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 16.h),
-                    const Text(
-                      'Detailed prayer schedule implementation coming soon with adhan notifications.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: AppColors.textSecondary),
-                    ),
-                    SizedBox(height: 32.h),
-                    ElevatedButton(
-                      onPressed: () => Navigator.pop(context),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.secondaryGold,
-                        minimumSize: Size(double.infinity, 56.h),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                      ),
-                      child: const Text('Great!'),
-                    ),
-                  ],
-                ),
-              ),
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const PrayerTimesPage()),
+        );
+        break;
+      case 'Duas':
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const DuasPage()),
+        );
+        break;
+      case 'Qibla':
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const QiblaPage()),
+        );
+        break;
+      case 'Zakat':
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const ZakatCalculatorPage()),
+        );
+        break;
+      case 'Calendar':
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const IslamicCalendarPage()),
+        );
+        break;
+      case 'Mosques':
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const MosqueFinderPage()),
+        );
+        break;
+      case 'Hajj Guide':
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const HajjGuidePage()),
         );
         break;
       default:
@@ -558,10 +622,10 @@ class _QuickActionIcon extends StatelessWidget {
         children: [
           GlassBox(
             width: 60.w,
-            height: 60.w,
-            borderRadius: BorderRadius.circular(20),
+            height: 60.h,
+            borderRadius: BorderRadius.circular(20.r),
             child: Container(
-              padding: EdgeInsets.all(12.w),
+              padding: EdgeInsets.all(12.sp),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,

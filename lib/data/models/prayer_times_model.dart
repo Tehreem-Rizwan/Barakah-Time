@@ -22,7 +22,7 @@ class PrayerTimesModel extends PrayerTimesEntity {
       maghrib: adhanTimes.maghrib,
       isha: adhanTimes.isha,
       currentPrayerName: _getPrayerName(next),
-      timeUntilNextPrayer: adhanTimes.timeForPrayer(next)!.difference(DateTime.now()),
+      timeUntilNextPrayer: adhanTimes.timeForPrayer(next)?.difference(DateTime.now()) ?? Duration.zero,
     );
   }
 
