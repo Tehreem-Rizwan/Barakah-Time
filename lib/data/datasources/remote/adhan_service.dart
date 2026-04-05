@@ -2,9 +2,32 @@ import 'package:adhan/adhan.dart';
 import '../../models/prayer_times_model.dart';
 
 class AdhanService {
-  Future<PrayerTimesModel> getTimes(double lat, double lng) async {
+  Future<PrayerTimesModel> getTimes(double lat, double lng, {String method = 'Karachi'}) async {
     final coordinates = Coordinates(lat, lng);
-    final params = CalculationMethod.karachi.getParameters();
+    
+    CalculationMethod adhanMethod;
+    switch (method) {
+      case 'ISNA':
+        adhanMethod = CalculationMethod.north_america;
+        break;
+      case 'MWL':
+        adhanMethod = CalculationMethod.muslim_world_league;
+        break;
+      case 'Makkah':
+        adhanMethod = CalculationMethod.umm_al_qura;
+        break;
+      case 'Dubai':
+        adhanMethod = CalculationMethod.dubai;
+        break;
+      case 'Qatar':
+        adhanMethod = CalculationMethod.qatar;
+        break;
+      case 'Karachi':
+      default:
+        adhanMethod = CalculationMethod.karachi;
+    }
+
+    final params = adhanMethod.getParameters();
     params.madhab = Madhab.hanafi;
 
     final adhanTimes = PrayerTimes.today(coordinates, params);

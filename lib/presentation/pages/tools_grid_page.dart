@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:adhan/adhan.dart';
+import 'package:hijri/hijri_calendar.dart';
 import '../../core/theme/app_colors.dart';
 import '../widgets/glass_box.dart';
 import 'names_all_page.dart';
@@ -19,6 +21,9 @@ class ToolsGridPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hijri = HijriCalendar.now();
+    final hijriLabel = '${hijri.hDay} ${hijri.longMonthName}';
+
     final List<Map<String, dynamic>> tools = [
       {
         'icon': Icons.mosque,
@@ -41,7 +46,7 @@ class ToolsGridPage extends StatelessWidget {
       },
       {
         'icon': Icons.calendar_month,
-        'label': 'Calendar',
+        'label': hijriLabel,
         'page': const IslamicCalendarPage(),
       },
       {
@@ -61,16 +66,11 @@ class ToolsGridPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.backgroundSlate,
       appBar: AppBar(
-        title: const Text(
-          'All Tools',
-          style: TextStyle(
-            color: AppColors.textMain,
-            fontWeight: FontWeight.bold,
-          ),
+        title: const Text('All Tools'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: AppColors.secondaryGold),
+          onPressed: () => Navigator.pop(context),
         ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: AppColors.secondaryGold),
       ),
       body: GridView.builder(
         padding: EdgeInsets.all(24.sp),

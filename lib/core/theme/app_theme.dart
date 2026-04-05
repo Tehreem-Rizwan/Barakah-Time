@@ -17,6 +17,17 @@ class AppTheme {
         onPrimary: Colors.white,
         surface: AppColors.cardDark,
       ),
+      appBarTheme: AppBarTheme(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: true,
+        titleTextStyle: GoogleFonts.outfit(
+          color: AppColors.textMain,
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+        ),
+        iconTheme: const IconThemeData(color: AppColors.secondaryGold),
+      ),
       textTheme: GoogleFonts.outfitTextTheme(
         ThemeData.dark().textTheme,
       ).copyWith(

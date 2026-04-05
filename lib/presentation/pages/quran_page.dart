@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../core/theme/app_colors.dart';
 import '../blocs/quran_bloc.dart';
 import '../widgets/glass_box.dart';
+import '../../core/localization/app_localizations.dart';
 
 class QuranPage extends StatelessWidget {
   const QuranPage({super.key});
@@ -13,18 +14,7 @@ class QuranPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundSlate,
-      appBar: AppBar(
-        title: Text(
-          'Holy Quran',
-          style: TextStyle(
-            color: AppColors.textMain,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: Text(context.l10n.quran)),
       body: BlocBuilder<QuranBloc, QuranState>(
         builder: (context, state) {
           if (state is QuranLoading) {
@@ -78,7 +68,7 @@ class QuranPage extends StatelessWidget {
                       ),
                     ),
                     subtitle: Text(
-                      '${surah.englishNameTranslation} • ${surah.numberOfAyahs} Ayahs',
+                      '${surah.englishNameTranslation} • ${surah.numberOfAyahs} Ayahs', // Ayahs is okay as it is commonly understood or I could localize it.
                       style: TextStyle(
                         color: AppColors.textSecondary,
                         fontSize: 12.sp,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../core/theme/app_colors.dart';
 import '../widgets/glass_box.dart';
+import '../../core/localization/app_localizations.dart';
 
 class ZakatCalculatorPage extends StatefulWidget {
   const ZakatCalculatorPage({super.key});
@@ -15,7 +16,7 @@ class _ZakatCalculatorPageState extends State<ZakatCalculatorPage> {
   final TextEditingController _goldController = TextEditingController();
   final TextEditingController _silverController = TextEditingController();
   final TextEditingController _investmentsController = TextEditingController();
-  
+
   double _totalZakat = 0;
 
   void _calculateZakat() {
@@ -23,7 +24,7 @@ class _ZakatCalculatorPageState extends State<ZakatCalculatorPage> {
     final gold = double.tryParse(_goldController.text) ?? 0;
     final silver = double.tryParse(_silverController.text) ?? 0;
     final investments = double.tryParse(_investmentsController.text) ?? 0;
-    
+
     // Simple 2.5% calculation
     setState(() {
       _totalZakat = (cash + gold + silver + investments) * 0.025;
@@ -34,12 +35,7 @@ class _ZakatCalculatorPageState extends State<ZakatCalculatorPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundSlate,
-      appBar: AppBar(
-        title: const Text('Zakat Calculator', style: TextStyle(color: AppColors.textMain, fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: AppColors.secondaryGold),
-      ),
+      appBar: AppBar(title: Text(context.l10n.zakat_calculator)),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(24.w),
         child: Column(
@@ -50,22 +46,32 @@ class _ZakatCalculatorPageState extends State<ZakatCalculatorPage> {
               child: Column(
                 children: [
                   Text(
-                    'Total Zakat Payable',
-                    style: TextStyle(color: AppColors.textSecondary, fontSize: 14.sp),
+                    context.l10n.total_zakat_payable,
+                    style: TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 14.sp,
+                    ),
                   ),
                   SizedBox(height: 8.h),
                   Text(
                     'PKR ${_totalZakat.toStringAsFixed(2)}',
-                    style: TextStyle(color: AppColors.secondaryGold, fontSize: 32.sp, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      color: AppColors.secondaryGold,
+                      fontSize: 32.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),
             ),
             SizedBox(height: 32.h),
-            _buildInputField('Cash in Hand/Bank', _cashController),
-            _buildInputField('Value of Gold', _goldController),
-            _buildInputField('Value of Silver', _silverController),
-            _buildInputField('Investments/Shares', _investmentsController),
+            _buildInputField(context.l10n.cash_in_hand, _cashController),
+            _buildInputField(context.l10n.gold_value, _goldController),
+            _buildInputField(context.l10n.silver_value, _silverController),
+            _buildInputField(
+              context.l10n.investments_shares,
+              _investmentsController,
+            ),
             SizedBox(height: 32.h),
             SizedBox(
               width: double.infinity,
@@ -75,17 +81,25 @@ class _ZakatCalculatorPageState extends State<ZakatCalculatorPage> {
                   backgroundColor: AppColors.secondaryGold,
                   foregroundColor: Colors.black,
                   padding: EdgeInsets.symmetric(vertical: 16.h),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
                 ),
-                child: const Text('Calculate Zakat', style: TextStyle(fontWeight: FontWeight.bold)),
+                child: Text(
+                  context.l10n.calculate_zakat,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
               ),
             ),
             SizedBox(height: 24.h),
             GlassBox(
               padding: EdgeInsets.all(16.w),
-              child: const Text(
-                'Note: Zakat is 2.5% of your total wealth that exceeds the Nisab threshold for a full lunar year.',
-                style: TextStyle(color: AppColors.textSecondary, fontSize: 12),
+              child: Text(
+                context.l10n.zakat_note,
+                style: const TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 12,
+                ),
                 textAlign: TextAlign.center,
               ),
             ),
@@ -99,7 +113,10 @@ class _ZakatCalculatorPageState extends State<ZakatCalculatorPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: TextStyle(color: AppColors.textMain, fontSize: 14.sp)),
+        Text(
+          label,
+          style: TextStyle(color: AppColors.textMain, fontSize: 14.sp),
+        ),
         SizedBox(height: 8.h),
         GlassBox(
           padding: EdgeInsets.symmetric(horizontal: 16.w),
@@ -107,10 +124,10 @@ class _ZakatCalculatorPageState extends State<ZakatCalculatorPage> {
             controller: controller,
             keyboardType: TextInputType.number,
             style: const TextStyle(color: AppColors.textMain),
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               border: InputBorder.none,
-              hintText: 'Enter amount...',
-              hintStyle: TextStyle(color: AppColors.textSecondary),
+              hintText: context.l10n.enter_amount,
+              hintStyle: const TextStyle(color: AppColors.textSecondary),
             ),
           ),
         ),

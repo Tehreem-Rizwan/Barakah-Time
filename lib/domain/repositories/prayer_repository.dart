@@ -1,5 +1,5 @@
 import '../entities/prayer_times.dart';
 
 abstract class PrayerRepository {
-  Future<PrayerTimesEntity> getPrayerTimes(double latitude, double longitude);
+  Future<PrayerTimesEntity> getPrayerTimes(double latitude, double longitude, {String method});
 }

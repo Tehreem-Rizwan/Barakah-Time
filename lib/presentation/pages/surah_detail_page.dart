@@ -1,3 +1,4 @@
+import 'package:barakah_time/presentation/blocs/settings_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:share_plus/share_plus.dart';
@@ -6,7 +7,11 @@ import '../../domain/entities/surah.dart';
 import '../../domain/entities/ayah.dart';
 import '../../data/repositories/quran_repository.dart';
 import '../widgets/glass_box.dart';
+import 'package:barakah_time/domain/entities/saved_verse.dart';
+import '../../domain/entities/spiritual_activity.dart';
 import '../../injection_container.dart';
+import '../blocs/pulse_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SurahDetailPage extends StatefulWidget {
   final Surah surah;
@@ -48,6 +53,30 @@ class _SurahDetailPageState extends State<SurahDetailPage> {
         elevation: 0,
         iconTheme: const IconThemeData(color: AppColors.secondaryGold),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.check_circle_outline),
+            onPressed: () {
+              final activity = SpiritualActivity(
+                id: DateTime.now().millisecondsSinceEpoch.toString(),
+                type: 'quran',
+                subType: widget.surah.englishName,
+                timestamp: DateTime.now(),
+                points: 20, // 20 points for reading a surah
+              );
+              context.read<PulseBloc>().add(LogActivity(activity));
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Surah ${widget.surah.englishName} logged! ✨'),
+                  backgroundColor: AppColors.primaryEmerald,
+                  duration: const Duration(seconds: 2),
+                ),
+              );
+            },
+            tooltip: 'Mark as Read',
+          ),
+          SizedBox(width: 8.w),
+        ],
       ),
       body: FutureBuilder<List<Ayah>>(
         future: _ayahsFuture,
@@ -104,31 +133,78 @@ class _SurahDetailPageState extends State<SurahDetailPage> {
                             ),
                           ),
                         ),
-                        GestureDetector(
-                          onTap: () {
-                            Share.share(
-                              '📖 *Ayah ${ayah.numberInSurah}* of *Surah ${widget.surah.englishName}*\n\n${ayah.text}\n\n${ayah.translation ?? ""}\n\nShared from *Barakah Time* ✨',
-                            );
-                          },
-                          child: const Icon(
-                            Icons.share_outlined,
-                            color: AppColors.textSecondary,
-                            size: 20,
-                          ),
+                        Row(
+                          children: [
+                            BlocBuilder<PulseBloc, PulseState>(
+                              builder: (context, state) {
+                                bool isSaved = false;
+                                if (state is PulseLoaded) {
+                                  isSaved = state.savedVerses.any(
+                                    (v) =>
+                                        v.id ==
+                                        '${widget.surah.number}:${ayah.numberInSurah}',
+                                  );
+                                }
+                                return IconButton(
+                                  icon: Icon(
+                                    isSaved
+                                        ? Icons.bookmark
+                                        : Icons.bookmark_border,
+                                    color:
+                                        isSaved
+                                            ? AppColors.secondaryGold
+                                            : AppColors.textSecondary,
+                                    size: 20.sp,
+                                  ),
+                                  onPressed: () {
+                                    final savedVerse = SavedVerse(
+                                      id:
+                                          '${widget.surah.number}:${ayah.numberInSurah}',
+                                      surahNumber: widget.surah.number,
+                                      ayahNumber: ayah.numberInSurah,
+                                      text: ayah.text,
+                                      translation: ayah.translation,
+                                      surahName: widget.surah.englishName,
+                                      timestamp: DateTime.now(),
+                                    );
+                                    context.read<PulseBloc>().add(
+                                      ToggleSaveVerse(savedVerse),
+                                    );
+                                  },
+                                );
+                              },
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                Share.share(
+                                  '📖 *Ayah ${ayah.numberInSurah}* of *Surah ${widget.surah.englishName}*\n\n${ayah.text}\n\n${ayah.translation ?? ""}\n\nShared from *Barakah Time* ✨',
+                                );
+                              },
+                              child: const Icon(
+                                Icons.share_outlined,
+                                color: AppColors.textSecondary,
+                                size: 20,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
                     SizedBox(height: 20.h),
-                    Text(
-                      ayah.text,
-                      textAlign: TextAlign.right,
-                      style: TextStyle(
-                        color: AppColors.textMain,
-                        fontSize: 26.sp,
-                        fontFamily: 'Amiri',
-                        height: 2.2,
-                        letterSpacing: 0.5,
-                      ),
+                    BlocBuilder<SettingsBloc, SettingsState>(
+                      builder: (context, settingsState) {
+                        return Text(
+                          ayah.text,
+                          textAlign: TextAlign.right,
+                          style: TextStyle(
+                            color: AppColors.textMain,
+                            fontSize: settingsState.quranFontSize.sp,
+                            fontFamily: 'Amiri',
+                            height: 2.2,
+                            letterSpacing: 0.5,
+                          ),
+                        );
+                      },
                     ),
                     SizedBox(height: 16.h),
                     Text(

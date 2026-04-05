@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../core/theme/app_colors.dart';
 import '../widgets/glass_box.dart';
+import '../../core/localization/app_localizations.dart';
 import 'dart:math' as math;
 
 class QiblaPage extends StatefulWidget {
@@ -16,12 +17,7 @@ class _QiblaPageState extends State<QiblaPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundSlate,
-      appBar: AppBar(
-        title: const Text('Qibla Finder', style: TextStyle(color: AppColors.textMain, fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: AppColors.secondaryGold),
-      ),
+      appBar: AppBar(title: Text(context.l10n.qibla_finder)),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -37,7 +33,10 @@ class _QiblaPageState extends State<QiblaPage> {
                   Container(
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      border: Border.all(color: AppColors.secondaryGold.withOpacity(0.3), width: 2),
+                      border: Border.all(
+                        color: AppColors.secondaryGold.withOpacity(0.3),
+                        width: 2,
+                      ),
                     ),
                   ),
                   // Compass Markings
@@ -51,7 +50,11 @@ class _QiblaPageState extends State<QiblaPage> {
                           padding: EdgeInsets.all(10.w),
                           child: Text(
                             labels[index],
-                            style: TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.bold, fontSize: 16.sp),
+                            style: TextStyle(
+                              color: AppColors.textSecondary,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16.sp,
+                            ),
                           ),
                         ),
                       ),
@@ -63,20 +66,32 @@ class _QiblaPageState extends State<QiblaPage> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.location_on, color: AppColors.secondaryGold, size: 40.sp),
+                        Icon(
+                          Icons.location_on,
+                          color: AppColors.secondaryGold,
+                          size: 40.sp,
+                        ),
                         SizedBox(height: 100.h),
                       ],
                     ),
                   ),
                   // Kaaba Icon in center
-                  Icon(Icons.mosque, color: Colors.white.withOpacity(0.1), size: 100.sp),
+                  Icon(
+                    Icons.mosque,
+                    color: Colors.white.withOpacity(0.1),
+                    size: 100.sp,
+                  ),
                 ],
               ),
             ),
             SizedBox(height: 48.h),
             Text(
-              'Qibla Direction',
-              style: TextStyle(color: AppColors.textMain, fontSize: 24.sp, fontWeight: FontWeight.bold),
+              context.l10n.qibla_direction,
+              style: TextStyle(
+                color: AppColors.textMain,
+                fontSize: 24.sp,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             SizedBox(height: 8.h),
             Text(
@@ -86,9 +101,12 @@ class _QiblaPageState extends State<QiblaPage> {
             SizedBox(height: 32.h),
             GlassBox(
               padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
-              child: const Text(
-                'Point your phone towards the Kaaba',
-                style: TextStyle(color: AppColors.secondaryGold, fontWeight: FontWeight.w500),
+              child: Text(
+                context.l10n.qibla_hint,
+                style: const TextStyle(
+                  color: AppColors.secondaryGold,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
           ],

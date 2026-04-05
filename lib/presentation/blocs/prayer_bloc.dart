@@ -10,12 +10,22 @@ abstract class PrayerEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class LoadPrayerTimesWithLocation extends PrayerEvent {}
+class LoadPrayerTimesWithLocation extends PrayerEvent {
+  final String method;
+  final double? latitude;
+  final double? longitude;
+  LoadPrayerTimesWithLocation({this.method = 'Karachi', this.latitude, this.longitude});
+  @override
+  List<Object?> get props => [method, latitude, longitude];
+}
 
 class LoadPrayerTimes extends PrayerEvent {
   final double latitude;
   final double longitude;
-  LoadPrayerTimes(this.latitude, this.longitude);
+  final String method;
+  LoadPrayerTimes(this.latitude, this.longitude, {this.method = 'Karachi'});
+  @override
+  List<Object?> get props => [latitude, longitude, method];
 }
 
 // States
@@ -51,6 +61,7 @@ class PrayerBloc extends Bloc<PrayerEvent, PrayerState> {
         final times = await repository.getPrayerTimes(
           event.latitude,
           event.longitude,
+          method: event.method,
         );
         emit(PrayerLoaded(times));
       } catch (e) {
@@ -61,27 +72,37 @@ class PrayerBloc extends Bloc<PrayerEvent, PrayerState> {
     on<LoadPrayerTimesWithLocation>((event, emit) async {
       emit(PrayerLoading());
       try {
-        bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-        if (!serviceEnabled) {
-          throw Exception('Location services are disabled.');
-        }
-
-        LocationPermission permission = await Geolocator.checkPermission();
-        if (permission == LocationPermission.denied) {
-          permission = await Geolocator.requestPermission();
-          if (permission == LocationPermission.denied) {
-            throw Exception('Location permissions are denied');
+        double lat, lng;
+        if (event.latitude != null && event.longitude != null) {
+          lat = event.latitude!;
+          lng = event.longitude!;
+        } else {
+          bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+          if (!serviceEnabled) {
+            throw Exception('Location services are disabled.');
           }
+
+          LocationPermission permission = await Geolocator.checkPermission();
+          if (permission == LocationPermission.denied) {
+            permission = await Geolocator.requestPermission();
+            if (permission == LocationPermission.denied) {
+              throw Exception('Location permissions are denied');
+            }
+          }
+
+          if (permission == LocationPermission.deniedForever) {
+            throw Exception('Location permissions are permanently denied');
+          }
+
+          final position = await Geolocator.getCurrentPosition();
+          lat = position.latitude;
+          lng = position.longitude;
         }
 
-        if (permission == LocationPermission.deniedForever) {
-          throw Exception('Location permissions are permanently denied');
-        }
-
-        final position = await Geolocator.getCurrentPosition();
         final times = await repository.getPrayerTimes(
-          position.latitude,
-          position.longitude,
+          lat,
+          lng,
+          method: event.method,
         );
         emit(PrayerLoaded(times));
       } catch (e) {

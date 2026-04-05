@@ -8,7 +8,7 @@ class PrayerRepositoryImpl implements PrayerRepository {
   PrayerRepositoryImpl(this.adhanService);
 
   @override
-  Future<PrayerTimesEntity> getPrayerTimes(double latitude, double longitude) async {
-    return await adhanService.getTimes(latitude, longitude);
+  Future<PrayerTimesEntity> getPrayerTimes(double latitude, double longitude, {String method = 'Karachi'}) async {
+    return await adhanService.getTimes(latitude, longitude, method: method);
   }
 }

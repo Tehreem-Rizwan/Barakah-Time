@@ -5,6 +5,9 @@ import 'package:flutter/material.dart';
 
 import 'pulse_page.dart';
 import 'settings_page.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../blocs/settings_bloc.dart';
+import '../blocs/prayer_bloc.dart';
 
 class MainNavigationPage extends StatefulWidget {
   const MainNavigationPage({super.key});
@@ -25,48 +28,64 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: _pages[_selectedIndex],
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          border: Border(
-            top: BorderSide(color: Colors.white.withOpacity(0.05), width: 1),
+    return BlocListener<SettingsBloc, SettingsState>(
+      listenWhen:
+          (previous, current) =>
+              previous.calculationMethod != current.calculationMethod ||
+              previous.useAutoLocation != current.useAutoLocation ||
+              previous.manualLocation != current.manualLocation,
+      listener: (context, state) {
+        context.read<PrayerBloc>().add(
+          LoadPrayerTimesWithLocation(
+            method: state.calculationMethod,
+            latitude: state.useAutoLocation ? null : state.manualLatitude,
+            longitude: state.useAutoLocation ? null : state.manualLongitude,
           ),
-        ),
-        child: BottomNavigationBar(
-          currentIndex: _selectedIndex,
-          onTap: (index) => setState(() => _selectedIndex = index),
-          backgroundColor: AppColors.backgroundSlate,
-          type: BottomNavigationBarType.fixed,
-          selectedItemColor: AppColors.secondaryGold,
-          unselectedItemColor: AppColors.textSecondary,
-          selectedLabelStyle: const TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 12,
+        );
+      },
+      child: Scaffold(
+        body: _pages[_selectedIndex],
+        bottomNavigationBar: Container(
+          decoration: BoxDecoration(
+            border: Border(
+              top: BorderSide(color: Colors.white.withOpacity(0.05), width: 1),
+            ),
           ),
-          unselectedLabelStyle: const TextStyle(fontSize: 12),
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home_outlined),
-              activeIcon: Icon(Icons.home),
-              label: 'Home',
+          child: BottomNavigationBar(
+            currentIndex: _selectedIndex,
+            onTap: (index) => setState(() => _selectedIndex = index),
+            backgroundColor: AppColors.backgroundSlate,
+            type: BottomNavigationBarType.fixed,
+            selectedItemColor: AppColors.secondaryGold,
+            unselectedItemColor: AppColors.textSecondary,
+            selectedLabelStyle: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 12,
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.menu_book_outlined),
-              activeIcon: Icon(Icons.menu_book),
-              label: 'Quran',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.bolt_outlined),
-              activeIcon: Icon(Icons.bolt),
-              label: 'Pulse',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.settings_outlined),
-              activeIcon: Icon(Icons.settings),
-              label: 'Settings',
-            ),
-          ],
+            unselectedLabelStyle: const TextStyle(fontSize: 12),
+            items: const [
+              BottomNavigationBarItem(
+                icon: Icon(Icons.home_outlined),
+                activeIcon: Icon(Icons.home),
+                label: 'Home',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.menu_book_outlined),
+                activeIcon: Icon(Icons.menu_book),
+                label: 'Quran',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.bolt_outlined),
+                activeIcon: Icon(Icons.bolt),
+                label: 'Pulse',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.settings_outlined),
+                activeIcon: Icon(Icons.settings),
+                label: 'Settings',
+              ),
+            ],
+          ),
         ),
       ),
     );

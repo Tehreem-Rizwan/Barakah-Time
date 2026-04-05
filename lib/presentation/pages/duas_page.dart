@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../core/theme/app_colors.dart';
 import '../widgets/glass_box.dart';
+import '../../core/localization/app_localizations.dart';
 
 class DuasPage extends StatefulWidget {
   const DuasPage({super.key});
@@ -170,12 +171,7 @@ class _DuasPageState extends State<DuasPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundSlate,
-      appBar: AppBar(
-        title: Text('Daily Duas', style: TextStyle(color: AppColors.textMain, fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: AppColors.secondaryGold),
-      ),
+      appBar: AppBar(title: Text(context.l10n.daily_duas)),
       body: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(
@@ -187,7 +183,7 @@ class _DuasPageState extends State<DuasPage> {
                   controller: _searchController,
                   style: const TextStyle(color: AppColors.textMain),
                   decoration: InputDecoration(
-                    hintText: 'Search duas...',
+                    hintText: context.l10n.search_duas,
                     hintStyle: TextStyle(color: AppColors.textSecondary, fontSize: 14.sp),
                     prefixIcon: const Icon(Icons.search, color: AppColors.secondaryGold),
                     suffixIcon: _searchController.text.isNotEmpty
@@ -276,9 +272,9 @@ class _DuasPageState extends State<DuasPage> {
                   children: [
                     Icon(Icons.search_off, color: AppColors.textSecondary, size: 48.sp),
                     SizedBox(height: 16.h),
-                    const Text(
-                      'No duas found',
-                      style: TextStyle(color: AppColors.textSecondary),
+                    Text(
+                      context.l10n.no_duas_found,
+                      style: const TextStyle(color: AppColors.textSecondary),
                     ),
                   ],
                 ),

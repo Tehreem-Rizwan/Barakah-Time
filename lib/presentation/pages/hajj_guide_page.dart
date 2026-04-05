@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../core/theme/app_colors.dart';
 import '../widgets/glass_box.dart';
+import '../../core/localization/app_localizations.dart';
 
 class HajjGuidePage extends StatelessWidget {
   const HajjGuidePage({super.key});
@@ -9,21 +10,54 @@ class HajjGuidePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<Map<String, String>> steps = [
-      {'step': 'Ihram', 'desc': 'Put on the Ihram and make your Niyyah (intention).'},
-      {'step': 'Mina', 'desc': 'Stay in Mina on the 8th of Dhul-Hijjah.'},
-      {'step': 'Arafat', 'desc': 'Stand in Arafat on the 9th of Dhul-Hijjah (The peak of Hajj).'},
-      {'step': 'Muzdalifah', 'desc': 'Collect pebbles and stay overnight.'},
-      {'step': 'Ramy al-Jamarat', 'desc': 'Stoning the Jamarat (the pillars representing devil).'},
-      {'step': 'Qurbani', 'desc': 'Hady (sacrifice of an animal).'},
-      {'step': 'Halq or Taqsir', 'desc': 'Shaving or cutting of hair.'},
-      {'step': 'Tawaf al-Ifadah', 'desc': 'Circumambulation around the Kaaba.'},
-      {'step': 'Sai', 'desc': 'Walking between Safa and Marwa.'},
+      {
+        'step': context.l10n.hajj_step1_title,
+        'desc': context.l10n.hajj_step1_desc,
+      },
+      {
+        'step': context.l10n.hajj_step2_title,
+        'desc': context.l10n.hajj_step2_desc,
+      },
+      {
+        'step': context.l10n.hajj_step3_title,
+        'desc': context.l10n.hajj_step3_desc,
+      },
+      {
+        'step': context.l10n.hajj_step4_title,
+        'desc': context.l10n.hajj_step4_desc,
+      },
+      {
+        'step': context.l10n.hajj_step5_title,
+        'desc': context.l10n.hajj_step5_desc,
+      },
+      {
+        'step': context.l10n.hajj_step6_title,
+        'desc': context.l10n.hajj_step6_desc,
+      },
+      {
+        'step': context.l10n.hajj_step7_title,
+        'desc': context.l10n.hajj_step7_desc,
+      },
+      {
+        'step': context.l10n.hajj_step8_title,
+        'desc': context.l10n.hajj_step8_desc,
+      },
+      {
+        'step': context.l10n.hajj_step9_title,
+        'desc': context.l10n.hajj_step9_desc,
+      },
     ];
 
     return Scaffold(
       backgroundColor: AppColors.backgroundSlate,
       appBar: AppBar(
-        title: const Text('Hajj & Umrah Guide', style: TextStyle(color: AppColors.textMain, fontWeight: FontWeight.bold)),
+        title: Text(
+          context.l10n.hajj_guide,
+          style: const TextStyle(
+            color: AppColors.textMain,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         backgroundColor: Colors.transparent,
         elevation: 0,
         iconTheme: const IconThemeData(color: AppColors.secondaryGold),
@@ -47,7 +81,13 @@ class HajjGuidePage extends StatelessWidget {
                         shape: BoxShape.circle,
                       ),
                       child: Center(
-                        child: Text('${index + 1}', style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                        child: Text(
+                          '${index + 1}',
+                          style: const TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ),
                     if (index != steps.length - 1)
@@ -65,9 +105,22 @@ class HajjGuidePage extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(steps[index]['step']!, style: TextStyle(color: AppColors.textMain, fontSize: 16.sp, fontWeight: FontWeight.bold)),
+                        Text(
+                          steps[index]['step']!,
+                          style: TextStyle(
+                            color: AppColors.textMain,
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                         SizedBox(height: 8.h),
-                        Text(steps[index]['desc']!, style: TextStyle(color: AppColors.textSecondary, fontSize: 13.sp)),
+                        Text(
+                          steps[index]['desc']!,
+                          style: TextStyle(
+                            color: AppColors.textSecondary,
+                            fontSize: 13.sp,
+                          ),
+                        ),
                       ],
                     ),
                   ),

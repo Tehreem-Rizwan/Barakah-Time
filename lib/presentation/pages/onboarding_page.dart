@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../core/theme/app_colors.dart';
-import 'main_navigation_page.dart';
+import '../../core/theme/app_colors.dart';
+import 'auth/sign_in_page.dart';
 
 class OnboardingPage extends StatefulWidget {
   const OnboardingPage({super.key});
@@ -64,7 +65,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                   onPressed: () {
                     if (_currentPage == _pages.length - 1) {
                       Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(builder: (_) => const MainNavigationPage()),
+                        MaterialPageRoute(builder: (_) => const SignInPage()),
                       );
                     } else {
                       _pageController.nextPage(

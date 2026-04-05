@@ -1,8 +1,8 @@
 import 'dart:async';
-import 'dart:math';
 import 'package:barakah_time/presentation/pages/profile_page.dart';
 import 'package:barakah_time/presentation/pages/quran_page.dart';
 import 'package:flutter/material.dart';
+import 'package:hijri/hijri_calendar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:share_plus/share_plus.dart';
@@ -22,9 +22,19 @@ import 'mosque_finder_page.dart';
 import 'hajj_guide_page.dart';
 import 'tasbeeh_page.dart';
 import 'pulse_page.dart';
+import '../../core/localization/app_localizations.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
+
+  String _getHijriDate() {
+    final hijri = HijriCalendar.now();
+    return '${hijri.hDay} ${hijri.longMonthName}';
+  }
+
+  String _getGreeting(BuildContext context) {
+    return context.l10n.greeting;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +81,7 @@ class HomePage extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Assalamualaikum,',
+                                  '${_getGreeting(context)},',
                                   style: Theme.of(
                                     context,
                                   ).textTheme.bodyMedium?.copyWith(
@@ -81,7 +91,7 @@ class HomePage extends StatelessWidget {
                                 ),
                                 SizedBox(height: 4.h),
                                 Text(
-                                  'Barakah Time',
+                                  context.l10n.app_name,
                                   style: Theme.of(
                                     context,
                                   ).textTheme.headlineMedium?.copyWith(
@@ -196,7 +206,7 @@ class HomePage extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Essential Tools',
+                          context.l10n.essential_tools,
                           style: Theme.of(
                             context,
                           ).textTheme.titleLarge?.copyWith(
@@ -213,7 +223,7 @@ class HomePage extends StatelessWidget {
                                 ),
                               ),
                           child: Text(
-                            'See All',
+                            context.l10n.see_all,
                             style: TextStyle(
                               color: AppColors.secondaryGold,
                               fontSize: 13.sp,
@@ -236,20 +246,41 @@ class HomePage extends StatelessWidget {
                       mainAxisSpacing: 16.h,
                       crossAxisSpacing: 12.w,
                       childAspectRatio: 0.75,
-                      children: const [
-                        _QuickActionIcon(icon: Icons.mosque, label: 'Prayer'),
-                        _QuickActionIcon(icon: Icons.menu_book, label: 'Quran'),
-                        _QuickActionIcon(icon: Icons.timer, label: 'Tasbeeh'),
+                      children: [
+                        _QuickActionIcon(
+                          icon: Icons.mosque,
+                          label: context.l10n.prayer_times.split(' ').first,
+                        ),
+                        _QuickActionIcon(
+                          icon: Icons.menu_book,
+                          label: context.l10n.quran,
+                        ),
+                        _QuickActionIcon(
+                          icon: Icons.timer,
+                          label: 'Tasbeeh', // Add to l10n or use literal
+                        ),
                         _QuickActionIcon(
                           icon: Icons.auto_awesome,
                           label: '99 Names',
                         ),
-                        _QuickActionIcon(icon: Icons.explore, label: 'Qibla'),
-                        _QuickActionIcon(icon: Icons.bolt, label: 'Pulse'),
-                        _QuickActionIcon(icon: Icons.favorite, label: 'Duas'),
+                        _QuickActionIcon(
+                          icon: Icons.calendar_month,
+                          label: _getHijriDate(),
+                          onTapOverride:
+                              () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const IslamicCalendarPage(),
+                                ),
+                              ),
+                        ),
+                        _QuickActionIcon(
+                          icon: Icons.favorite,
+                          label: 'Duas',
+                        ),
                         _QuickActionIcon(
                           icon: Icons.settings,
-                          label: 'Settings',
+                          label: context.l10n.settings,
                         ),
                       ],
                     ),
@@ -276,7 +307,7 @@ class HomePage extends StatelessWidget {
                                   ),
                                   SizedBox(width: 8.w),
                                   Text(
-                                    'Daily Ayats',
+                                    context.l10n.daily_ayats,
                                     style: Theme.of(
                                       context,
                                     ).textTheme.titleMedium?.copyWith(
@@ -287,7 +318,7 @@ class HomePage extends StatelessWidget {
                                 ],
                               ),
                               Text(
-                                'Swipe for more',
+                                 context.l10n.swipe_for_more,
                                 style: TextStyle(
                                   color: AppColors.textSecondary,
                                   fontSize: 11.sp,
@@ -479,7 +510,7 @@ class _PrayerTimesCardState extends State<_PrayerTimesCard> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    '${prayer.currentPrayerName} In',
+                    '${prayer.currentPrayerName} ${context.l10n.prayer_in}',
                     style: Theme.of(
                       context,
                     ).textTheme.bodyMedium?.copyWith(color: Colors.white70),
@@ -529,10 +560,19 @@ class _PrayerTimesCardState extends State<_PrayerTimesCard> {
 class _QuickActionIcon extends StatelessWidget {
   final IconData icon;
   final String label;
+  final VoidCallback? onTapOverride;
 
-  const _QuickActionIcon({required this.icon, required this.label});
+  const _QuickActionIcon({
+    required this.icon,
+    required this.label,
+    this.onTapOverride,
+  });
 
   void _handleTap(BuildContext context) {
+    if (onTapOverride != null) {
+      onTapOverride!();
+      return;
+    }
     switch (label) {
       case '99 Names':
         Navigator.push(
@@ -543,7 +583,7 @@ class _QuickActionIcon extends StatelessWidget {
       case 'Tasbeeh':
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => const TasbeehPage()),
+          MaterialPageRoute(builder: (_) => TasbeehPage()),
         );
         break;
       case 'Quran':
@@ -684,7 +724,7 @@ class _SpiritualPulseCard extends StatelessWidget {
                       Padding(
                         padding: EdgeInsets.only(left: 14.w),
                         child: Text(
-                          'Spiritual Pulse',
+                          context.l10n.pulse, // Or 'Spiritual Pulse' if localized
                           style: Theme.of(
                             context,
                           ).textTheme.headlineSmall?.copyWith(
