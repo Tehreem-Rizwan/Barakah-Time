@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "630175539288",
+    "project_id": "barakahtime-cbfa8",
+    "storage_bucket": "barakahtime-cbfa8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:630175539288:android:aa573dbd4b9ea45f5eaa2d",
+        "android_client_info": {
+          "package_name": "com.example.barakah_time"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "630175539288-ltan7qpt5old4qrtdrfem7jdlj8g0rqr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCcE_VEirh5mnoR5WjdjNMDk0UVoiySuWU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "630175539288-ltan7qpt5old4qrtdrfem7jdlj8g0rqr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
