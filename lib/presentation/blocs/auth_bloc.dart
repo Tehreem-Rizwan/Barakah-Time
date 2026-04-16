@@ -2,6 +2,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../domain/entities/user.dart';
+import '../../core/services/supabase_service.dart';
+import '../../core/services/firebase_service.dart';
 
 // Events
 abstract class AuthEvent extends Equatable {
@@ -71,8 +73,10 @@ class AuthError extends AuthState {
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final SharedPreferences prefs;
+  final SupabaseService supabaseService;
+  final FirebaseService firebaseService;
 
-  AuthBloc(this.prefs) : super(AuthInitial()) {
+  AuthBloc(this.prefs, this.supabaseService, this.firebaseService) : super(AuthInitial()) {
     on<AuthCheckRequested>(_onAuthCheckRequested);
     on<SignInRequested>(_onSignInRequested);
     on<SignUpRequested>(_onSignUpRequested);
@@ -83,13 +87,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   Future<void> _onAuthCheckRequested(AuthCheckRequested event, Emitter<AuthState> emit) async {
     final name = prefs.getString('user_name');
+    final uid = prefs.getString('user_id') ?? '1'; // In real app, get from FirebaseAuth
+    
     if (name != null) {
       emit(Authenticated(UserEntity(
-        id: '1',
+        id: uid,
         name: name,
         email: prefs.getString('user_email') ?? '',
         profilePicPath: prefs.getString('user_profile_pic'),
-        memberSince: DateTime.now(), // Placeholder for simplicity
+        memberSince: DateTime.now(),
       )));
     } else {
       emit(Unauthenticated());
@@ -100,12 +106,20 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthLoading());
     await Future.delayed(const Duration(seconds: 1)); // Simulate network
     
-    // Simple mock logic
+    const uid = '123'; // Mock UID
+    await prefs.setString('user_id', uid);
     await prefs.setString('user_name', 'Barakah User');
     await prefs.setString('user_email', event.email);
+
+    // Sync to Firebase
+    await firebaseService.saveUserProfile(
+      uid: uid,
+      name: 'Barakah User',
+      email: event.email,
+    );
     
     emit(Authenticated(UserEntity(
-      id: '1',
+      id: uid,
       name: 'Barakah User',
       email: event.email,
       memberSince: DateTime.now(),
@@ -116,11 +130,20 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthLoading());
     await Future.delayed(const Duration(seconds: 1)); // Simulate network
     
+    const uid = '123'; // Mock UID
+    await prefs.setString('user_id', uid);
     await prefs.setString('user_name', event.name);
     await prefs.setString('user_email', event.email);
+
+    // Sync to Firebase
+    await firebaseService.saveUserProfile(
+      uid: uid,
+      name: event.name,
+      email: event.email,
+    );
     
     emit(Authenticated(UserEntity(
-      id: '1',
+      id: uid,
       name: event.name,
       email: event.email,
       memberSince: DateTime.now(),
@@ -135,17 +158,48 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   Future<void> _onUpdateProfileImage(UpdateProfileImageRequested event, Emitter<AuthState> emit) async {
     if (state is Authenticated) {
       final currentUser = (state as Authenticated).user;
-      await prefs.setString('user_profile_pic', event.imagePath);
-      emit(Authenticated(currentUser.copyWith(profilePicPath: event.imagePath)));
+      emit(AuthLoading());
+      try {
+        final String imageUrl = await supabaseService.uploadImage(event.imagePath);
+        await prefs.setString('user_profile_pic', imageUrl);
+        
+        // Update Firebase
+        await firebaseService.saveUserProfile(
+          uid: currentUser.id,
+          name: currentUser.name,
+          email: currentUser.email,
+          profilePicUrl: imageUrl,
+        );
+
+        emit(Authenticated(currentUser.copyWith(profilePicPath: imageUrl)));
+      } catch (e) {
+        emit(AuthError('Failed to upload profile image: ${e.toString()}'));
+        emit(Authenticated(currentUser));
+      }
     }
   }
 
   Future<void> _onUpdateProfile(UpdateProfileRequested event, Emitter<AuthState> emit) async {
     if (state is Authenticated) {
       final currentUser = (state as Authenticated).user;
-      await prefs.setString('user_name', event.name);
-      await prefs.setString('user_email', event.email);
-      emit(Authenticated(currentUser.copyWith(name: event.name, email: event.email)));
+      emit(AuthLoading());
+      try {
+        await prefs.setString('user_name', event.name);
+        await prefs.setString('user_email', event.email);
+
+        // Update Firebase
+        await firebaseService.saveUserProfile(
+          uid: currentUser.id,
+          name: event.name,
+          email: event.email,
+          profilePicUrl: currentUser.profilePicPath,
+        );
+
+        emit(Authenticated(currentUser.copyWith(name: event.name, email: event.email)));
+      } catch (e) {
+        emit(AuthError('Failed to update profile: ${e.toString()}'));
+        emit(Authenticated(currentUser));
+      }
     }
   }
 }

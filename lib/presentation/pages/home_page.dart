@@ -9,6 +9,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/constants/daily_ayats.dart';
 import '../blocs/prayer_bloc.dart';
+import '../blocs/location_bloc.dart';
 import '../blocs/pulse_bloc.dart';
 import '../widgets/glass_box.dart';
 import 'names_all_page.dart';
@@ -64,7 +65,15 @@ class HomePage extends StatelessWidget {
           ),
 
           SafeArea(
-            child: CustomScrollView(
+            child: BlocListener<LocationBloc, LocationState>(
+              listener: (context, state) {
+                if (state is LocationLoaded) {
+                  context.read<PrayerBloc>().add(
+                    LoadPrayerTimes(state.latitude, state.longitude),
+                  );
+                }
+              },
+              child: CustomScrollView(
               physics: const BouncingScrollPhysics(),
               slivers: [
                 // Premium Header
@@ -421,9 +430,10 @@ class HomePage extends StatelessWidget {
               ],
             ),
           ),
-        ],
-      ),
-    );
+        ),
+      ],
+    ),
+  );
   }
 }
 
@@ -532,11 +542,23 @@ class _PrayerTimesCardState extends State<_PrayerTimesCard> {
                         color: AppColors.secondaryGold,
                       ),
                       SizedBox(width: 4.w),
-                      Text(
-                        'Islamabad, Pakistan',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
+                      BlocBuilder<LocationBloc, LocationState>(
+                        builder: (context, state) {
+                          String locationText = 'Locating...';
+                          if (state is LocationLoaded) {
+                            locationText = '${state.city}, ${state.country}';
+                          } else if (state is LocationError) {
+                            locationText = 'Location Error';
+                          }
+                          return Text(
+                            locationText,
+                            style: Theme.of(
+                              context,
+                            ).textTheme.bodyMedium?.copyWith(
+                              color: AppColors.textSecondary,
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),
