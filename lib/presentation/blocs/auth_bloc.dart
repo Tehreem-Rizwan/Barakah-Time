@@ -5,7 +5,8 @@ import '../../domain/entities/user.dart';
 import '../../core/services/supabase_service.dart';
 import '../../core/services/firebase_service.dart';
 
-// Events
+// ─── Events ───────────────────────────────────────────────────────────────────
+
 abstract class AuthEvent extends Equatable {
   const AuthEvent();
   @override
@@ -22,6 +23,8 @@ class SignInRequested extends AuthEvent {
   List<Object?> get props => [email, password];
 }
 
+class GoogleSignInRequested extends AuthEvent {}
+
 class SignUpRequested extends AuthEvent {
   final String name;
   final String email;
@@ -32,6 +35,17 @@ class SignUpRequested extends AuthEvent {
 }
 
 class SignOutRequested extends AuthEvent {}
+
+class ForgotPasswordRequested extends AuthEvent {
+  final String email;
+  const ForgotPasswordRequested(this.email);
+  @override
+  List<Object?> get props => [email];
+}
+
+class ForgotPasswordSent extends AuthState {
+  const ForgotPasswordSent();
+}
 
 class UpdateProfileImageRequested extends AuthEvent {
   final String imagePath;
@@ -48,7 +62,8 @@ class UpdateProfileRequested extends AuthEvent {
   List<Object?> get props => [name, email];
 }
 
-// States
+// ─── States ───────────────────────────────────────────────────────────────────
+
 abstract class AuthState extends Equatable {
   const AuthState();
   @override
@@ -56,14 +71,18 @@ abstract class AuthState extends Equatable {
 }
 
 class AuthInitial extends AuthState {}
+
 class AuthLoading extends AuthState {}
+
 class Authenticated extends AuthState {
   final UserEntity user;
   const Authenticated(this.user);
   @override
   List<Object?> get props => [user];
 }
+
 class Unauthenticated extends AuthState {}
+
 class AuthError extends AuthState {
   final String message;
   const AuthError(this.message);
@@ -71,99 +90,181 @@ class AuthError extends AuthState {
   List<Object?> get props => [message];
 }
 
+// ─── BLoC ─────────────────────────────────────────────────────────────────────
+
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final SharedPreferences prefs;
   final SupabaseService supabaseService;
   final FirebaseService firebaseService;
 
-  AuthBloc(this.prefs, this.supabaseService, this.firebaseService) : super(AuthInitial()) {
+  AuthBloc(this.prefs, this.supabaseService, this.firebaseService)
+      : super(AuthInitial()) {
     on<AuthCheckRequested>(_onAuthCheckRequested);
     on<SignInRequested>(_onSignInRequested);
+    on<GoogleSignInRequested>(_onGoogleSignInRequested);
     on<SignUpRequested>(_onSignUpRequested);
     on<SignOutRequested>(_onSignOutRequested);
+    on<ForgotPasswordRequested>(_onForgotPasswordRequested);
     on<UpdateProfileImageRequested>(_onUpdateProfileImage);
     on<UpdateProfileRequested>(_onUpdateProfile);
   }
 
-  Future<void> _onAuthCheckRequested(AuthCheckRequested event, Emitter<AuthState> emit) async {
-    final name = prefs.getString('user_name');
-    final uid = prefs.getString('user_id') ?? '1'; // In real app, get from FirebaseAuth
-    
-    if (name != null) {
+  // ── Session Check ───────────────────────────────────────────────────────────
+  Future<void> _onAuthCheckRequested(
+    AuthCheckRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    final firebaseUser = firebaseService.currentUser;
+    if (firebaseUser != null) {
+      final name = firebaseUser.displayName ??
+          prefs.getString('user_name') ??
+          'Barakah User';
       emit(Authenticated(UserEntity(
-        id: uid,
+        id: firebaseUser.uid,
         name: name,
-        email: prefs.getString('user_email') ?? '',
-        profilePicPath: prefs.getString('user_profile_pic'),
-        memberSince: DateTime.now(),
+        email: firebaseUser.email ?? '',
+        profilePicPath:
+            firebaseUser.photoURL ?? prefs.getString('user_profile_pic'),
+        memberSince: firebaseUser.metadata.creationTime ?? DateTime.now(),
       )));
     } else {
       emit(Unauthenticated());
     }
   }
 
-  Future<void> _onSignInRequested(SignInRequested event, Emitter<AuthState> emit) async {
+  // ── Email Sign In ───────────────────────────────────────────────────────────
+  Future<void> _onSignInRequested(
+    SignInRequested event,
+    Emitter<AuthState> emit,
+  ) async {
     emit(AuthLoading());
-    await Future.delayed(const Duration(seconds: 1)); // Simulate network
-    
-    const uid = '123'; // Mock UID
-    await prefs.setString('user_id', uid);
-    await prefs.setString('user_name', 'Barakah User');
-    await prefs.setString('user_email', event.email);
+    try {
+      final firebaseUser = await firebaseService.signIn(
+        email: event.email,
+        password: event.password,
+      );
+      final name = firebaseUser.displayName ??
+          prefs.getString('user_name') ??
+          'Barakah User';
 
-    // Sync to Firebase
-    await firebaseService.saveUserProfile(
-      uid: uid,
-      name: 'Barakah User',
-      email: event.email,
-    );
-    
-    emit(Authenticated(UserEntity(
-      id: uid,
-      name: 'Barakah User',
-      email: event.email,
-      memberSince: DateTime.now(),
-    )));
+      await _syncToFirestoreAndPrefs(
+        uid: firebaseUser.uid,
+        name: name,
+        email: firebaseUser.email ?? event.email,
+      );
+
+      emit(Authenticated(UserEntity(
+        id: firebaseUser.uid,
+        name: name,
+        email: firebaseUser.email ?? event.email,
+        profilePicPath:
+            firebaseUser.photoURL ?? prefs.getString('user_profile_pic'),
+        memberSince: firebaseUser.metadata.creationTime ?? DateTime.now(),
+      )));
+    } catch (e) {
+      emit(AuthError(e.toString()));
+    }
   }
 
-  Future<void> _onSignUpRequested(SignUpRequested event, Emitter<AuthState> emit) async {
+  // ── Google Sign In ──────────────────────────────────────────────────────────
+  Future<void> _onGoogleSignInRequested(
+    GoogleSignInRequested event,
+    Emitter<AuthState> emit,
+  ) async {
     emit(AuthLoading());
-    await Future.delayed(const Duration(seconds: 1)); // Simulate network
-    
-    const uid = '123'; // Mock UID
-    await prefs.setString('user_id', uid);
-    await prefs.setString('user_name', event.name);
-    await prefs.setString('user_email', event.email);
+    try {
+      final firebaseUser = await firebaseService.signInWithGoogle();
+      final name = firebaseUser.displayName ?? 'Barakah User';
 
-    // Sync to Firebase
-    await firebaseService.saveUserProfile(
-      uid: uid,
-      name: event.name,
-      email: event.email,
-    );
-    
-    emit(Authenticated(UserEntity(
-      id: uid,
-      name: event.name,
-      email: event.email,
-      memberSince: DateTime.now(),
-    )));
+      await _syncToFirestoreAndPrefs(
+        uid: firebaseUser.uid,
+        name: name,
+        email: firebaseUser.email ?? '',
+        profilePicUrl: firebaseUser.photoURL,
+      );
+
+      emit(Authenticated(UserEntity(
+        id: firebaseUser.uid,
+        name: name,
+        email: firebaseUser.email ?? '',
+        profilePicPath: firebaseUser.photoURL,
+        memberSince: firebaseUser.metadata.creationTime ?? DateTime.now(),
+      )));
+    } catch (e) {
+      emit(AuthError(e.toString()));
+    }
   }
 
-  Future<void> _onSignOutRequested(SignOutRequested event, Emitter<AuthState> emit) async {
-    await prefs.clear();
+  // ── Sign Up ──────────────────────────────────────────────────────────────────
+  Future<void> _onSignUpRequested(
+    SignUpRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(AuthLoading());
+    try {
+      final firebaseUser = await firebaseService.signUp(
+        name: event.name,
+        email: event.email,
+        password: event.password,
+      );
+
+      await _syncToFirestoreAndPrefs(
+        uid: firebaseUser.uid,
+        name: event.name,
+        email: firebaseUser.email ?? event.email,
+      );
+
+      emit(Authenticated(UserEntity(
+        id: firebaseUser.uid,
+        name: event.name,
+        email: firebaseUser.email ?? event.email,
+        memberSince: firebaseUser.metadata.creationTime ?? DateTime.now(),
+      )));
+    } catch (e) {
+      emit(AuthError(e.toString()));
+    }
+  }
+
+  // ── Sign Out ─────────────────────────────────────────────────────────────────
+  Future<void> _onSignOutRequested(
+    SignOutRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    await firebaseService.signOut();
+    await prefs.remove('user_name');
+    await prefs.remove('user_email');
+    await prefs.remove('user_id');
+    await prefs.remove('user_profile_pic');
     emit(Unauthenticated());
   }
 
-  Future<void> _onUpdateProfileImage(UpdateProfileImageRequested event, Emitter<AuthState> emit) async {
+  // ── Forgot Password ───────────────────────────────────────────────────────────
+  Future<void> _onForgotPasswordRequested(
+    ForgotPasswordRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(AuthLoading());
+    try {
+      await firebaseService.sendPasswordResetEmail(event.email);
+      emit(const ForgotPasswordSent());
+    } catch (e) {
+      emit(AuthError(e.toString()));
+    }
+  }
+
+  // ── Update Profile Image ──────────────────────────────────────────────────────
+  Future<void> _onUpdateProfileImage(
+    UpdateProfileImageRequested event,
+    Emitter<AuthState> emit,
+  ) async {
     if (state is Authenticated) {
       final currentUser = (state as Authenticated).user;
       emit(AuthLoading());
       try {
-        final String imageUrl = await supabaseService.uploadImage(event.imagePath);
+        final String imageUrl =
+            await supabaseService.uploadImage(event.imagePath);
         await prefs.setString('user_profile_pic', imageUrl);
-        
-        // Update Firebase
+
         await firebaseService.saveUserProfile(
           uid: currentUser.id,
           name: currentUser.name,
@@ -173,13 +274,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
         emit(Authenticated(currentUser.copyWith(profilePicPath: imageUrl)));
       } catch (e) {
-        emit(AuthError('Failed to upload profile image: ${e.toString()}'));
+        emit(AuthError('Failed to upload image: $e'));
         emit(Authenticated(currentUser));
       }
     }
   }
 
-  Future<void> _onUpdateProfile(UpdateProfileRequested event, Emitter<AuthState> emit) async {
+  // ── Update Profile ────────────────────────────────────────────────────────────
+  Future<void> _onUpdateProfile(
+    UpdateProfileRequested event,
+    Emitter<AuthState> emit,
+  ) async {
     if (state is Authenticated) {
       final currentUser = (state as Authenticated).user;
       emit(AuthLoading());
@@ -187,7 +292,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         await prefs.setString('user_name', event.name);
         await prefs.setString('user_email', event.email);
 
-        // Update Firebase
         await firebaseService.saveUserProfile(
           uid: currentUser.id,
           name: event.name,
@@ -195,11 +299,30 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           profilePicUrl: currentUser.profilePicPath,
         );
 
-        emit(Authenticated(currentUser.copyWith(name: event.name, email: event.email)));
+        emit(Authenticated(
+            currentUser.copyWith(name: event.name, email: event.email)));
       } catch (e) {
-        emit(AuthError('Failed to update profile: ${e.toString()}'));
+        emit(AuthError('Failed to update profile: $e'));
         emit(Authenticated(currentUser));
       }
     }
+  }
+
+  // ── Helpers ───────────────────────────────────────────────────────────────────
+  Future<void> _syncToFirestoreAndPrefs({
+    required String uid,
+    required String name,
+    required String email,
+    String? profilePicUrl,
+  }) async {
+    await prefs.setString('user_id', uid);
+    await prefs.setString('user_name', name);
+    await prefs.setString('user_email', email);
+    await firebaseService.saveUserProfile(
+      uid: uid,
+      name: name,
+      email: email,
+      profilePicUrl: profilePicUrl,
+    );
   }
 }

@@ -72,6 +72,7 @@ dependencies:
   supabase_flutter: ^2.12.2
   cloud_firestore: ^6.3.0
   geocoding: ^4.0.0
+  google_sign_in: ^7.2.0
 
 dev_dependencies:
   flutter_test:
