@@ -9,9 +9,10 @@ import '../../data/repositories/quran_repository.dart';
 import '../widgets/glass_box.dart';
 import 'package:barakah_time/domain/entities/saved_verse.dart';
 import '../../domain/entities/spiritual_activity.dart';
-import '../../injection_container.dart';
 import '../blocs/pulse_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../core/services/audio_service.dart';
+import '../../injection_container.dart';
 
 class SurahDetailPage extends StatefulWidget {
   final Surah surah;
@@ -74,6 +75,42 @@ class _SurahDetailPageState extends State<SurahDetailPage> {
               );
             },
             tooltip: 'Mark as Read',
+          ),
+          FutureBuilder<List<Ayah>>(
+            future: _ayahsFuture,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                final mediaId = 'surah_${widget.surah.number}';
+                return StreamBuilder<bool>(
+                  stream: sl<AudioService>().isPlayingStream,
+                  builder: (context, playingSnapshot) {
+                    final isPlaying =
+                        sl<AudioService>().currentMediaId == mediaId &&
+                        (playingSnapshot.data ?? false);
+                    return IconButton(
+                      icon: Icon(
+                        isPlaying ? Icons.pause_circle_filled : Icons.play_circle_fill,
+                      ),
+                      onPressed: () {
+                        final urls = snapshot.data!
+                            .map((a) => a.audio)
+                            .whereType<String>()
+                            .toList();
+                        sl<AudioService>().playList(
+                          urls,
+                          title: widget.surah.englishName,
+                          artist: "Mishary Rashid Alafasy",
+                          mediaId: mediaId,
+                        );
+                      },
+                      tooltip: 'Play Surah',
+                      color: AppColors.secondaryGold,
+                    );
+                  },
+                );
+              }
+              return const SizedBox.shrink();
+            },
           ),
           SizedBox(width: 8.w),
         ],
@@ -171,6 +208,68 @@ class _SurahDetailPageState extends State<SurahDetailPage> {
                                       ToggleSaveVerse(savedVerse),
                                     );
                                   },
+                                );
+                              },
+                            ),
+                            StreamBuilder<bool>(
+                              stream: sl<AudioService>().isPlayingStream,
+                              builder: (context, snapshot) {
+                                final mediaId =
+                                    'ayah_${widget.surah.number}_${ayah.numberInSurah}';
+                                final isPlaying =
+                                    sl<AudioService>().currentMediaId == mediaId &&
+                                    (snapshot.data ?? false);
+                                return IconButton(
+                                  icon: Icon(
+                                    isPlaying
+                                        ? Icons.pause_rounded
+                                        : Icons.play_arrow_rounded,
+                                    color: AppColors.secondaryGold,
+                                    size: 24.sp,
+                                  ),
+                                  onPressed: () {
+                                    if (ayah.audio != null) {
+                                      sl<AudioService>().playUrl(
+                                        ayah.audio!,
+                                        title:
+                                            "${widget.surah.englishName} : Ayah ${ayah.numberInSurah}",
+                                        mediaId: mediaId,
+                                      );
+                                    }
+                                  },
+                                );
+                              },
+                            ),
+                            StreamBuilder<bool>(
+                              stream: sl<AudioService>().isPlayingStream,
+                              builder: (context, snapshot) {
+                                final mediaId =
+                                    'trans_${widget.surah.number}_${ayah.numberInSurah}';
+                                final isPlaying =
+                                    sl<AudioService>().currentMediaId == mediaId &&
+                                    (snapshot.data ?? false);
+                                return IconButton(
+                                  icon: Icon(
+                                    isPlaying
+                                        ? Icons.stop_circle_outlined
+                                        : Icons.record_voice_over_outlined,
+                                    color: AppColors.textSecondary,
+                                    size: 20.sp,
+                                  ),
+                                  onPressed: () {
+                                    if (ayah.translation != null) {
+                                      sl<AudioService>().playTts(
+                                        ayah.translation!,
+                                        title: "Translation: Ayah ${ayah.numberInSurah}",
+                                        mediaId: mediaId,
+                                        languageCode: context
+                                            .read<SettingsBloc>()
+                                            .state
+                                            .languageCode,
+                                      );
+                                    }
+                                  },
+                                  tooltip: 'Listen to Translation',
                                 );
                               },
                             ),

@@ -24,16 +24,28 @@ class QuranRepository {
     final enResponse = await http.get(
       Uri.parse('$baseUrl/surah/$number/en.asad'),
     );
+    final audioResponse = await http.get(
+      Uri.parse('$baseUrl/surah/$number/ar.alafasy'),
+    );
 
-    if (arResponse.statusCode == 200 && enResponse.statusCode == 200) {
+    if (arResponse.statusCode == 200 &&
+        enResponse.statusCode == 200 &&
+        audioResponse.statusCode == 200) {
       final arAyahs = json.decode(arResponse.body)['data']['ayahs'] as List;
       final enAyahs = json.decode(enResponse.body)['data']['ayahs'] as List;
+      final audioAyahs = json.decode(audioResponse.body)['data']['ayahs'] as List;
 
       return List.generate(arAyahs.length, (i) {
         final ayah = Ayah.fromJson(arAyahs[i]);
-        return ayah.copyWith(translation: enAyahs[i]['text']);
+        return ayah.copyWith(
+          translation: enAyahs[i]['text'],
+          audio: audioAyahs[i]['audio'],
+          audioSecondary: audioAyahs[i]['audioSecondary'] != null
+              ? List<String>.from(audioAyahs[i]['audioSecondary'])
+              : null,
+        );
       });
     }
-    throw Exception('Failed to load surah translation');
+    throw Exception('Failed to load surah data');
   }
 }

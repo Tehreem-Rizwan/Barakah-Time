@@ -1,6 +1,7 @@
 import 'package:barakah_time/core/theme/app_colors.dart';
 import 'package:barakah_time/presentation/pages/home_page.dart';
 import 'package:barakah_time/presentation/pages/quran_page.dart';
+import 'package:barakah_time/presentation/widgets/audio_control_bar.dart';
 import 'package:flutter/material.dart';
 
 import 'pulse_page.dart';
@@ -44,7 +45,12 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
         );
       },
       child: Scaffold(
-        body: _pages[_selectedIndex],
+        body: Column(
+          children: [
+            Expanded(child: _pages[_selectedIndex]),
+            const AudioControlBar(),
+          ],
+        ),
         bottomNavigationBar: Container(
           decoration: BoxDecoration(
             border: Border(

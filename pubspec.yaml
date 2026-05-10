@@ -73,6 +73,10 @@ dependencies:
   cloud_firestore: ^6.3.0
   geocoding: ^4.0.0
   google_sign_in: ^7.2.0
+  just_audio: ^0.10.5
+  audio_session: ^0.2.3
+  audio_video_progress_bar: ^2.0.3
+  flutter_tts: ^4.2.5
 
 dev_dependencies:
   flutter_test:
@@ -134,4 +138,5 @@ flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
   image_path: "assets/images/app_icon.png"
+  remove_alpha_ios: true
   min_sdk_android: 21 # android min sdk min:16, default:21

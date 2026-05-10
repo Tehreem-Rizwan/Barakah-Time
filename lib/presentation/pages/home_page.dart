@@ -11,6 +11,7 @@ import '../../core/constants/daily_ayats.dart';
 import '../blocs/prayer_bloc.dart';
 import '../blocs/location_bloc.dart';
 import '../blocs/pulse_bloc.dart';
+import '../blocs/settings_bloc.dart';
 import '../widgets/glass_box.dart';
 import 'names_all_page.dart';
 import 'prayer_times_page.dart';
@@ -24,6 +25,8 @@ import 'hajj_guide_page.dart';
 import 'tasbeeh_page.dart';
 import 'pulse_page.dart';
 import '../../core/localization/app_localizations.dart';
+import '../../core/services/audio_service.dart';
+import '../../injection_container.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -365,6 +368,39 @@ class HomePage extends StatelessWidget {
                                             onPressed: () {
                                               Share.share(
                                                 '${ayat.arabic}\n\n${ayat.translation}\n\n${ayat.surah}\n\nBarakah Time ✨',
+                                              );
+                                            },
+                                          ),
+                                          StreamBuilder<bool>(
+                                            stream: sl<AudioService>().isPlayingStream,
+                                            builder: (context, snapshot) {
+                                              final mediaId = 'daily_ayat_${index}';
+                                              final isPlaying =
+                                                  sl<AudioService>().currentMediaId == mediaId;
+                                              return IconButton(
+                                                icon: Icon(
+                                                  isPlaying
+                                                      ? Icons.pause_rounded
+                                                      : Icons.play_arrow_rounded,
+                                                  color: AppColors.secondaryGold,
+                                                  size: 24,
+                                                ),
+                                                onPressed: () {
+                                                  if (isPlaying) {
+                                                    sl<AudioService>().stop();
+                                                  } else {
+                                                    sl<AudioService>().playArabicThenTranslation(
+                                                      ayat.arabic,
+                                                      ayat.translation,
+                                                      title: "Daily Ayat",
+                                                      mediaId: mediaId,
+                                                      translationLang: context
+                                                          .read<SettingsBloc>()
+                                                          .state
+                                                          .languageCode,
+                                                    );
+                                                  }
+                                                },
                                               );
                                             },
                                           ),

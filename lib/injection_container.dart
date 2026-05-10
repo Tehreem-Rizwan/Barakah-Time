@@ -8,6 +8,7 @@ import 'package:barakah_time/presentation/blocs/location_bloc.dart';
 import 'package:barakah_time/core/services/location_service.dart';
 import 'package:barakah_time/core/services/supabase_service.dart';
 import 'package:barakah_time/core/services/firebase_service.dart';
+import 'package:barakah_time/core/services/audio_service.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -47,4 +48,5 @@ Future<void> init() async {
   sl.registerLazySingleton(() => LocationService());
   sl.registerLazySingleton(() => SupabaseService());
   sl.registerLazySingleton(() => FirebaseService());
+  sl.registerLazySingleton(() => AudioService());
 }

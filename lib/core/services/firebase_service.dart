@@ -1,13 +1,48 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
+import 'package:google_sign_in/google_sign_in.dart' as g_sign_in;
 
 class FirebaseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  late final GoogleSignIn _googleSignIn;
+  final g_sign_in.GoogleSignIn _googleSignIn = g_sign_in.GoogleSignIn.instance;
   // ── Getters ──────────────────────────────────────────────────────────────
   User? get currentUser => _auth.currentUser;
+
+  // ── Google Sign In ────────────────────────────────────────────────────────
+  Future<User> signInWithGoogle() async {
+    try {
+      // In version 7.0.0+, authenticate() is used instead of signIn()
+      final g_sign_in.GoogleSignInAccount? googleUser = await _googleSignIn.authenticate();
+      if (googleUser == null) {
+        throw Exception('Google Sign-In canceled');
+      }
+
+      // authentication is now a getter, not a Future
+      final g_sign_in.GoogleSignInAuthentication googleAuth = googleUser.authentication;
+
+      // To get an accessToken in v7.0.0+, we use authorizationClient
+      final authorization = await googleUser.authorizationClient.authorizeScopes([
+        'email',
+        'https://www.googleapis.com/auth/userinfo.profile',
+      ]);
+
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: authorization.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      final UserCredential userCredential =
+          await _auth.signInWithCredential(credential);
+
+      return userCredential.user!;
+    } catch (e) {
+      if (e is FirebaseAuthException) {
+        throw _authException(e);
+      }
+      throw Exception('Failed to sign in with Google: $e');
+    }
+  }
 
   // ── Email / Password ──────────────────────────────────────────────────────
   Future<User> signIn({required String email, required String password}) async {

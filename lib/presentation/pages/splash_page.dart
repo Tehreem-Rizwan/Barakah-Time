@@ -118,7 +118,7 @@ class _SplashPageState extends State<SplashPage>
                         ],
                       ),
                       child: Icon(
-                        Icons.auto_awesome,
+                        Icons.mosque,
                         size: 80.sp,
                         color: AppColors.secondaryGold,
                       ),

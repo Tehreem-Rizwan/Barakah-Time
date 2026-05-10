@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "630175539288-fr6pvrvrdif21h3l4q021lv6pvssl3j8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.barakah_time",
+            "certificate_hash": "2f97297d38ed93a059fbeb0ef2dd5b7987b48d99"
+          }
+        },
+        {
           "client_id": "630175539288-ltan7qpt5old4qrtdrfem7jdlj8g0rqr.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -29,6 +37,13 @@
             {
               "client_id": "630175539288-ltan7qpt5old4qrtdrfem7jdlj8g0rqr.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "630175539288-h16v371sst1fh3bnjo37joajoaplaqsd.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.barakahTime"
+              }
             }
           ]
         }

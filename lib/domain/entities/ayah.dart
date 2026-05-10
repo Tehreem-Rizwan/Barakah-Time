@@ -8,6 +8,8 @@ class Ayah {
   final int page;
   final int ruku;
   final int hizbQuarter;
+  final String? audio;
+  final List<String>? audioSecondary;
 
   Ayah({
     required this.number,
@@ -19,6 +21,8 @@ class Ayah {
     required this.page,
     required this.ruku,
     required this.hizbQuarter,
+    this.audio,
+    this.audioSecondary,
   });
 
   factory Ayah.fromJson(Map<String, dynamic> json) {
@@ -31,6 +35,10 @@ class Ayah {
       page: json['page'],
       ruku: json['ruku'],
       hizbQuarter: json['hizbQuarter'],
+      audio: json['audio'],
+      audioSecondary: json['audioSecondary'] != null
+          ? List<String>.from(json['audioSecondary'])
+          : null,
     );
   }
 
@@ -44,6 +52,8 @@ class Ayah {
     int? page,
     int? ruku,
     int? hizbQuarter,
+    String? audio,
+    List<String>? audioSecondary,
   }) {
     return Ayah(
       number: number ?? this.number,
@@ -55,6 +65,8 @@ class Ayah {
       page: page ?? this.page,
       ruku: ruku ?? this.ruku,
       hizbQuarter: hizbQuarter ?? this.hizbQuarter,
+      audio: audio ?? this.audio,
+      audioSecondary: audioSecondary ?? this.audioSecondary,
     );
   }
 }

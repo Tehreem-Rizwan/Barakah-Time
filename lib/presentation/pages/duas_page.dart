@@ -3,6 +3,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../core/theme/app_colors.dart';
 import '../widgets/glass_box.dart';
 import '../../core/localization/app_localizations.dart';
+import '../../core/services/audio_service.dart';
+import '../../injection_container.dart';
+import '../blocs/settings_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class DuasPage extends StatefulWidget {
   const DuasPage({super.key});
@@ -222,7 +226,41 @@ class _DuasPageState extends State<DuasPage> {
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              Icon(Icons.bookmark_border, color: AppColors.secondaryGold.withOpacity(0.5), size: 20.sp),
+                                  StreamBuilder<bool>(
+                                    stream: sl<AudioService>().isPlayingStream,
+                                    builder: (context, snapshot) {
+                                      final mediaId = 'dua_${dua['title']}';
+                                      final isPlaying =
+                                          sl<AudioService>().currentMediaId == mediaId;
+                                      return IconButton(
+                                        icon: Icon(
+                                          isPlaying
+                                              ? Icons.pause_rounded
+                                              : Icons.play_arrow_rounded,
+                                          color: AppColors.secondaryGold,
+                                          size: 24.sp,
+                                        ),
+                                        onPressed: () {
+                                          if (isPlaying) {
+                                            sl<AudioService>().stop();
+                                          } else {
+                                            sl<AudioService>().playArabicThenTranslation(
+                                              dua['arabic']!,
+                                              dua['meaning']!,
+                                              title: dua['title'],
+                                              mediaId: mediaId,
+                                              translationLang: context
+                                                  .read<SettingsBloc>()
+                                                  .state
+                                                  .languageCode,
+                                            );
+                                          }
+                                        },
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
                             ],
                           ),
                           SizedBox(height: 16.h),
