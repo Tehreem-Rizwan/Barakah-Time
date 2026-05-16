@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:630175539288:android:aa573dbd4b9ea45f5eaa2d",
         "android_client_info": {
-          "package_name": "com.example.barakah_time"
+          "package_name": "com.tehreem.barakah_time"
         }
       },
       "oauth_client": [
@@ -17,7 +17,7 @@
           "client_id": "630175539288-fr6pvrvrdif21h3l4q021lv6pvssl3j8.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.barakah_time",
+            "package_name": "com.tehreem.barakah_time",
             "certificate_hash": "2f97297d38ed93a059fbeb0ef2dd5b7987b48d99"
           }
         },
