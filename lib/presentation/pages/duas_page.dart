@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../../core/theme/app_colors.dart';
-import '../widgets/glass_box.dart';
+import 'package:share_plus/share_plus.dart';
+
 import '../../core/localization/app_localizations.dart';
 import '../../core/services/audio_service.dart';
+import '../../core/utils/arabic_text.dart' as arabic_utils;
 import '../../injection_container.dart';
-import '../blocs/settings_bloc.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import '../widgets/widgets.dart';
 
 class DuasPage extends StatefulWidget {
   const DuasPage({super.key});
@@ -16,311 +17,366 @@ class DuasPage extends StatefulWidget {
 }
 
 class _DuasPageState extends State<DuasPage> {
-  final TextEditingController _searchController = TextEditingController();
-  List<Map<String, String>> _filteredDuas = [];
+  String _query = '';
 
-  final List<Map<String, String>> duas = const [
-    {
-      'title': 'Before Sleeping',
-      'arabic': 'بِاسْمِكَ رَبِّي وَضَعْتُ جَنْبِي، وَبِكَ أَرْفَعُهُ',
-      'transliteration': 'Bismika Rabbi wadatu janbi, wa bika arfauhu',
-      'meaning': 'In Your name, my Lord, I lie down and in Your name I rise.',
-    },
-    {
-      'title': 'Waking Up',
-      'arabic': 'الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا وَإِلَيْهِ النُّشُورُ',
-      'transliteration': 'Alhamdu lillahil-ladhi ahyana bada ma amatana wa ilaihin-nushur',
-      'meaning': 'Praise be to Allah who gave us life after our death and to Him is the return.',
-    },
-    {
-      'title': 'Before Eating',
-      'arabic': 'بِسْمِ اللَّهِ',
-      'transliteration': 'Bismillah',
-      'meaning': 'In the name of Allah.',
-    },
-    {
-      'title': 'After Eating',
-      'arabic': 'الْحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنَا وَسَقَانَا وَجَعَلَنَا مُسْلِمِينَ',
-      'transliteration': 'Alhamdu lillahil-ladhi atamana wa saqana wa jaalana muslimin',
-      'meaning': 'Praise be to Allah who fed us and gave us drink and made us Muslims.',
-    },
-    {
-      'title': 'Entering Home',
-      'arabic': 'بِسْمِ اللَّهِ وَلَجْنَا، وَبِسْمِ اللَّهِ خَرَجْنَا',
-      'transliteration': 'Bismillahi walajna, wa bismillahi kharajna',
-      'meaning': 'In the name of Allah we enter and in the name of Allah we leave.',
-    },
-    {
-      'title': 'Leaving Home',
-      'arabic': 'بِسْمِ اللَّهِ تَوَكَّلْتُ عَلَى اللَّهِ، لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ',
-      'transliteration': 'Bismillahi tawakkaltu alallahi, la hawla wala quwwata illa billah',
-      'meaning': 'In the name of Allah, I place my trust in Allah, there is no might nor power except with Allah.',
-    },
-    {
-      'title': 'Entering Mosque',
-      'arabic': 'اللَّهُمَّ افْتَحْ لِي أَبْوَابَ رَحْمَتِكَ',
-      'transliteration': 'Allahummaftah li abwaba rahmatik',
-      'meaning': 'O Allah, open for me the gates of Your mercy.',
-    },
-    {
-      'title': 'Leaving Mosque',
-      'arabic': 'اللَّهُمَّ إِنِّي أَسْأَلُكَ مِنْ فَضْلِكَ',
-      'transliteration': 'Allahummainni asaluka min fadlik',
-      'meaning': 'O Allah, I ask You from Your favor.',
-    },
-    {
-      'title': 'For Parents',
-      'arabic': 'رَّبِّ ارْحَمْهُمَا كَمَا رَبَّيَانِي صَغِيرًا',
-      'transliteration': 'Rabbi irhamhuma kama rabbayani saghira',
-      'meaning': 'My Lord, have mercy upon them as they brought me up [when I was] small.',
-    },
-    {
-      'title': 'For Knowledge',
-      'arabic': 'رَّبِّ زِدْنِي عِلْمًا',
-      'transliteration': 'Rabbi zidni ilma',
-      'meaning': 'My Lord, increase me in knowledge.',
-    },
-    {
-      'title': 'For Forgiveness (Istighfar)',
-      'arabic': 'أَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ',
-      'transliteration': 'Astaghfirullah wa atubu ilaih',
-      'meaning': 'I seek forgiveness from Allah and turn to Him in repentance.',
-    },
-    {
-      'title': 'Entering Washroom',
-      'arabic': 'اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْخُبُثِ وَالْخَبَائِثِ',
-      'transliteration': 'Allahummainni audhu bika minal-khubuthi wal-khabaith',
-      'meaning': 'O Allah, I seek refuge in You from the male and female devils.',
-    },
-    {
-      'title': 'Leaving Washroom',
-      'arabic': 'غُفْرَانَكَ',
-      'transliteration': 'Ghufranak',
-      'meaning': 'I ask for Your forgiveness.',
-    },
-    {
-      'title': 'Before Wudu',
-      'arabic': 'بِسْمِ اللَّهِ',
-      'transliteration': 'Bismillah',
-      'meaning': 'In the name of Allah.',
-    },
-    {
-      'title': 'After Wudu',
-      'arabic': 'أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ',
-      'transliteration': 'Ashhadu an la ilaha illallahu wahdahu la sharika lah',
-      'meaning': 'I bear witness that there is no god but Allah alone, without partner.',
-    },
-    {
-      'title': 'Traveling',
-      'arabic': 'سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ',
-      'transliteration': 'Subhanalladhi sakhkhara lana hadha wa ma kunna lahu muqrinin',
-      'meaning': 'Glory be to Him who has placed this service at our disposal, for we could not have done it by ourselves.',
-    },
-    {
-      'title': 'Morning/Evening',
-      'arabic': 'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ',
-      'transliteration': 'Subhanallahi wa bihamdihi',
-      'meaning': 'Glory be to Allah and praise be to Him.',
-    },
-    {
-      'title': 'For Protection',
-      'arabic': 'بِسْمِ اللَّهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ',
-      'transliteration': 'Bismillahi-ladhi la yadurru maasmihi shaiun fil-ardi wala fis-samai',
-      'meaning': 'In the name of Allah, with whose name nothing can cause harm in the earth or in the sky.',
-    },
-    {
-      'title': 'Ayatul Kursi (After Prayer)',
-      'arabic': 'اللَّهُ لَا إِلَهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ',
-      'transliteration': 'Allahu la ilaha illa huwal hayyul qayyum',
-      'meaning': 'Allah! There is no god but He, the Living, the Self-subsisting.',
-    },
-    {
-      'title': 'Looking in Mirror',
-      'arabic': 'اللَّهُمَّ كَمَا حَسَّنْتَ خَلْقِي فَحَسِّنْ خُلُقِي',
-      'transliteration': 'Allahumma kama hassanta khalqi fahassin khuluqi',
-      'meaning': 'O Allah, as You have made my physical appearance beautiful, make my character beautiful.',
-    },
-    {
-      'title': 'Wearing Clothes',
-      'arabic': 'الْحَمْدُ لِلَّهِ الَّذِي كَسَانِي هَذَا الثَّوْبَ',
-      'transliteration': 'Alhamdu lillahil-ladhi kasani hadhath-thaub',
-      'meaning': 'Praise be to Allah who has clothed me with this garment.',
-    },
-  ];
+  /// Lowercases and drops apostrophes/hyphens so "al-hamdu" matches
+  /// "alhamdu".
+  static String _latinKey(String s) =>
+      s.toLowerCase().replaceAll(RegExp(r"[\-'’`ʿʾ]"), '');
 
-  @override
-  void initState() {
-    super.initState();
-    _filteredDuas = duas;
-    _searchController.addListener(_onSearchChanged);
+  List<Map<String, String>> _filter(AppLocalizations l10n) {
+    final raw = _query.trim();
+    if (raw.isEmpty) return kDuas;
+    final lower = raw.toLowerCase();
+    final latin = _latinKey(raw);
+    final arabic = arabic_utils.ArabicText.normalize(raw);
+    return kDuas.where((d) {
+      final index = [
+        l10n.translate(d['key']!).toLowerCase(),
+        d['meaning']!.toLowerCase(),
+        _latinKey(d['transliteration']!),
+        arabic_utils.ArabicText.normalize(d['arabic']!),
+      ].join('\n');
+      return index.contains(lower) ||
+          (latin.isNotEmpty && index.contains(latin)) ||
+          (arabic.isNotEmpty && index.contains(arabic));
+    }).toList();
   }
 
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
+  String _shareText(AppLocalizations l10n, Map<String, String> dua) =>
+      '🤲 ${l10n.translate(dua['key']!)}\n\n${dua['arabic']}\n\n'
+      '${dua['transliteration']}\n\n${dua['meaning']}\n\n'
+      '${l10n.shared_from_app} ✨';
 
-  void _onSearchChanged() {
-    setState(() {
-      _filteredDuas = duas
-          .where((dua) =>
-              dua['title']!.toLowerCase().contains(_searchController.text.toLowerCase()) ||
-              dua['meaning']!.toLowerCase().contains(_searchController.text.toLowerCase()))
-          .toList();
-    });
+  Future<void> _copy(Map<String, String> dua) async {
+    final l10n = context.l10n;
+    await Clipboard.setData(ClipboardData(text: _shareText(l10n, dua)));
+    if (!mounted) return;
+    showAppSnackBar(
+      context,
+      l10n.copied,
+      type: SnackType.success,
+      duration: const Duration(seconds: 2),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.backgroundSlate,
-      appBar: AppBar(title: Text(context.l10n.daily_duas)),
+    final l10n = context.l10n;
+    final visible = _filter(l10n);
+    return AppScaffold(
+      title: l10n.daily_duas,
+      bottomBar: const AudioControlBar(),
       body: CustomScrollView(
         slivers: [
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(24.w, 12.h, 24.w, 24.h),
-              child: GlassBox(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-                child: TextField(
-                  controller: _searchController,
-                  style: const TextStyle(color: AppColors.textMain),
-                  decoration: InputDecoration(
-                    hintText: context.l10n.search_duas,
-                    hintStyle: TextStyle(color: AppColors.textSecondary, fontSize: 14.sp),
-                    prefixIcon: const Icon(Icons.search, color: AppColors.secondaryGold),
-                    suffixIcon: _searchController.text.isNotEmpty
-                        ? IconButton(
-                            icon: const Icon(Icons.clear, color: AppColors.textSecondary, size: 18),
-                            onPressed: () => _searchController.clear(),
-                          )
-                        : null,
-                    border: InputBorder.none,
-                  ),
-                ),
-              ),
-            ),
-          ),
           SliverPadding(
-            padding: EdgeInsets.symmetric(horizontal: 24.w),
-            sliver: SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  final dua = _filteredDuas[index];
-                  return Padding(
-                    padding: EdgeInsets.only(bottom: 16.h),
-                    child: GlassBox(
-                      padding: EdgeInsets.all(20.w),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                dua['title']!,
-                                style: TextStyle(
-                                  color: AppColors.secondaryGold,
-                                  fontSize: 16.sp,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                                  StreamBuilder<bool>(
-                                    stream: sl<AudioService>().isPlayingStream,
-                                    builder: (context, snapshot) {
-                                      final mediaId = 'dua_${dua['title']}';
-                                      final isPlaying =
-                                          sl<AudioService>().currentMediaId == mediaId;
-                                      return IconButton(
-                                        icon: Icon(
-                                          isPlaying
-                                              ? Icons.pause_rounded
-                                              : Icons.play_arrow_rounded,
-                                          color: AppColors.secondaryGold,
-                                          size: 24.sp,
-                                        ),
-                                        onPressed: () {
-                                          if (isPlaying) {
-                                            sl<AudioService>().stop();
-                                          } else {
-                                            sl<AudioService>().playArabicThenTranslation(
-                                              dua['arabic']!,
-                                              dua['meaning']!,
-                                              title: dua['title'],
-                                              mediaId: mediaId,
-                                              translationLang: context
-                                                  .read<SettingsBloc>()
-                                                  .state
-                                                  .languageCode,
-                                            );
-                                          }
-                                        },
-                                      );
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 16.h),
-                          Text(
-                            dua['arabic']!,
-                            textAlign: TextAlign.right,
-                            style: TextStyle(
-                              color: AppColors.textMain,
-                              fontSize: 22.sp,
-                              fontFamily: 'Amiri',
-                              height: 1.8,
-                            ),
-                          ),
-                          SizedBox(height: 12.h),
-                          Text(
-                            dua['transliteration']!,
-                            style: TextStyle(
-                              color: AppColors.textMain.withOpacity(0.8),
-                              fontSize: 14.sp,
-                              fontStyle: FontStyle.italic,
-                            ),
-                          ),
-                          SizedBox(height: 8.h),
-                          Text(
-                            dua['meaning']!,
-                            style: TextStyle(
-                              color: AppColors.textSecondary,
-                              fontSize: 12.sp,
-                              height: 1.4,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-                childCount: _filteredDuas.length,
+            padding: AppSpacing.only(start: 24, end: 24, top: 16, bottom: 16),
+            sliver: SliverToBoxAdapter(
+              child: AppSearchField(
+                hint: l10n.search_duas,
+                onChanged: (v) => setState(() => _query = v),
               ),
             ),
           ),
-          if (_filteredDuas.isEmpty)
-            SliverFillRemaining(
-              hasScrollBody: false,
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.search_off, color: AppColors.textSecondary, size: 48.sp),
-                    SizedBox(height: 16.h),
-                    Text(
-                      context.l10n.no_duas_found,
-                      style: const TextStyle(color: AppColors.textSecondary),
+          if (visible.isEmpty)
+            SliverToBoxAdapter(
+              child: StateView.empty(
+                icon: Icons.search_off_rounded,
+                message: l10n.no_duas_found,
+              ),
+            )
+          else
+            SliverPadding(
+              padding: AppSpacing.only(start: 24, end: 24, bottom: 32),
+              sliver: SliverList.separated(
+                itemCount: visible.length,
+                separatorBuilder: (_, _) => SizedBox(height: AppSpacing.vLg),
+                itemBuilder:
+                    (context, index) => _DuaCard(
+                      dua: visible[index],
+                      onCopy: () => _copy(visible[index]),
+                      onShare:
+                          () => Share.share(_shareText(l10n, visible[index])),
                     ),
-                  ],
-                ),
               ),
             ),
-          SliverToBoxAdapter(child: SizedBox(height: 40.h)),
         ],
       ),
     );
   }
 }
+
+class _DuaCard extends StatelessWidget {
+  const _DuaCard({
+    required this.dua,
+    required this.onCopy,
+    required this.onShare,
+  });
+
+  final Map<String, String> dua;
+  final VoidCallback onCopy;
+  final VoidCallback onShare;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final textTheme = Theme.of(context).textTheme;
+    final audioService = sl<AudioService>();
+    final title = l10n.translate(dua['key']!);
+    final mediaId = dua['key']!;
+    final reference = dua['reference'];
+
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: textTheme.titleMedium?.copyWith(
+                    color: AppColors.secondaryGold,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              StreamBuilder<AudioStatus>(
+                stream: audioService.statusStream,
+                initialData: audioService.status,
+                builder: (context, snapshot) {
+                  final status = snapshot.data ?? AudioStatus.idle;
+                  final isPlaying = status.isPlayingMedia(mediaId);
+                  return IconButton(
+                    tooltip: isPlaying ? l10n.stop : l10n.play,
+                    icon: Icon(
+                      isPlaying ? Icons.stop_rounded : Icons.play_arrow_rounded,
+                      color: AppColors.secondaryGold,
+                      size: 26.sp,
+                    ),
+                    onPressed: () {
+                      if (isPlaying) {
+                        audioService.stop();
+                      } else {
+                        // Dua meanings are English text.
+                        audioService.playArabicThenTranslation(
+                          dua['arabic']!,
+                          dua['meaning']!,
+                          title: title,
+                          mediaId: mediaId,
+                          translationLang: 'en',
+                        );
+                      }
+                    },
+                  );
+                },
+              ),
+            ],
+          ),
+          SizedBox(height: AppSpacing.vMd),
+          ArabicText(dua['arabic']!, fontSize: 22.sp),
+          SizedBox(height: AppSpacing.vMd),
+          TranslationText(
+            dua['transliteration']!,
+            style: textTheme.bodyMedium?.copyWith(
+              color: AppColors.textMain,
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+          SizedBox(height: AppSpacing.vSm),
+          TranslationText(dua['meaning']!),
+          if (reference != null) ...[
+            SizedBox(height: AppSpacing.vXs),
+            Text(
+              reference,
+              textDirection: TextDirection.ltr,
+              style: textTheme.labelSmall?.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ],
+          SizedBox(height: AppSpacing.vSm),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              IconButton(
+                tooltip: l10n.copy,
+                icon: Icon(
+                  Icons.copy_rounded,
+                  color: AppColors.textSecondary,
+                  size: 20.sp,
+                ),
+                onPressed: onCopy,
+              ),
+              IconButton(
+                tooltip: l10n.share,
+                icon: Icon(
+                  Icons.share_outlined,
+                  color: AppColors.textSecondary,
+                  size: 20.sp,
+                ),
+                onPressed: onShare,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Dua data. Titles are l10n keys; meanings are English.
+const List<Map<String, String>> kDuas = [
+  {
+    'key': 'dua_before_sleeping',
+    'arabic': 'بِاسْمِكَ رَبِّي وَضَعْتُ جَنْبِي، وَبِكَ أَرْفَعُهُ',
+    'transliteration': 'Bismika Rabbi wadatu janbi, wa bika arfauhu',
+    'meaning': 'In Your name, my Lord, I lie down and in Your name I rise.',
+  },
+  {
+    'key': 'dua_waking_up',
+    'arabic':
+        'الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا وَإِلَيْهِ النُّشُورُ',
+    'transliteration':
+        'Alhamdu lillahil-ladhi ahyana bada ma amatana wa ilaihin-nushur',
+    'meaning':
+        'Praise be to Allah who gave us life after our death and to Him is the return.',
+  },
+  {
+    'key': 'dua_before_eating',
+    'arabic': 'بِسْمِ اللَّهِ',
+    'transliteration': 'Bismillah',
+    'meaning': 'In the name of Allah.',
+  },
+  {
+    'key': 'dua_after_eating',
+    'arabic':
+        'الْحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنَا وَسَقَانَا وَجَعَلَنَا مُسْلِمِينَ',
+    'transliteration':
+        'Alhamdu lillahil-ladhi atamana wa saqana wa jaalana muslimin',
+    'meaning':
+        'Praise be to Allah who fed us and gave us drink and made us Muslims.',
+  },
+  {
+    'key': 'dua_entering_home',
+    'arabic': 'بِسْمِ اللَّهِ وَلَجْنَا، وَبِسْمِ اللَّهِ خَرَجْنَا',
+    'transliteration': 'Bismillahi walajna, wa bismillahi kharajna',
+    'meaning':
+        'In the name of Allah we enter and in the name of Allah we leave.',
+  },
+  {
+    'key': 'dua_leaving_home',
+    'arabic':
+        'بِسْمِ اللَّهِ تَوَكَّلْتُ عَلَى اللَّهِ، لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ',
+    'transliteration':
+        'Bismillahi tawakkaltu alallahi, la hawla wala quwwata illa billah',
+    'meaning':
+        'In the name of Allah, I place my trust in Allah, there is no might nor power except with Allah.',
+  },
+  {
+    'key': 'dua_entering_mosque',
+    'arabic': 'اللَّهُمَّ افْتَحْ لِي أَبْوَابَ رَحْمَتِكَ',
+    'transliteration': 'Allahummaftah li abwaba rahmatik',
+    'meaning': 'O Allah, open for me the gates of Your mercy.',
+  },
+  {
+    'key': 'dua_leaving_mosque',
+    'arabic': 'اللَّهُمَّ إِنِّي أَسْأَلُكَ مِنْ فَضْلِكَ',
+    'transliteration': 'Allahummainni asaluka min fadlik',
+    'meaning': 'O Allah, I ask You from Your favor.',
+  },
+  {
+    'key': 'dua_for_parents',
+    'arabic': 'رَّبِّ ارْحَمْهُمَا كَمَا رَبَّيَانِي صَغِيرًا',
+    'transliteration': 'Rabbi irhamhuma kama rabbayani saghira',
+    'meaning':
+        'My Lord, have mercy upon them as they brought me up [when I was] small.',
+  },
+  {
+    'key': 'dua_for_knowledge',
+    'arabic': 'رَّبِّ زِدْنِي عِلْمًا',
+    'transliteration': 'Rabbi zidni ilma',
+    'meaning': 'My Lord, increase me in knowledge.',
+  },
+  {
+    'key': 'dua_forgiveness',
+    'arabic': 'أَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ',
+    'transliteration': 'Astaghfirullah wa atubu ilaih',
+    'meaning': 'I seek forgiveness from Allah and turn to Him in repentance.',
+  },
+  {
+    'key': 'dua_entering_washroom',
+    'arabic': 'اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْخُبُثِ وَالْخَبَائِثِ',
+    'transliteration': 'Allahummainni audhu bika minal-khubuthi wal-khabaith',
+    'meaning': 'O Allah, I seek refuge in You from the male and female devils.',
+  },
+  {
+    'key': 'dua_leaving_washroom',
+    'arabic': 'غُفْرَانَكَ',
+    'transliteration': 'Ghufranak',
+    'meaning': 'I ask for Your forgiveness.',
+  },
+  {
+    'key': 'dua_before_wudu',
+    'arabic': 'بِسْمِ اللَّهِ',
+    'transliteration': 'Bismillah',
+    'meaning': 'In the name of Allah.',
+  },
+  {
+    'key': 'dua_after_wudu',
+    'arabic':
+        'أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ',
+    'transliteration': 'Ashhadu an la ilaha illallahu wahdahu la sharika lah',
+    'meaning':
+        'I bear witness that there is no god but Allah alone, without partner.',
+  },
+  {
+    'key': 'dua_traveling',
+    'arabic':
+        'سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ',
+    'transliteration':
+        'Subhanalladhi sakhkhara lana hadha wa ma kunna lahu muqrinin',
+    'meaning':
+        'Glory be to Him who has placed this service at our disposal, for we could not have done it by ourselves.',
+  },
+  {
+    'key': 'dua_morning_evening',
+    'arabic': 'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ',
+    'transliteration': 'Subhanallahi wa bihamdihi',
+    'meaning': 'Glory be to Allah and praise be to Him.',
+  },
+  {
+    'key': 'dua_protection',
+    'arabic':
+        'بِسْمِ اللَّهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ',
+    'transliteration':
+        'Bismillahi-ladhi la yadurru maasmihi shaiun fil-ardi wala fis-samai',
+    'meaning':
+        'In the name of Allah, with whose name nothing can cause harm in the earth or in the sky.',
+  },
+  {
+    'key': 'dua_ayatul_kursi',
+    'reference': '2:255',
+    'arabic':
+        'اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ ۚ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ ۚ لَهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ ۗ مَنْ ذَا الَّذِي يَشْفَعُ عِنْدَهُ إِلَّا بِإِذْنِهِ ۚ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ ۖ وَلَا يُحِيطُونَ بِشَيْءٍ مِنْ عِلْمِهِ إِلَّا بِمَا شَاءَ ۚ وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالْأَرْضَ ۖ وَلَا يَئُودُهُ حِفْظُهُمَا ۚ وَهُوَ الْعَلِيُّ الْعَظِيمُ',
+    'transliteration':
+        "Allahu la ilaha illa Huwal-Hayyul-Qayyum. La ta'khudhuhu sinatun wa la nawm. Lahu ma fis-samawati wa ma fil-ard. Man dhal-ladhi yashfa'u 'indahu illa bi-idhnih. Ya'lamu ma bayna aydihim wa ma khalfahum, wa la yuhituna bi-shay'im-min 'ilmihi illa bima sha'. Wasi'a kursiyyuhus-samawati wal-ard, wa la ya'uduhu hifzuhuma, wa Huwal-'Aliyyul-'Azim.",
+    'meaning':
+        'Allah: there is no god but Him, the Ever-Living, the Sustainer of all that exists. Neither drowsiness nor sleep overtakes Him. To Him belongs everything in the heavens and everything on the earth. Who could intercede with Him except by His leave? He knows what lies before them and what lies behind them, and they grasp nothing of His knowledge except what He wills. His Kursi extends over the heavens and the earth, and guarding them does not weary Him. He is the Most High, the Most Great. (Al-Baqarah 2:255)',
+  },
+  {
+    'key': 'dua_mirror',
+    'arabic': 'اللَّهُمَّ كَمَا حَسَّنْتَ خَلْقِي فَحَسِّنْ خُلُقِي',
+    'transliteration': 'Allahumma kama hassanta khalqi fahassin khuluqi',
+    'meaning':
+        'O Allah, as You have made my physical appearance beautiful, make my character beautiful.',
+  },
+  {
+    'key': 'dua_wearing_clothes',
+    'arabic': 'الْحَمْدُ لِلَّهِ الَّذِي كَسَانِي هَذَا الثَّوْبَ',
+    'transliteration': 'Alhamdu lillahil-ladhi kasani hadhath-thaub',
+    'meaning': 'Praise be to Allah who has clothed me with this garment.',
+  },
+];

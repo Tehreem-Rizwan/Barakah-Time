@@ -1,752 +1,712 @@
-import 'dart:async';
-import 'package:barakah_time/presentation/pages/profile_page.dart';
-import 'package:barakah_time/presentation/pages/quran_page.dart';
 import 'package:flutter/material.dart';
-import 'package:hijri/hijri_calendar.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl/intl.dart' hide TextDirection;
 import 'package:share_plus/share_plus.dart';
-import '../../core/theme/app_colors.dart';
+
 import '../../core/constants/daily_ayats.dart';
-import '../blocs/prayer_bloc.dart';
-import '../blocs/location_bloc.dart';
-import '../blocs/pulse_bloc.dart';
-import '../blocs/settings_bloc.dart';
-import '../widgets/glass_box.dart';
-import 'names_all_page.dart';
-import 'prayer_times_page.dart';
-import 'duas_page.dart';
-import 'tools_grid_page.dart';
-import 'qibla_page.dart';
-import 'zakat_calculator_page.dart';
-import 'islamic_calendar_page.dart';
-import 'mosque_finder_page.dart';
-import 'hajj_guide_page.dart';
-import 'tasbeeh_page.dart';
-import 'pulse_page.dart';
 import '../../core/localization/app_localizations.dart';
 import '../../core/services/audio_service.dart';
+import '../../domain/entities/prayer_times.dart';
+import '../../domain/entities/spiritual_pulse.dart';
+import '../../domain/entities/badge.dart';
+import '../../domain/entities/user.dart';
 import '../../injection_container.dart';
+import '../blocs/auth_bloc.dart';
+import '../blocs/prayer_bloc.dart';
+import '../blocs/pulse_bloc.dart';
+import '../widgets/widgets.dart';
+import 'duas_page.dart';
+import 'hijri_label.dart';
+import 'islamic_calendar_page.dart';
+import 'main_navigation_scope.dart';
+import 'names_all_page.dart';
+import 'prayer_times_page.dart';
+import 'profile_page.dart' show ProfilePage, UserAvatar;
+import 'pulse_page.dart';
+import 'qibla_page.dart';
+import 'quran_page.dart';
+import 'tasbeeh_page.dart';
+import 'tools_grid_page.dart';
+
+/// Number of daily ayats shown in the slider (starting from today's ayat).
+const int _ayatsShown = 5;
+
+/// Index of today's ayat; changes every calendar day.
+int dailyAyatStartIndex(DateTime now, int count) {
+  if (count == 0) return 0;
+  final start = DateTime.utc(now.year, 1, 1);
+  final today = DateTime.utc(now.year, now.month, now.day);
+  final dayOfYear = today.difference(start).inDays;
+  return (now.year * 366 + dayOfYear) % count;
+}
+
+/// l10n key of the time-of-day greeting for [now].
+String homeGreetingKey(DateTime now) {
+  final h = now.hour;
+  if (h >= 4 && h < 12) return 'good_morning';
+  if (h >= 12 && h < 17) return 'good_afternoon';
+  return 'good_evening';
+}
+
+/// First name of [user], or [fallback] when the user has no name.
+String homeFirstName(UserEntity user, String fallback) {
+  if (!user.hasName) return fallback;
+  return user.name.trim().split(RegExp(r'\s+')).first;
+}
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
-  String _getHijriDate() {
-    final hijri = HijriCalendar.now();
-    return '${hijri.hDay} ${hijri.longMonthName}';
-  }
-
-  String _getGreeting(BuildContext context) {
-    return context.l10n.greeting;
-  }
+  Future<void> _refresh(BuildContext context) =>
+      Future.wait([refreshPrayerTimes(context), refreshPulse(context)]);
 
   @override
   Widget build(BuildContext context) {
-    // Select daily ayat based on date to keep it consistent for the day
-    final dayOfYear =
-        DateTime.now().difference(DateTime(DateTime.now().year, 1, 1)).inDays;
-    final ayat = dailyAyats[dayOfYear % dailyAyats.length];
+    final l10n = context.l10n;
+    Widget padded(Widget child) => SliverToBoxAdapter(
+      child: Padding(padding: AppSpacing.pageHorizontal, child: child),
+    );
+    SliverToBoxAdapter gap(double h) =>
+        SliverToBoxAdapter(child: SizedBox(height: h));
 
-    return Scaffold(
-      backgroundColor: AppColors.backgroundSlate,
-      body: Stack(
-        children: [
-          // Background Gradient
-          Positioned.fill(
-            child: Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFF00382E), // Deeper Emerald
-                    AppColors.backgroundSlate,
-                  ],
-                ),
-              ),
-            ),
+    return AppScaffold(
+      gradientBackground: true,
+      body: RefreshIndicator(
+        onRefresh: () => _refresh(context),
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(
+            parent: BouncingScrollPhysics(),
           ),
-
-          SafeArea(
-            child: BlocListener<LocationBloc, LocationState>(
-              listener: (context, state) {
-                if (state is LocationLoaded) {
-                  context.read<PrayerBloc>().add(
-                    LoadPrayerTimes(state.latitude, state.longitude),
-                  );
-                }
-              },
-              child: CustomScrollView(
-              physics: const BouncingScrollPhysics(),
-              slivers: [
-                // Premium Header
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: EdgeInsets.fromLTRB(24.w, 20.h, 24.w, 0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  '${_getGreeting(context)},',
-                                  style: Theme.of(
-                                    context,
-                                  ).textTheme.bodyMedium?.copyWith(
-                                    color: AppColors.textSecondary,
-                                    letterSpacing: 1.1,
-                                  ),
-                                ),
-                                SizedBox(height: 4.h),
-                                Text(
-                                  context.l10n.app_name,
-                                  style: Theme.of(
-                                    context,
-                                  ).textTheme.headlineMedium?.copyWith(
-                                    color: AppColors.textMain,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 1.2,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            IconButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => const ProfilePage(),
-                                  ),
-                                );
-                              },
-                              icon: CircleAvatar(
-                                backgroundColor: Colors.white.withOpacity(0.1),
-                                child: const Icon(
-                                  Icons.person_outline,
-                                  color: AppColors.textMain,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 32.h),
-                        BlocBuilder<PrayerBloc, PrayerState>(
-                          builder: (context, state) {
-                            if (state is PrayerLoading) {
-                              return GlassBox(
-                                height: 180.h,
-                                child: const Center(
-                                  child: CircularProgressIndicator(
-                                    color: AppColors.secondaryGold,
-                                  ),
-                                ),
-                              );
-                            }
-                            if (state is PrayerLoaded) {
-                              return _PrayerTimesCard(
-                                prayerTimes: state.prayerTimes,
-                              );
-                            }
-                            if (state is PrayerError) {
-                              return GlassBox(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 32.w,
-                                  vertical: 24.h,
-                                ),
-                                child: Column(
-                                  children: [
-                                    Icon(
-                                      Icons.location_off_outlined,
-                                      color: AppColors.secondaryGold
-                                          .withOpacity(0.5),
-                                      size: 40.sp,
-                                    ),
-                                    SizedBox(height: 16.h),
-                                    Text(
-                                      'Location Access Required',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        color: AppColors.textMain,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16.sp,
-                                      ),
-                                    ),
-                                    SizedBox(height: 8.h),
-                                    Text(
-                                      'Please enable location to see prayer times',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        color: AppColors.textSecondary,
-                                        fontSize: 13.sp,
-                                      ),
-                                    ),
-                                    SizedBox(height: 16.h),
-                                    TextButton(
-                                      onPressed:
-                                          () => context.read<PrayerBloc>().add(
-                                            LoadPrayerTimesWithLocation(),
-                                          ),
-                                      child: const Text(
-                                        'Grant Access & Retry',
-                                        style: TextStyle(
-                                          color: AppColors.secondaryGold,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }
-                            return const SizedBox.shrink();
-                          },
-                        ),
-                      ],
+          slivers: [
+            gap(AppSpacing.vLg),
+            padded(const _HomeHeader()),
+            gap(AppSpacing.vXl),
+            padded(const _PrayerHeroCard()),
+            gap(AppSpacing.vXl),
+            padded(
+              SectionHeader(
+                title: l10n.essential_tools,
+                actionLabel: l10n.see_all,
+                onAction:
+                    () => Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const ToolsGridPage()),
                     ),
-                  ),
-                ),
-
-                // Quick Actions Title
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: EdgeInsets.fromLTRB(24.w, 32.h, 24.w, 16.h),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          context.l10n.essential_tools,
-                          style: Theme.of(
-                            context,
-                          ).textTheme.titleLarge?.copyWith(
-                            color: AppColors.textMain,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap:
-                              () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => const ToolsGridPage(),
-                                ),
-                              ),
-                          child: Text(
-                            context.l10n.see_all,
-                            style: TextStyle(
-                              color: AppColors.secondaryGold,
-                              fontSize: 13.sp,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                // Quick Action Grid
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 24.w),
-                    child: GridView.count(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      crossAxisCount: 4,
-                      mainAxisSpacing: 16.h,
-                      crossAxisSpacing: 12.w,
-                      childAspectRatio: 0.75,
-                      children: [
-                        _QuickActionIcon(
-                          icon: Icons.mosque,
-                          label: context.l10n.prayer_times.split(' ').first,
-                        ),
-                        _QuickActionIcon(
-                          icon: Icons.menu_book,
-                          label: context.l10n.quran,
-                        ),
-                        _QuickActionIcon(
-                          icon: Icons.timer,
-                          label: 'Tasbeeh', // Add to l10n or use literal
-                        ),
-                        _QuickActionIcon(
-                          icon: Icons.auto_awesome,
-                          label: '99 Names',
-                        ),
-                        _QuickActionIcon(
-                          icon: Icons.calendar_month,
-                          label: _getHijriDate(),
-                          onTapOverride:
-                              () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => const IslamicCalendarPage(),
-                                ),
-                              ),
-                        ),
-                        _QuickActionIcon(
-                          icon: Icons.favorite,
-                          label: 'Duas',
-                        ),
-                        _QuickActionIcon(
-                          icon: Icons.settings,
-                          label: context.l10n.settings,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                // Daily Ayat Slider
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: EdgeInsets.only(top: 16.h, bottom: 24.h),
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 24.w),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                children: [
-                                  const Icon(
-                                    Icons.format_quote,
-                                    color: AppColors.secondaryGold,
-                                    size: 24,
-                                  ),
-                                  SizedBox(width: 8.w),
-                                  Text(
-                                    context.l10n.daily_ayats,
-                                    style: Theme.of(
-                                      context,
-                                    ).textTheme.titleMedium?.copyWith(
-                                      color: AppColors.textMain,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Text(
-                                 context.l10n.swipe_for_more,
-                                style: TextStyle(
-                                  color: AppColors.textSecondary,
-                                  fontSize: 11.sp,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 16.h),
-                        SizedBox(
-                          height: 220.h,
-                          child: PageView.builder(
-                            itemCount: 5, // Show 5 relevant ayats
-                            controller: PageController(viewportFraction: 0.9),
-                            itemBuilder: (context, index) {
-                              final ayat =
-                                  dailyAyats[index % dailyAyats.length];
-                              return Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 8.w),
-                                child: GlassBox(
-                                  padding: EdgeInsets.all(20.w),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.end,
-                                        children: [
-                                          IconButton(
-                                            icon: const Icon(
-                                              Icons.share_outlined,
-                                              color: AppColors.textSecondary,
-                                              size: 18,
-                                            ),
-                                            onPressed: () {
-                                              Share.share(
-                                                '${ayat.arabic}\n\n${ayat.translation}\n\n${ayat.surah}\n\nBarakah Time ✨',
-                                              );
-                                            },
-                                          ),
-                                          StreamBuilder<bool>(
-                                            stream: sl<AudioService>().isPlayingStream,
-                                            builder: (context, snapshot) {
-                                              final mediaId = 'daily_ayat_${index}';
-                                              final isPlaying =
-                                                  sl<AudioService>().currentMediaId == mediaId;
-                                              return IconButton(
-                                                icon: Icon(
-                                                  isPlaying
-                                                      ? Icons.pause_rounded
-                                                      : Icons.play_arrow_rounded,
-                                                  color: AppColors.secondaryGold,
-                                                  size: 24,
-                                                ),
-                                                onPressed: () {
-                                                  if (isPlaying) {
-                                                    sl<AudioService>().stop();
-                                                  } else {
-                                                    sl<AudioService>().playArabicThenTranslation(
-                                                      ayat.arabic,
-                                                      ayat.translation,
-                                                      title: "Daily Ayat",
-                                                      mediaId: mediaId,
-                                                      translationLang: context
-                                                          .read<SettingsBloc>()
-                                                          .state
-                                                          .languageCode,
-                                                    );
-                                                  }
-                                                },
-                                              );
-                                            },
-                                          ),
-                                        ],
-                                      ),
-                                      Text(
-                                        ayat.arabic,
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          color: AppColors.secondaryGold,
-                                          fontSize: 20.sp,
-                                          fontFamily: 'Amiri',
-                                          height: 1.6,
-                                        ),
-                                      ),
-                                      SizedBox(height: 12.h),
-                                      Text(
-                                        '“${ayat.translation}”',
-                                        textAlign: TextAlign.center,
-                                        maxLines: 3,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: Theme.of(
-                                          context,
-                                        ).textTheme.bodyMedium?.copyWith(
-                                          fontStyle: FontStyle.italic,
-                                          fontSize: 14.sp,
-                                          color: AppColors.textMain,
-                                          height: 1.4,
-                                        ),
-                                      ),
-                                      SizedBox(height: 8.h),
-                                      Text(
-                                        '- ${ayat.surah}',
-                                        style: Theme.of(
-                                          context,
-                                        ).textTheme.bodySmall?.copyWith(
-                                          color: AppColors.textSecondary,
-                                          fontSize: 10.sp,
-                                          letterSpacing: 0.5,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                // Spiritual Pulse Preview
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: EdgeInsets.fromLTRB(24.w, 0, 24.w, 24.h),
-                    child: const _SpiritualPulseCard(),
-                  ),
-                ),
-
-                SizedBox(height: 40.h).toSliver(),
-              ],
-            ),
-          ),
-        ),
-      ],
-    ),
-  );
-  }
-}
-
-class _PrayerTimesCard extends StatefulWidget {
-  const _PrayerTimesCard({required this.prayerTimes});
-  final dynamic prayerTimes;
-
-  @override
-  State<_PrayerTimesCard> createState() => _PrayerTimesCardState();
-}
-
-class _PrayerTimesCardState extends State<_PrayerTimesCard> {
-  Timer? _timer;
-
-  @override
-  void initState() {
-    super.initState();
-    _startTimer();
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
-  }
-
-  void _startTimer() {
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (mounted) setState(() {});
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final prayer = widget.prayerTimes;
-
-    // Find the actual DateTime for the next prayer for dynamic countdown
-    DateTime nextPrayerTime;
-    switch (prayer.currentPrayerName) {
-      case 'Fajr':
-        nextPrayerTime = prayer.fajr;
-        break;
-      case 'Dhuhr':
-        nextPrayerTime = prayer.dhuhr;
-        break;
-      case 'Asr':
-        nextPrayerTime = prayer.asr;
-        break;
-      case 'Maghrib':
-        nextPrayerTime = prayer.maghrib;
-        break;
-      case 'Isha':
-        nextPrayerTime = prayer.isha;
-        break;
-      default:
-        nextPrayerTime = DateTime.now();
-    }
-
-    final timeUntil = nextPrayerTime.difference(DateTime.now());
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const PrayerTimesPage()),
-        );
-      },
-      child: GlassBox(
-        height: 180.h,
-        width: double.infinity,
-        child: Stack(
-          children: [
-            Positioned(
-              right: -20,
-              bottom: -20,
-              child: Opacity(
-                opacity: 0.1,
-                child: Icon(Icons.mosque, size: 200.sp, color: Colors.white),
               ),
             ),
-            Padding(
-              padding: EdgeInsets.all(20.w),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    '${prayer.currentPrayerName} ${context.l10n.prayer_in}',
-                    style: Theme.of(
-                      context,
-                    ).textTheme.bodyMedium?.copyWith(color: Colors.white70),
-                  ),
-                  Text(
-                    _formatDuration(timeUntil),
-                    style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                      color: AppColors.secondaryGold,
-                      letterSpacing: 2,
-                      fontSize: 48.sp,
-                    ),
-                  ),
-                  SizedBox(height: 8.h),
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.location_on,
-                        size: 14,
-                        color: AppColors.secondaryGold,
-                      ),
-                      SizedBox(width: 4.w),
-                      BlocBuilder<LocationBloc, LocationState>(
-                        builder: (context, state) {
-                          String locationText = 'Locating...';
-                          if (state is LocationLoaded) {
-                            locationText = '${state.city}, ${state.country}';
-                          } else if (state is LocationError) {
-                            locationText = 'Location Error';
-                          }
-                          return Text(
-                            locationText,
-                            style: Theme.of(
-                              context,
-                            ).textTheme.bodyMedium?.copyWith(
-                              color: AppColors.textSecondary,
-                            ),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ],
+            gap(AppSpacing.vMd),
+            padded(const HomeQuickActions()),
+            gap(AppSpacing.vXl),
+            padded(
+              SectionHeader(
+                title: l10n.daily_ayats,
+                icon: Icons.format_quote_rounded,
               ),
             ),
+            gap(AppSpacing.vMd),
+            const SliverToBoxAdapter(child: _DailyAyatCarousel()),
+            gap(AppSpacing.vXl),
+            padded(SectionHeader(title: l10n.pulse, icon: Icons.bolt_rounded)),
+            gap(AppSpacing.vMd),
+            padded(const _PulseSummaryCard()),
+            gap(AppSpacing.vXxl),
           ],
         ),
       ),
     );
   }
+}
 
-  String _formatDuration(Duration duration) {
-    String twoDigits(int n) => n.toString().padLeft(2, "0");
-    String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
-    String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
-    return "${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
+// ---------------------------------------------------------------------------
+// Header
+// ---------------------------------------------------------------------------
+
+class _HomeHeader extends StatelessWidget {
+  const _HomeHeader();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final textTheme = Theme.of(context).textTheme;
+    final locale = Localizations.localeOf(context).languageCode;
+    final now = DateTime.now();
+    final comma = const {'ar', 'fa', 'ur'}.contains(locale) ? '، ' : ', ';
+
+    return BlocBuilder<AuthBloc, AuthState>(
+      builder: (context, auth) {
+        final user = auth is Authenticated ? auth.user : null;
+        final name =
+            user == null ? null : homeFirstName(user, l10n.default_user_name);
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.translate(homeGreetingKey(now)),
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                  SizedBox(height: AppSpacing.vXs),
+                  Text(
+                    name == null
+                        ? l10n.assalamualaikum
+                        : '${l10n.assalamualaikum}$comma$name',
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: textTheme.headlineSmall,
+                  ),
+                  SizedBox(height: AppSpacing.vXs),
+                  Text(
+                    '${hijriDateLabel(now, l10n)}  ·  '
+                    '${gregorianDateLabel(now, locale)}',
+                    style: textTheme.bodySmall?.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(width: AppSpacing.md),
+            Tooltip(
+              message: l10n.profile,
+              child: Semantics(
+                button: true,
+                label: l10n.profile,
+                excludeSemantics: true,
+                child: InkWell(
+                  customBorder: const CircleBorder(),
+                  onTap:
+                      () => Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => const ProfilePage()),
+                      ),
+                  child: Padding(
+                    padding: AppSpacing.all(4),
+                    child: UserAvatar(
+                      imagePath: user?.profilePicPath,
+                      radius: 22.r,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 }
 
-class _QuickActionIcon extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final VoidCallback? onTapOverride;
+// ---------------------------------------------------------------------------
+// Next-prayer hero
+// ---------------------------------------------------------------------------
 
-  const _QuickActionIcon({
-    required this.icon,
-    required this.label,
-    this.onTapOverride,
-  });
+class _PrayerHeroCard extends StatelessWidget {
+  const _PrayerHeroCard();
 
-  void _handleTap(BuildContext context) {
-    if (onTapOverride != null) {
-      onTapOverride!();
-      return;
-    }
-    switch (label) {
-      case '99 Names':
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const NamesOfAllahPage()),
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<PrayerBloc, PrayerState>(
+      buildWhen: keepLoadedWhileReloading,
+      builder: (context, state) {
+        if (state is PrayerLoaded) {
+          return NextPrayerBuilder(
+            times: state.prayerTimes,
+            builder:
+                (context, next, now) =>
+                    _PrayerHeroContent(times: state.prayerTimes, next: next),
+          );
+        }
+        if (state is PrayerError) {
+          return AppCard(
+            padding: EdgeInsets.zero,
+            child: PrayerErrorView(state: state),
+          );
+        }
+        return AppCard(
+          padding: AppSpacing.symmetric(vertical: 32),
+          child: StateView.loading(message: context.l10n.locating),
         );
-        break;
-      case 'Tasbeeh':
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => TasbeehPage()),
-        );
-        break;
-      case 'Quran':
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const QuranPage()),
-        );
-        break;
-      case 'Pulse':
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const PulsePage()),
-        );
-        break;
-      case 'Prayer':
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const PrayerTimesPage()),
-        );
-        break;
-      case 'Duas':
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const DuasPage()),
-        );
-        break;
-      case 'Qibla':
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const QiblaPage()),
-        );
-        break;
-      case 'Zakat':
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const ZakatCalculatorPage()),
-        );
-        break;
-      case 'Calendar':
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const IslamicCalendarPage()),
-        );
-        break;
-      case 'Mosques':
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const MosqueFinderPage()),
-        );
-        break;
-      case 'Hajj Guide':
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const HajjGuidePage()),
-        );
-        break;
-      default:
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('$label feature coming soon!'),
-            backgroundColor: AppColors.cardDark,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
+      },
+    );
+  }
+}
+
+class _PrayerHeroContent extends StatelessWidget {
+  const _PrayerHeroContent({required this.times, required this.next});
+
+  final PrayerTimesEntity times;
+  final NextPrayer next;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final textTheme = Theme.of(context).textTheme;
+    final name =
+        next.isTomorrow ? l10n.tomorrow_fajr : l10n.translate(next.prayer.key);
+
+    return AppCard(
+      blur: true,
+      padding: AppSpacing.all(20),
+      onTap:
+          () => Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => const PrayerTimesPage())),
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          PositionedDirectional(
+            end: -8,
+            top: -8,
+            child: ExcludeSemantics(
+              child: Icon(
+                Icons.mosque,
+                size: 96.sp,
+                color: AppColors.glassFill,
+              ),
             ),
           ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                l10n.prayer_in_label.replaceAll('{prayer}', name),
+                style: textTheme.titleSmall?.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+              ),
+              SizedBox(height: AppSpacing.vXs),
+              SizedBox(
+                width: double.infinity,
+                child: PrayerCountdown(
+                  target: next.time,
+                  style: textTheme.displayMedium?.copyWith(
+                    color: AppColors.secondaryGold,
+                    letterSpacing: 1.5,
+                  ),
+                ),
+              ),
+              SizedBox(height: AppSpacing.vSm),
+              const PrayerLocationText(),
+              Padding(
+                padding: EdgeInsetsDirectional.symmetric(
+                  vertical: AppSpacing.vMd,
+                ),
+                child: const Divider(height: 1),
+              ),
+              _PrayerStrip(times: times, next: next),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Compact row of the five prayer times; the next one highlighted and
+/// logged prayers marked with a check.
+class _PrayerStrip extends StatelessWidget {
+  const _PrayerStrip({required this.times, required this.next});
+
+  final PrayerTimesEntity times;
+  final NextPrayer next;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final textTheme = Theme.of(context).textTheme;
+    final locale = Localizations.localeOf(context).languageCode;
+
+    return BlocBuilder<PulseBloc, PulseState>(
+      builder: (context, pulse) {
+        return Row(
+          children: [
+            for (final prayer in PrayerName.values)
+              Expanded(
+                child: Builder(
+                  builder: (context) {
+                    final isNext = !next.isTomorrow && next.prayer == prayer;
+                    final logged =
+                        pulse is PulseLoaded &&
+                        pulse.isPrayerLoggedToday(prayer.key);
+                    final label = l10n.translate(prayer.key);
+                    final time = DateFormat.jm(
+                      locale,
+                    ).format(times.today.timeOf(prayer));
+                    return Semantics(
+                      label:
+                          '$label $time'
+                          '${logged ? ', ${l10n.logged}' : ''}',
+                      selected: isNext,
+                      excludeSemantics: true,
+                      child: Container(
+                        margin: AppSpacing.symmetric(horizontal: 2),
+                        padding: AppSpacing.symmetric(
+                          horizontal: 2,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color:
+                              isNext
+                                  ? AppColors.secondaryGold.withValues(
+                                    alpha: 0.15,
+                                  )
+                                  : null,
+                          borderRadius: AppRadius.smAll,
+                          border:
+                              isNext
+                                  ? Border.all(
+                                    color: AppColors.secondaryGold.withValues(
+                                      alpha: 0.4,
+                                    ),
+                                  )
+                                  : null,
+                        ),
+                        child: Column(
+                          children: [
+                            FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                label,
+                                maxLines: 1,
+                                style: textTheme.labelSmall?.copyWith(
+                                  color:
+                                      isNext
+                                          ? AppColors.secondaryGold
+                                          : AppColors.textSecondary,
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: AppSpacing.vXs),
+                            FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                time,
+                                maxLines: 1,
+                                style: textTheme.labelMedium?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: AppSpacing.vXs),
+                            Icon(
+                              logged
+                                  ? Icons.check_circle_rounded
+                                  : Icons.circle_outlined,
+                              size: 14.sp,
+                              color:
+                                  logged
+                                      ? AppColors.success
+                                      : AppColors.glassStrokeStrong,
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+          ],
         );
+      },
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Quick actions
+// ---------------------------------------------------------------------------
+
+/// Stable identifiers for quick actions (never route on localized labels).
+enum HomeQuickAction {
+  prayer,
+  qibla,
+  quran,
+  tasbeeh,
+  duas,
+  names,
+  calendar,
+  more,
+}
+
+/// The 2×4 grid of quick actions on Home.
+class HomeQuickActions extends StatelessWidget {
+  const HomeQuickActions({super.key});
+
+  static IconData iconOf(HomeQuickAction action) => switch (action) {
+    HomeQuickAction.prayer => Icons.access_time_rounded,
+    HomeQuickAction.qibla => Icons.explore_outlined,
+    HomeQuickAction.quran => Icons.menu_book_rounded,
+    HomeQuickAction.tasbeeh => Icons.blur_circular_rounded,
+    HomeQuickAction.duas => Icons.volunteer_activism_outlined,
+    HomeQuickAction.names => Icons.auto_awesome,
+    HomeQuickAction.calendar => Icons.calendar_month_outlined,
+    HomeQuickAction.more => Icons.apps_rounded,
+  };
+
+  static String labelOf(AppLocalizations l10n, HomeQuickAction action) =>
+      switch (action) {
+        HomeQuickAction.prayer => l10n.prayer_times,
+        HomeQuickAction.qibla => l10n.qibla_short,
+        HomeQuickAction.quran => l10n.quran,
+        HomeQuickAction.tasbeeh => l10n.tasbeeh_short,
+        HomeQuickAction.duas => l10n.duas_short,
+        HomeQuickAction.names => l10n.names_99_short,
+        HomeQuickAction.calendar => l10n.calendar_short,
+        HomeQuickAction.more => l10n.more,
+      };
+
+  static void open(BuildContext context, HomeQuickAction action) {
+    void push(Widget page) =>
+        Navigator.of(context).push(MaterialPageRoute(builder: (_) => page));
+    switch (action) {
+      case HomeQuickAction.prayer:
+        push(const PrayerTimesPage());
+      case HomeQuickAction.qibla:
+        push(const QiblaPage());
+      case HomeQuickAction.quran:
+        MainNavigationScope.openTab(
+          context,
+          MainTab.quran,
+          fallback: (_) => const QuranPage(),
+        );
+      case HomeQuickAction.tasbeeh:
+        push(const TasbeehPage());
+      case HomeQuickAction.duas:
+        push(const DuasPage());
+      case HomeQuickAction.names:
+        push(const NamesOfAllahPage());
+      case HomeQuickAction.calendar:
+        push(const IslamicCalendarPage());
+      case HomeQuickAction.more:
+        push(const ToolsGridPage());
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => _handleTap(context),
-      child: Column(
-        children: [
-          GlassBox(
-            width: 60.w,
-            height: 60.h,
-            borderRadius: BorderRadius.circular(20.r),
-            child: Container(
-              padding: EdgeInsets.all(12.sp),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    AppColors.secondaryGold.withOpacity(0.15),
-                    AppColors.secondaryGold.withOpacity(0.05),
-                  ],
-                ),
-              ),
-              child: Icon(icon, color: AppColors.secondaryGold, size: 26.sp),
+    final l10n = context.l10n;
+    const actions = HomeQuickAction.values;
+    Widget row(int from) => Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (var i = from; i < from + 4; i++)
+          Expanded(
+            child: _QuickActionTile(
+              icon: iconOf(actions[i]),
+              label: labelOf(l10n, actions[i]),
+              onTap: () => open(context, actions[i]),
             ),
           ),
-          SizedBox(height: 10.h),
-          Text(
-            label,
-            textAlign: TextAlign.center,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              fontSize: 12.sp,
-              color: AppColors.textMain,
-              fontWeight: FontWeight.w500,
+      ],
+    );
+    return Column(children: [row(0), SizedBox(height: AppSpacing.vMd), row(4)]);
+  }
+}
+
+class _QuickActionTile extends StatelessWidget {
+  const _QuickActionTile({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    return Semantics(
+      button: true,
+      label: label,
+      excludeSemantics: true,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: AppRadius.mdAll,
+        child: Padding(
+          padding: AppSpacing.symmetric(horizontal: 2, vertical: 4),
+          child: Column(
+            children: [
+              GlassBox(
+                width: 60.r,
+                height: 60.r,
+                blur: false,
+                borderRadius: AppRadius.mdAll,
+                color: AppColors.secondaryGold,
+                child: Center(
+                  child: Icon(
+                    icon,
+                    color: AppColors.secondaryGold,
+                    size: 26.sp,
+                  ),
+                ),
+              ),
+              SizedBox(height: AppSpacing.vSm),
+              Text(
+                label,
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: textTheme.labelMedium,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Daily ayat
+// ---------------------------------------------------------------------------
+
+class _DailyAyatCarousel extends StatefulWidget {
+  const _DailyAyatCarousel();
+
+  @override
+  State<_DailyAyatCarousel> createState() => _DailyAyatCarouselState();
+}
+
+class _DailyAyatCarouselState extends State<_DailyAyatCarousel> {
+  final PageController _controller = PageController(viewportFraction: 0.88);
+  int _page = 0;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (dailyAyats.isEmpty) return const SizedBox.shrink();
+    // Today's ayat comes first; the slider continues from there.
+    final start = dailyAyatStartIndex(DateTime.now(), dailyAyats.length);
+    final count =
+        dailyAyats.length < _ayatsShown ? dailyAyats.length : _ayatsShown;
+    // Grow with the user's text size so the preview never clips.
+    final scale = MediaQuery.textScalerOf(context).scale(1).clamp(1.0, 1.6);
+
+    return Column(
+      children: [
+        SizedBox(
+          height: 190.h * scale,
+          child: PageView.builder(
+            controller: _controller,
+            itemCount: count,
+            onPageChanged: (i) => setState(() => _page = i),
+            itemBuilder: (context, index) {
+              final ayatIndex = (start + index) % dailyAyats.length;
+              return Padding(
+                padding: AppSpacing.symmetric(horizontal: 6),
+                child: _DailyAyatCard(
+                  ayat: dailyAyats[ayatIndex],
+                  mediaId: 'daily_ayat_$ayatIndex',
+                ),
+              );
+            },
+          ),
+        ),
+        SizedBox(height: AppSpacing.vMd),
+        ExcludeSemantics(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              for (var i = 0; i < count; i++)
+                AnimatedContainer(
+                  duration: AppDurations.medium,
+                  curve: AppDurations.curve,
+                  margin: AppSpacing.symmetric(horizontal: 3),
+                  width: i == _page ? 18.w : 6.w,
+                  height: 6.w,
+                  decoration: BoxDecoration(
+                    color:
+                        i == _page
+                            ? AppColors.secondaryGold
+                            : AppColors.glassStrokeStrong,
+                    borderRadius: AppRadius.pillAll,
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _DailyAyatCard extends StatelessWidget {
+  const _DailyAyatCard({required this.ayat, required this.mediaId});
+
+  final DailyAyat ayat;
+  final String mediaId;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final textTheme = Theme.of(context).textTheme;
+    return AppCard(
+      onTap: () => showDailyAyahSheet(context, ayat, mediaId),
+      semanticLabel: l10n.read_full_ayah,
+      padding: AppSpacing.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  ayat.surah,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: textTheme.labelMedium?.copyWith(
+                    color: AppColors.secondaryGold,
+                  ),
+                ),
+              ),
+              Icon(
+                Icons.open_in_full_rounded,
+                size: 16.sp,
+                color: AppColors.textSecondary,
+              ),
+            ],
+          ),
+          SizedBox(height: AppSpacing.vSm),
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Flexible(
+                  child: ArabicText(
+                    ayat.arabic,
+                    fontSize: 20.sp,
+                    height: 1.7,
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                SizedBox(height: AppSpacing.vSm),
+                Flexible(
+                  child: TranslationText(
+                    ayat.translation,
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: textTheme.bodyMedium?.copyWith(
+                      fontStyle: FontStyle.italic,
+                      color: AppColors.textMain,
+                      height: 1.4,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -755,137 +715,252 @@ class _QuickActionIcon extends StatelessWidget {
   }
 }
 
-class _SpiritualPulseCard extends StatelessWidget {
-  const _SpiritualPulseCard();
+/// Full daily ayah (Arabic + translation) with share and play.
+Future<void> showDailyAyahSheet(
+  BuildContext context,
+  DailyAyat ayat,
+  String mediaId,
+) {
+  return showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    useSafeArea: true,
+    builder:
+        (sheetContext) => DraggableScrollableSheet(
+          expand: false,
+          initialChildSize: 0.6,
+          minChildSize: 0.4,
+          maxChildSize: 0.95,
+          builder:
+              (context, controller) => _AyahSheetBody(
+                ayat: ayat,
+                mediaId: mediaId,
+                controller: controller,
+              ),
+        ),
+  );
+}
+
+class _AyahSheetBody extends StatelessWidget {
+  const _AyahSheetBody({
+    required this.ayat,
+    required this.mediaId,
+    required this.controller,
+  });
+
+  final DailyAyat ayat;
+  final String mediaId;
+  final ScrollController controller;
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final textTheme = Theme.of(context).textTheme;
+    final audio = sl<AudioService>();
+
+    return ListView(
+      controller: controller,
+      padding: AppSpacing.page,
+      children: [
+        Text(
+          ayat.surah,
+          textAlign: TextAlign.center,
+          style: textTheme.titleMedium?.copyWith(
+            color: AppColors.secondaryGold,
+          ),
+        ),
+        SizedBox(height: AppSpacing.vLg),
+        ArabicText(ayat.arabic, fontSize: 26.sp, textAlign: TextAlign.center),
+        SizedBox(height: AppSpacing.vLg),
+        // The daily ayat translations are English text.
+        TranslationText(
+          ayat.translation,
+          textAlign: TextAlign.center,
+          style: textTheme.bodyLarge?.copyWith(color: AppColors.textMain),
+        ),
+        SizedBox(height: AppSpacing.vXl),
+        Row(
+          children: [
+            Expanded(
+              child: SecondaryButton(
+                label: l10n.share,
+                icon: Icons.share_outlined,
+                onPressed:
+                    () => Share.share(
+                      '${ayat.arabic}\n\n${ayat.translation}\n— ${ayat.surah}'
+                      '\n\n${l10n.shared_from_app}',
+                    ),
+              ),
+            ),
+            SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: StreamBuilder<AudioStatus>(
+                stream: audio.statusStream,
+                initialData: audio.status,
+                builder: (context, snapshot) {
+                  final playing = (snapshot.data ?? audio.status)
+                      .isPlayingMedia(mediaId);
+                  return PrimaryButton(
+                    label: playing ? l10n.stop : l10n.play,
+                    icon:
+                        playing ? Icons.stop_rounded : Icons.play_arrow_rounded,
+                    onPressed: () {
+                      if (playing) {
+                        audio.stop();
+                      } else {
+                        audio.playArabicThenTranslation(
+                          ayat.arabic,
+                          ayat.translation,
+                          title: l10n.daily_ayats,
+                          mediaId: mediaId,
+                        );
+                      }
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Pulse summary
+// ---------------------------------------------------------------------------
+
+class _PulseSummaryCard extends StatelessWidget {
+  const _PulseSummaryCard();
+
+  void _openPulse(BuildContext context) => MainNavigationScope.openTab(
+    context,
+    MainTab.pulse,
+    fallback: (_) => const PulsePage(),
+  );
+
+  void _share(AppLocalizations l10n, SpiritualPulseEntity pulse) {
+    final text = l10n.pulse_share_text
+        .replaceAll('{streak}', '${pulse.currentStreak}')
+        .replaceAll('{points}', '${weeklyPointsOf(pulse)}');
+    Share.share(
+      '$text\n${l10n.translate(pulse.motivation.l10nKey)}'
+      '\n\n${l10n.shared_from_app}',
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final textTheme = Theme.of(context).textTheme;
     return BlocBuilder<PulseBloc, PulseState>(
       builder: (context, state) {
         if (state is PulseLoaded) {
           final pulse = state.pulse;
-          return GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const PulsePage()),
-              );
-            },
-            child: GlassBox(
-              padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 20.h),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(left: 14.w),
-                        child: Text(
-                          context.l10n.pulse, // Or 'Spiritual Pulse' if localized
-                          style: Theme.of(
-                            context,
-                          ).textTheme.headlineSmall?.copyWith(
-                            fontSize: 18.sp,
-                            fontWeight: FontWeight.bold,
+          return AppCard(
+            onTap: () => _openPulse(context),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Semantics(
+                      label: l10n.day_streak_count.replaceAll(
+                        '{n}',
+                        '${pulse.currentStreak}',
+                      ),
+                      excludeSemantics: true,
+                      child: Container(
+                        padding: AppSpacing.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.secondaryGold.withValues(
+                            alpha: 0.12,
                           ),
+                          borderRadius: AppRadius.pillAll,
                         ),
-                      ),
-                      IconButton(
-                        icon: const Icon(
-                          Icons.share,
-                          color: AppColors.secondaryGold,
-                          size: 20,
-                        ),
-                        onPressed: () => _shareReport(pulse),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 16.h),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.w),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: List.generate(7, (index) {
-                        final points = pulse.dailyPoints[index];
-                        final active = points > 50;
-                        return Column(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            Container(
-                              width: 32.w,
-                              height: 80.h,
-                              decoration: BoxDecoration(
-                                color:
-                                    active
-                                        ? AppColors.secondaryGold
-                                        : Colors.white.withOpacity(0.05),
-                                borderRadius: BorderRadius.circular(20.r),
-                              ),
-                              alignment: Alignment.bottomCenter,
-                              child:
-                                  active
-                                      ? Padding(
-                                        padding: const EdgeInsets.only(
-                                          bottom: 8.0,
-                                        ),
-                                        child: Icon(
-                                          Icons.bolt,
-                                          color: AppColors.primaryEmerald,
-                                          size: 16.sp,
-                                        ),
-                                      )
-                                      : null,
+                            Icon(
+                              Icons.local_fire_department_rounded,
+                              size: 16.sp,
+                              color: AppColors.secondaryGold,
                             ),
-                            SizedBox(height: 8.h),
+                            SizedBox(width: AppSpacing.xs),
                             Text(
-                              ['M', 'T', 'W', 'T', 'F', 'S', 'S'][index],
-                              style: TextStyle(
-                                fontSize: 11.sp,
-                                color:
-                                    active
-                                        ? AppColors.secondaryGold
-                                        : AppColors.textSecondary,
+                              l10n.day_streak_count.replaceAll(
+                                '{n}',
+                                '${pulse.currentStreak}',
+                              ),
+                              style: textTheme.labelMedium?.copyWith(
+                                color: AppColors.secondaryGold,
                               ),
                             ),
                           ],
-                        );
-                      }),
-                    ),
-                  ),
-                  SizedBox(height: 16.h),
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 16.w,
-                      vertical: 12.h,
-                    ),
-                    child: Text(
-                      pulse.motivationalMessage,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppColors.secondaryGold,
-                        fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
+                    const Spacer(),
+                    IconButton(
+                      tooltip: l10n.share,
+                      icon: const Icon(Icons.share_outlined),
+                      color: AppColors.secondaryGold,
+                      onPressed: () => _share(l10n, pulse),
+                    ),
+                  ],
+                ),
+                SizedBox(height: AppSpacing.vSm),
+                Text(
+                  l10n.translate(pulse.motivation.l10nKey),
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                SizedBox(height: AppSpacing.vLg),
+                WeeklyBars(points: pulse.dailyPoints, barHeight: 64.h),
+                if (pulse.badges.isNotEmpty) ...[
+                  SizedBox(height: AppSpacing.vMd),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.military_tech_outlined,
+                        size: 18.sp,
+                        color: AppColors.secondaryGold,
+                      ),
+                      SizedBox(width: AppSpacing.xs),
+                      Expanded(
+                        child: Text(
+                          l10n.translate(badgeL10nKey(pulse.badges.last)),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: textTheme.labelMedium,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
-              ),
+              ],
             ),
           );
         }
-        return const SizedBox.shrink();
+        if (state is PulseError) {
+          return AppCard(
+            padding: EdgeInsets.zero,
+            child: StateView.error(
+              message: l10n.pulse_load_failed,
+              onRetry: () => context.read<PulseBloc>().add(LoadPulseData()),
+            ),
+          );
+        }
+        return AppCard(
+          padding: AppSpacing.symmetric(vertical: 24),
+          child: const StateView.loading(),
+        );
       },
     );
   }
-
-  void _shareReport(dynamic pulse) {
-    final text =
-        '✨ My Barakah Report ✨\n\n'
-        'I\'m on a ${pulse.currentStreak}-day spiritual streak! 🚀\n'
-        '${pulse.motivationalMessage}\n\n'
-        'Built with #Sakinah #IslamicApp #Flutter #BarakahTime';
-    Share.share(text);
-  }
-}
-
-extension on Widget {
-  SliverToBoxAdapter toSliver() => SliverToBoxAdapter(child: this);
 }

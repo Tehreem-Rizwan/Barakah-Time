@@ -1,0 +1,98 @@
+rules_version = '2';
+
+// Barakah Time — every document lives under users/{uid} and is only
+// readable/writable by that signed-in user.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function isOwner(uid) { return signedIn() && request.auth.uid == uid; }
+    function incoming() { return request.resource.data; }
+    // Optional fields may be absent or null.
+    function optString(field, maxLen) {
+      return !(field in incoming()) || incoming()[field] == null ||
+        (incoming()[field] is string && incoming()[field].size() <= maxLen);
+    }
+    function optNumber(field) {
+      return !(field in incoming()) || incoming()[field] == null ||
+        incoming()[field] is number;
+    }
+    function optBool(field) {
+      return !(field in incoming()) || incoming()[field] == null ||
+        incoming()[field] is bool;
+    }
+
+    match /users/{uid} {
+      allow read, delete: if isOwner(uid);
+      allow create, update: if isOwner(uid)
+        && optString('name', 100)
+        && optString('email', 320)
+        && optString('profilePicUrl', 2048)
+        && optString('lastActiveDay', 8)
+        && (!('totalPoints' in incoming()) ||
+            (incoming().totalPoints is int && incoming().totalPoints >= 0))
+        && (!('longestStreak' in incoming()) ||
+            (incoming().longestStreak is int && incoming().longestStreak >= 0));
+
+      match /activities/{activityId} {
+        allow read, delete: if isOwner(uid);
+        // Activities are immutable once written (points are counted once).
+        allow create: if isOwner(uid)
+          && activityId.size() <= 200
+          && incoming().type is string && incoming().type.size() <= 32
+          && optString('subType', 64)
+          && incoming().points is int
+          && incoming().points >= 0 && incoming().points <= 100
+          && incoming().timestamp is timestamp
+          && incoming().day is string && incoming().day.size() == 8;
+        allow update: if false;
+      }
+
+      match /saved_verses/{verseId} {
+        allow read, delete: if isOwner(uid);
+        allow create, update: if isOwner(uid)
+          && incoming().surahNumber is int
+          && incoming().surahNumber >= 1 && incoming().surahNumber <= 114
+          && incoming().ayahNumber is int
+          && incoming().ayahNumber >= 1 && incoming().ayahNumber <= 286
+          && incoming().text is string && incoming().text.size() <= 10000
+          && optString('translation', 20000)
+          && optString('surahName', 200);
+      }
+
+      match /badges/{badgeId} {
+        allow read, delete: if isOwner(uid);
+        allow create, update: if isOwner(uid) && badgeId.size() <= 64;
+      }
+
+      match /settings/{docId} {
+        allow read, delete: if isOwner(uid);
+        allow create, update: if isOwner(uid)
+          && optString('calculationMethod', 64)
+          && optString('asrMadhab', 16)
+          && optString('manualLocation', 200)
+          && optString('languageCode', 8)
+          && optBool('useAutoLocation')
+          && optBool('notificationsEnabled')
+          && optBool('adhanSoundEnabled')
+          && optNumber('manualLatitude')
+          && optNumber('manualLongitude')
+          && optNumber('quranFontSize');
+      }
+
+      match /state/{docId} {
+        allow read, delete: if isOwner(uid);
+        allow create, update: if isOwner(uid)
+          && (!('count' in incoming()) ||
+              (incoming().count is int && incoming().count >= 0))
+          && (!('loggedCount' in incoming()) ||
+              (incoming().loggedCount is int && incoming().loggedCount >= 0));
+      }
+    }
+
+    // Everything else is closed.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

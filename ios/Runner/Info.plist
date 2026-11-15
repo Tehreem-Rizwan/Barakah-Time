@@ -13,7 +13,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>barakah_time</string>
+	<string>Barakah Time</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -31,8 +31,6 @@
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array>
@@ -45,5 +43,38 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Barakah Time uses your location to calculate accurate prayer times and the Qibla direction.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Barakah Time needs access to your photos so you can choose a profile picture.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Barakah Time needs camera access so you can take a profile picture.</string>
+	<key>NSMotionUsageDescription</key>
+	<string>Barakah Time uses the compass to point you towards the Qibla.</string>
+	<key>GIDClientID</key>
+	<string>630175539288-h16v371sst1fh3bnjo37joajoaplaqsd.apps.googleusercontent.com</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.630175539288-h16v371sst1fh3bnjo37joajoaplaqsd</string>
+			</array>
+		</dict>
+	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>audio</string>
+	</array>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>https</string>
+		<string>comgooglemaps</string>
+		<string>maps</string>
+	</array>
 </dict>
 </plist>

@@ -1,521 +1,767 @@
 import 'dart:io';
-import 'package:barakah_time/presentation/blocs/auth_bloc.dart';
-import 'package:barakah_time/presentation/blocs/pulse_bloc.dart';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../core/theme/app_colors.dart';
-import '../widgets/glass_box.dart';
+import 'package:intl/intl.dart';
+
+import '../../core/localization/app_localizations.dart';
+import '../../domain/entities/badge.dart';
+import '../../domain/entities/user.dart';
+import '../blocs/auth_bloc.dart';
+import '../blocs/pulse_bloc.dart';
+import '../widgets/widgets.dart';
+import 'activity_history_page.dart';
 import 'auth/sign_in_page.dart';
+import 'saved_verses_page.dart';
+import 'main_navigation_scope.dart';
+import 'settings_page.dart';
+
+export 'activity_history_page.dart' show ActivityHistoryPage;
+export 'saved_verses_page.dart' show SavedVersesPage;
+
+/// Compact number formatting: 150 → "150", 1500 → "1.5k", 2000000 → "2M".
+String formatCompactNumber(int value) {
+  String trim(double v) {
+    final s = v.toStringAsFixed(1);
+    return s.endsWith('.0') ? s.substring(0, s.length - 2) : s;
+  }
+
+  final abs = value.abs();
+  if (abs >= 1000000) return '${trim(value / 1000000)}M';
+  if (abs >= 1000) return '${trim(value / 1000)}k';
+  return value.toString();
+}
+
+/// Profile avatar that handles remote URLs, local files and missing images.
+class UserAvatar extends StatelessWidget {
+  final String? imagePath;
+  final double radius;
+  const UserAvatar({super.key, required this.imagePath, required this.radius});
+
+  ImageProvider? _provider() {
+    final path = imagePath?.trim();
+    if (path == null || path.isEmpty) return null;
+    final uri = Uri.tryParse(path);
+    if (uri != null && (uri.scheme == 'http' || uri.scheme == 'https')) {
+      return NetworkImage(path);
+    }
+    final file = File(path);
+    return file.existsSync() ? FileImage(file) : null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final fallback = Icon(
+      Icons.person,
+      color: AppColors.secondaryGold,
+      size: radius,
+    );
+    final provider = _provider();
+    return CircleAvatar(
+      radius: radius,
+      backgroundColor: AppColors.secondaryGold.withValues(alpha: 0.1),
+      child:
+          provider == null
+              ? fallback
+              : ClipOval(
+                child: Image(
+                  image: provider,
+                  width: radius * 2,
+                  height: radius * 2,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, _, _) => fallback,
+                  loadingBuilder:
+                      (context, child, progress) =>
+                          progress == null
+                              ? child
+                              : SizedBox(
+                                width: radius * 2,
+                                height: radius * 2,
+                                child: const Center(
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                ),
+                              ),
+                ),
+              ),
+    );
+  }
+}
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
+  static bool _listenWhen(AuthState previous, AuthState current) {
+    if (current is Unauthenticated) return previous is Authenticated;
+    return current is Authenticated &&
+        current.feedback != null &&
+        (previous is! Authenticated || previous.feedback != current.feedback);
+  }
+
+  void _listener(BuildContext context, AuthState state) {
+    final l10n = context.l10n;
+    if (state is Unauthenticated) {
+      // Signed out / deleted / session ended: clear stale pulse data, then
+      // reset the stack to Sign In so back can't return into the app.
+      context.read<PulseBloc>().add(LoadPulseData());
+      if (state is AccountDeleted) {
+        showAppSnackBar(context, l10n.account_deleted, type: SnackType.success);
+      } else if (state is SessionExpired) {
+        showAppSnackBar(
+          context,
+          l10n.session_expired,
+          type: SnackType.warning,
+        );
+      }
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute<void>(builder: (_) => const SignInPage()),
+        (route) => false,
+      );
+      return;
+    }
+    // Avoid duplicate handling when Settings is pushed on top.
+    if (ModalRoute.of(context)?.isCurrent == false) return;
+    final authState = state as Authenticated;
+    final feedback = authState.feedback!;
+    if (feedback.code == AuthCodes.reauthRequired) {
+      _promptReauth(context, authState.user);
+      return;
+    }
+    showAppSnackBar(
+      context,
+      localizedAuthMessage(l10n, feedback.code, feedback.message),
+      type: feedback.isError ? SnackType.error : SnackType.success,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AuthBloc, AuthState>(
+    final l10n = context.l10n;
+    return BlocConsumer<AuthBloc, AuthState>(
+      listenWhen: _listenWhen,
+      listener: _listener,
       builder: (context, authState) {
-        if (authState is! Authenticated) return const SignInPage();
-        final user = authState.user;
-
-        return Scaffold(
-          backgroundColor: AppColors.backgroundSlate,
-          appBar: AppBar(
-            title: const Text(
-              'My Profile',
-              style: TextStyle(
-                color: AppColors.textMain,
-                fontWeight: FontWeight.bold,
-              ),
+        final Widget body;
+        if (authState is Authenticated) {
+          body = _AuthenticatedProfile(state: authState);
+        } else if (authState is GuestMode || authState is Unauthenticated) {
+          body = _GuestProfile(
+            authUnavailable: authState is GuestMode && authState.authUnavailable,
+          );
+        } else {
+          body = const StateView.loading();
+        }
+        return AppScaffold(
+          title: l10n.my_profile,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.settings_outlined),
+              tooltip: l10n.settings,
+              onPressed: () => MainNavigationScope.openTab(context, MainTab.settings, fallback: (_) => const SettingsPage()),
             ),
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            centerTitle: true,
-            actions: [
-              IconButton(
-                icon: const Icon(
-                  Icons.settings_outlined,
-                  color: AppColors.textSecondary,
+          ],
+          body: body,
+        );
+      },
+    );
+  }
+}
+
+void _push(BuildContext context, Widget page) {
+  Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => page));
+}
+
+// ─── Account deletion ─────────────────────────────────────────────────────────
+
+/// Step 1: destructive confirmation (type DELETE), then [DeleteAccountRequested].
+Future<void> confirmDeleteAccount(BuildContext context) async {
+  final l10n = context.l10n;
+  final bloc = context.read<AuthBloc>();
+  final confirmed = await showConfirmDialog(
+    context,
+    title: l10n.delete_account_confirm_title,
+    message: l10n.delete_account_confirm_message,
+    confirmLabel: l10n.delete_account,
+    destructive: true,
+    requireTypedText: l10n.delete_confirm_word,
+  );
+  if (confirmed) bloc.add(DeleteAccountRequested());
+}
+
+/// Step 2 (only if the sign-in is not recent): re-authenticate with the
+/// password or the original provider, then delete.
+Future<void> _promptReauth(BuildContext context, UserEntity user) async {
+  final l10n = context.l10n;
+  final bloc = context.read<AuthBloc>();
+  if (user.isPasswordAccount) {
+    final password = await showDialog<String>(
+      context: context,
+      builder: (_) => const _ReauthPasswordDialog(),
+    );
+    if (password != null && password.isNotEmpty) {
+      bloc.add(ReauthenticateAndDelete(password: password));
+    }
+    return;
+  }
+  final provider = switch (user.signInProvider) {
+    'apple.com' => 'Apple',
+    _ => 'Google',
+  };
+  final confirmed = await showConfirmDialog(
+    context,
+    title: l10n.delete_account_confirm_title,
+    message: l10n.reauth_required_delete,
+    confirmLabel: l10n
+        .translate('confirm_with_provider')
+        .replaceAll('{provider}', provider),
+    destructive: true,
+  );
+  if (confirmed) bloc.add(const ReauthenticateAndDelete());
+}
+
+class _ReauthPasswordDialog extends StatefulWidget {
+  const _ReauthPasswordDialog();
+
+  @override
+  State<_ReauthPasswordDialog> createState() => _ReauthPasswordDialogState();
+}
+
+class _ReauthPasswordDialogState extends State<_ReauthPasswordDialog> {
+  final _formKey = GlobalKey<FormState>();
+  final _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    if (_formKey.currentState?.validate() ?? false) {
+      Navigator.pop(context, _controller.text);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    return AlertDialog(
+      title: Text(l10n.delete_account_confirm_title),
+      scrollable: true,
+      content: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(l10n.reauth_required_delete),
+            SizedBox(height: AppSpacing.vLg),
+            AuthTextField(
+              controller: _controller,
+              label: l10n.confirm_with_password,
+              icon: Icons.lock_outline,
+              isPassword: true,
+              textInputAction: TextInputAction.done,
+              autofillHints: const [AutofillHints.password],
+              onFieldSubmitted: (_) => _submit(),
+              validator:
+                  (v) =>
+                      (v == null || v.isEmpty) ? l10n.password_required : null,
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          style: TextButton.styleFrom(foregroundColor: AppColors.textSecondary),
+          child: Text(l10n.cancel),
+        ),
+        FilledButton(
+          onPressed: _submit,
+          style: FilledButton.styleFrom(
+            backgroundColor: AppColors.error,
+            foregroundColor: AppColors.onGold,
+          ),
+          child: Text(l10n.delete_account),
+        ),
+      ],
+    );
+  }
+}
+
+// ─── Authenticated profile ────────────────────────────────────────────────────
+
+class _AuthenticatedProfile extends StatelessWidget {
+  const _AuthenticatedProfile({required this.state});
+
+  final Authenticated state;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final user = state.user;
+    final busy = state.isUpdating;
+    return Column(
+      children: [
+        if (busy) const LinearProgressIndicator(minHeight: 2),
+        Expanded(
+          child: ListView(
+            padding: AppSpacing.page,
+            children: [
+              _ProfileHeader(user: user, isUpdating: busy),
+              if (!user.emailVerified) ...[
+                SizedBox(height: AppSpacing.vLg),
+                AuthNotice(
+                  message: l10n.email_not_verified,
+                  icon: Icons.mark_email_unread_outlined,
+                  action: TextButton(
+                    onPressed:
+                        busy
+                            ? null
+                            : () => context.read<AuthBloc>().add(
+                              ResendVerificationEmail(),
+                            ),
+                    child: Text(l10n.resend_verification),
+                  ),
                 ),
-                onPressed: () {},
+              ],
+              SizedBox(height: AppSpacing.vXl),
+              const _PulseSummary(),
+              SizedBox(height: AppSpacing.vXl),
+              const _ActivityLinks(),
+              SizedBox(height: AppSpacing.vLg),
+              AppCard(
+                padding: EdgeInsets.zero,
+                child: Column(
+                  children: [
+                    ActionTile(
+                      icon: Icons.logout_rounded,
+                      title: l10n.sign_out,
+                      enabled: !busy,
+                      onTap: () async {
+                        final bloc = context.read<AuthBloc>();
+                        final ok = await showConfirmDialog(
+                          context,
+                          title: l10n.sign_out,
+                          message: l10n.sign_out_confirm,
+                          confirmLabel: l10n.sign_out,
+                        );
+                        if (ok) bloc.add(SignOutRequested());
+                      },
+                    ),
+                    const Divider(height: 1),
+                    ActionTile(
+                      icon: Icons.delete_forever_outlined,
+                      title: l10n.delete_account,
+                      destructive: true,
+                      enabled: !busy,
+                      onTap: () => confirmDeleteAccount(context),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
-          body: SingleChildScrollView(
-            padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 24.h),
-            child: Column(
-              children: [
-                buildProfileHeader(context, user),
-                SizedBox(height: 32.h),
-                _buildStatGridContent(context),
-                SizedBox(height: 32.h),
-                _buildTierCard(),
-                SizedBox(height: 32.h),
-                _buildActionList(context),
-              ],
-            ),
-          ),
-        );
-      },
+        ),
+      ],
     );
   }
+}
 
-  Widget _buildStatGridContent(BuildContext context) {
-    return BlocBuilder<PulseBloc, PulseState>(
-      builder: (context, state) {
-        int streak = 0;
-        int points = 0;
-        if (state is PulseLoaded) {
-          streak = state.pulse.currentStreak;
-          points =
-              state.pulse.dailyPoints.isNotEmpty
-                  ? state.pulse.dailyPoints.reduce((a, b) => a + b)
-                  : 0;
-        }
+class _ProfileHeader extends StatelessWidget {
+  const _ProfileHeader({required this.user, required this.isUpdating});
 
-        return Row(
-          children: [
-            Expanded(
-              child: _buildStatItem('Streak', '$streak Days', Icons.bolt),
-            ),
-            Expanded(child: _buildStatItem('Quran', '2 Juz', Icons.menu_book)),
-            Expanded(
-              child: _buildStatItem(
-                'Points',
-                '${(points / 10).toStringAsFixed(1)}k',
-                Icons.stars,
-              ),
-            ),
-          ],
-        );
-      },
+  final UserEntity user;
+  final bool isUpdating;
+
+  String? _memberSince(BuildContext context) {
+    final date = user.memberSince;
+    if (date == null) return null;
+    final formatted = formatLocalizedDate(
+      context,
+      date,
+      (l) => DateFormat.yMMM(l),
     );
+    return '${context.l10n.member_since} $formatted';
   }
 
-  Widget buildProfileHeader(BuildContext context, dynamic user) {
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final textTheme = Theme.of(context).textTheme;
+    final memberSince = _memberSince(context);
+    final avatarRadius = 56.r;
     return Column(
       children: [
         Stack(
-          alignment: Alignment.bottomRight,
+          clipBehavior: Clip.none,
           children: [
-            GestureDetector(
-              onTap: () => _pickImage(context),
-              child: CircleAvatar(
-                radius: 60.r,
-                backgroundColor: AppColors.primaryEmerald.withOpacity(0.1),
-                backgroundImage:
-                    user.profilePicPath != null
-                        ? FileImage(File(user.profilePicPath!))
-                        : null,
-                child:
-                    user.profilePicPath == null
-                        ? Icon(
-                          Icons.person,
-                          color: AppColors.secondaryGold,
-                          size: 60.sp,
-                        )
-                        : null,
+            Semantics(
+              button: true,
+              label: l10n.profile_change_photo,
+              child: GestureDetector(
+                onTap: isUpdating ? null : () => _pickImage(context),
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    UserAvatar(
+                      imagePath: user.profilePicPath,
+                      radius: avatarRadius,
+                    ),
+                    if (isUpdating)
+                      Container(
+                        width: avatarRadius * 2,
+                        height: avatarRadius * 2,
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.45),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
-            GestureDetector(
-              onTap: () => _pickImage(context),
-              child: Container(
-                padding: EdgeInsets.all(8.w),
-                decoration: const BoxDecoration(
-                  color: AppColors.secondaryGold,
-                  shape: BoxShape.circle,
+            PositionedDirectional(
+              end: -4,
+              bottom: -4,
+              child: IconButton.filled(
+                tooltip: l10n.profile_change_photo,
+                onPressed: isUpdating ? null : () => _pickImage(context),
+                style: IconButton.styleFrom(
+                  backgroundColor: AppColors.secondaryGold,
+                  foregroundColor: AppColors.onGold,
+                  minimumSize: const Size(
+                    AppSizes.minTapTarget,
+                    AppSizes.minTapTarget,
+                  ),
                 ),
-                child: Icon(Icons.camera_alt, color: Colors.black, size: 16.sp),
+                icon: Icon(Icons.camera_alt_rounded, size: 20.sp),
               ),
             ),
           ],
         ),
-        SizedBox(height: 16.h),
+        SizedBox(height: AppSpacing.vLg),
         Text(
-          user.name,
-          style: TextStyle(
-            color: AppColors.textMain,
-            fontSize: 24.sp,
-            fontWeight: FontWeight.bold,
+          user.displayNameOr(l10n.default_user_name),
+          textAlign: TextAlign.center,
+          style: textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+        ),
+        if (user.email.isNotEmpty) ...[
+          SizedBox(height: AppSpacing.vXs),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Flexible(
+                child: Text(
+                  user.email,
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ),
+              if (user.emailVerified) ...[
+                SizedBox(width: AppSpacing.xs),
+                Icon(
+                  Icons.verified_rounded,
+                  size: 16.sp,
+                  color: AppColors.success,
+                  semanticLabel: '✓',
+                ),
+              ],
+            ],
           ),
-        ),
-        Text(
-          'Member since Oct 2025',
-          style: TextStyle(color: AppColors.textSecondary, fontSize: 13.sp),
-        ),
+        ],
+        if (memberSince != null) ...[
+          SizedBox(height: AppSpacing.vXs),
+          Text(
+            memberSince,
+            textAlign: TextAlign.center,
+            style: textTheme.bodySmall?.copyWith(
+              color: AppColors.textSecondary,
+            ),
+          ),
+        ],
       ],
     );
   }
 
   Future<void> _pickImage(BuildContext context) async {
-    final picker = ImagePicker();
-    final image = await picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      context.read<AuthBloc>().add(UpdateProfileImageRequested(image.path));
-    }
-  }
-
-  Widget _buildStatItem(String label, String value, IconData icon) {
-    return Center(
-      child: GlassBox(
-        padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 14.w),
-        child: Column(
-          children: [
-            Icon(icon, color: AppColors.secondaryGold, size: 20.sp),
-            SizedBox(height: 8.h),
-            Text(
-              value,
-              style: TextStyle(
-                color: AppColors.textMain,
-                fontSize: 16.sp,
-                fontWeight: FontWeight.bold,
+    final l10n = context.l10n;
+    final authBloc = context.read<AuthBloc>();
+    final source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      showDragHandle: true,
+      builder:
+          (sheetContext) => SafeArea(
+            child: Padding(
+              padding: EdgeInsetsDirectional.only(bottom: AppSpacing.vLg),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ActionTile(
+                    icon: Icons.photo_camera_outlined,
+                    title: l10n.profile_take_photo,
+                    trailing: const SizedBox.shrink(),
+                    onTap: () => Navigator.pop(sheetContext, ImageSource.camera),
+                  ),
+                  ActionTile(
+                    icon: Icons.photo_library_outlined,
+                    title: l10n.profile_choose_gallery,
+                    trailing: const SizedBox.shrink(),
+                    onTap:
+                        () => Navigator.pop(sheetContext, ImageSource.gallery),
+                  ),
+                ],
               ),
             ),
-            Text(
-              label,
-              style: TextStyle(color: AppColors.textSecondary, fontSize: 11.sp),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTierCard() {
-    return GlassBox(
-      padding: EdgeInsets.all(20.w),
-      child: Row(
-        children: [
-          Container(
-            padding: EdgeInsets.all(12.w),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Icon(
-              Icons.workspace_premium,
-              color: AppColors.secondaryGold,
-              size: 30.sp,
-            ),
           ),
-          SizedBox(width: 16.w),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    );
+    if (source == null || !context.mounted) return;
+    XFile? image;
+    try {
+      image = await ImagePicker().pickImage(
+        source: source,
+        maxWidth: 1024,
+        maxHeight: 1024,
+        imageQuality: 85,
+      );
+    } on PlatformException catch (e) {
+      if (!context.mounted) return;
+      final denied = e.code.contains('denied') || e.code.contains('access');
+      showAppSnackBar(
+        context,
+        denied ? l10n.photo_permission_denied : l10n.photo_pick_failed,
+        type: SnackType.error,
+      );
+      return;
+    } catch (_) {
+      if (!context.mounted) return;
+      showAppSnackBar(context, l10n.photo_pick_failed, type: SnackType.error);
+      return;
+    }
+    if (!context.mounted || image == null) return;
+    authBloc.add(UpdateProfileImageRequested(image.path));
+  }
+}
+
+// ─── Guest profile ────────────────────────────────────────────────────────────
+
+class _GuestProfile extends StatelessWidget {
+  const _GuestProfile({required this.authUnavailable});
+
+  final bool authUnavailable;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final textTheme = Theme.of(context).textTheme;
+    return ListView(
+      padding: AppSpacing.page,
+      children: [
+        AppCard(
+          padding: AppSpacing.all(24),
+          child: Column(
             children: [
+              Container(
+                width: 72.r,
+                height: 72.r,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.secondaryGold.withValues(alpha: 0.1),
+                ),
+                child: Icon(
+                  Icons.cloud_sync_outlined,
+                  size: 34.sp,
+                  color: AppColors.secondaryGold,
+                ),
+              ),
+              SizedBox(height: AppSpacing.vLg),
               Text(
-                'Elite Member',
-                style: TextStyle(
-                  color: AppColors.textMain,
-                  fontSize: 18.sp,
+                l10n.profile_guest_title,
+                textAlign: TextAlign.center,
+                style: textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
               ),
+              SizedBox(height: AppSpacing.vSm),
               Text(
-                'Top 5% of productive users',
-                style: TextStyle(
+                authUnavailable
+                    ? l10n.auth_unavailable_notice
+                    : l10n.guest_mode_notice,
+                textAlign: TextAlign.center,
+                style: textTheme.bodyMedium?.copyWith(
                   color: AppColors.textSecondary,
-                  fontSize: 13.sp,
                 ),
+              ),
+              SizedBox(height: AppSpacing.vXl),
+              PrimaryButton(
+                label: l10n.sign_in_to_sync,
+                icon: Icons.login_rounded,
+                onPressed:
+                    authUnavailable
+                        ? null
+                        : () => _push(context, const SignInPage()),
               ),
             ],
           ),
-        ],
-      ),
+        ),
+        SizedBox(height: AppSpacing.vXl),
+        const _PulseSummary(),
+        SizedBox(height: AppSpacing.vXl),
+        const _ActivityLinks(),
+      ],
     );
   }
+}
 
-  Widget _buildActionList(BuildContext context) {
+// ─── Shared sections ──────────────────────────────────────────────────────────
+
+/// Lifetime points, streaks and badges from [PulseBloc].
+class _PulseSummary extends StatelessWidget {
+  const _PulseSummary();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final textTheme = Theme.of(context).textTheme;
     return BlocBuilder<PulseBloc, PulseState>(
       builder: (context, state) {
-        final recentActivities =
-            state is PulseLoaded ? state.pulse.recentActivities : [];
-        final savedVerses = state is PulseLoaded ? state.savedVerses : [];
-        final List<String> badges = state is PulseLoaded ? state.pulse.badges : [];
-
+        final pulse = state is PulseLoaded ? state.pulse : null;
+        final badges = [
+          for (final id in BadgeIds.all)
+            if (pulse?.badges.contains(id) ?? false) id,
+          // Unknown (future) ids last.
+          for (final id in pulse?.badges ?? const <String>[])
+            if (!BadgeIds.all.contains(id)) id,
+        ];
         return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _buildActionTile(
-              Icons.history,
-              'Activity History',
-              subtitle:
-                  recentActivities.isNotEmpty
-                      ? 'Last: ${recentActivities.first.type} - ${recentActivities.first.subType ?? ""}'
-                      : 'No recent activity',
-              onTap:
-                  () => _navigateTo(
-                    context,
-                    ActivityHistoryPage(activities: recentActivities),
+            StatRow(
+              children: [
+                StatTile(
+                  icon: Icons.stars_rounded,
+                  value: formatCompactNumber(pulse?.totalPoints ?? 0),
+                  label: l10n.lifetime_points,
+                ),
+                StatTile(
+                  icon: Icons.bolt_rounded,
+                  value: '${pulse?.currentStreak ?? 0}',
+                  label: l10n.current_streak,
+                ),
+              ],
+            ),
+            SizedBox(height: AppSpacing.vMd),
+            StatRow(
+              children: [
+                StatTile(
+                  icon: Icons.local_fire_department_outlined,
+                  value: '${pulse?.longestStreak ?? 0}',
+                  label: l10n.longest_streak,
+                ),
+                StatTile(
+                  icon: Icons.workspace_premium_outlined,
+                  value: '${badges.length}',
+                  label: l10n.badges,
+                ),
+              ],
+            ),
+            SizedBox(height: AppSpacing.vXl),
+            SectionHeader(
+              title: l10n.badges,
+              icon: Icons.workspace_premium_outlined,
+            ),
+            SizedBox(height: AppSpacing.vMd),
+            if (badges.isEmpty)
+              AppCard(
+                child: Text(
+                  l10n.no_badges_yet,
+                  textAlign: TextAlign.center,
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: AppColors.textSecondary,
                   ),
-            ),
-            _buildActionTile(
-              Icons.bookmark_outline,
-              'Saved Verses',
-              subtitle: '${savedVerses.length} verses saved',
-              onTap:
-                  () => _navigateTo(
-                    context,
-                    SavedVersesPage(verses: savedVerses),
-                  ),
-            ),
-            _buildActionTile(
-              Icons.people_outline,
-              'Community Badges',
-              subtitle: '${badges.length} badges earned',
-              onTap: () => _showBadgesDialog(context, badges),
-            ),
-            _buildActionTile(
-              Icons.logout,
-              'Sign Out',
-              isDestructive: true,
-              onTap: () => _showSignOutDialog(context),
-            ),
+                ),
+              )
+            else
+              AppCard(
+                padding: EdgeInsets.zero,
+                child: Column(
+                  children: [
+                    for (var i = 0; i < badges.length; i++) ...[
+                      if (i > 0) const Divider(height: 1),
+                      ActionTile(
+                        icon: Icons.military_tech_outlined,
+                        title: l10n.translate(badgeL10nKey(badges[i])),
+                        subtitle: l10n.translate(
+                          badgeDescriptionL10nKey(badges[i]),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
           ],
         );
       },
     );
   }
-
-  void _navigateTo(BuildContext context, Widget page) {
-    Navigator.push(context, MaterialPageRoute(builder: (_) => page));
-  }
-
-  void _showBadgesDialog(BuildContext context, List<String> badges) {
-    showDialog(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            backgroundColor: AppColors.backgroundSlate,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20.r),
-            ),
-            title: const Text(
-              'Your Badges',
-              style: TextStyle(color: AppColors.textMain),
-            ),
-            content:
-                badges.isEmpty
-                    ? const Text(
-                      'Keep using the app to earn badges!',
-                      style: TextStyle(color: AppColors.textSecondary),
-                    )
-                    : Wrap(
-                      spacing: 10,
-                      runSpacing: 10,
-                      children:
-                          badges
-                              .map(
-                                (badge) => Chip(
-                                  label: Text(
-                                    badge,
-                                    style: const TextStyle(color: Colors.black),
-                                  ),
-                                  backgroundColor: AppColors.secondaryGold,
-                                ),
-                              )
-                              .toList(),
-                    ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text(
-                  'Close',
-                  style: TextStyle(color: AppColors.secondaryGold),
-                ),
-              ),
-            ],
-          ),
-    );
-  }
-
-  void _showSignOutDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            backgroundColor: AppColors.backgroundSlate,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20.r),
-            ),
-            title: const Text(
-              'Sign Out',
-              style: TextStyle(color: AppColors.textMain),
-            ),
-            content: const Text(
-              'Are you sure you want to sign out?',
-              style: TextStyle(color: AppColors.textSecondary),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text(
-                  'Cancel',
-                  style: TextStyle(color: AppColors.textSecondary),
-                ),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  context.read<AuthBloc>().add(SignOutRequested());
-                },
-                child: const Text(
-                  'Sign Out',
-                  style: TextStyle(color: Colors.redAccent),
-                ),
-              ),
-            ],
-          ),
-    );
-  }
-
-  Widget _buildActionTile(
-    IconData icon,
-    String title, {
-    String? subtitle,
-    required VoidCallback onTap,
-    bool isDestructive = false,
-  }) {
-    return ListTile(
-      leading: Icon(
-        icon,
-        color: isDestructive ? Colors.redAccent : AppColors.textSecondary,
-      ),
-      title: Text(
-        title,
-        style: TextStyle(
-          color: isDestructive ? Colors.redAccent : AppColors.textMain,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-      subtitle:
-          subtitle != null
-              ? Text(
-                subtitle,
-                style: TextStyle(
-                  color: AppColors.textSecondary,
-                  fontSize: 12.sp,
-                ),
-              )
-              : null,
-      trailing: const Icon(Icons.chevron_right, color: AppColors.textSecondary),
-      onTap: onTap,
-    );
-  }
 }
 
-// Sub-pages implementations
-class ActivityHistoryPage extends StatelessWidget {
-  final List<dynamic> activities;
-  const ActivityHistoryPage({super.key, required this.activities});
+/// Saved verses / activity history / settings tiles.
+class _ActivityLinks extends StatelessWidget {
+  const _ActivityLinks();
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.backgroundSlate,
-      appBar: AppBar(title: const Text('Activity History')),
-      body:
-          activities.isEmpty
-              ? const Center(
-                child: Text(
-                  'No activities yet.',
-                  style: TextStyle(color: AppColors.textSecondary),
-                ),
-              )
-              : ListView.builder(
-                padding: EdgeInsets.all(16.w),
-                itemCount: activities.length,
-                itemBuilder: (context, index) {
-                  final activity = activities[index];
-                  return GlassBox(
-                    padding: EdgeInsets.all(16.w),
-                    child: ListTile(
-                      leading: Icon(
-                        activity.type == 'prayer'
-                            ? Icons.mosque
-                            : Icons.menu_book,
-                        color: AppColors.secondaryGold,
-                      ),
-                      title: Text(
-                        '${activity.type.toUpperCase()} ${activity.subType ?? ""}',
-                        style: const TextStyle(color: AppColors.textMain),
-                      ),
-                      subtitle: Text(
-                        activity.timestamp.toString(),
-                        style: const TextStyle(color: AppColors.textSecondary),
-                      ),
-                      trailing: Text(
-                        '+${activity.points} pts',
-                        style: const TextStyle(
-                          color: AppColors.secondaryGold,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  );
-                },
+    final l10n = context.l10n;
+    return BlocBuilder<PulseBloc, PulseState>(
+      builder: (context, state) {
+        final loaded = state is PulseLoaded ? state : null;
+        final activities = [...?loaded?.pulse.recentActivities]
+          ..sort((a, b) => b.timestamp.compareTo(a.timestamp));
+        final savedCount = loaded?.savedVerses.length ?? 0;
+        return AppCard(
+          padding: EdgeInsets.zero,
+          child: Column(
+            children: [
+              ActionTile(
+                icon: Icons.bookmark_outline_rounded,
+                title: l10n.profile_saved_verses,
+                subtitle: l10n.profileSavedCount(savedCount),
+                onTap: () => _push(context, const SavedVersesPage()),
               ),
-    );
-  }
-}
-
-class SavedVersesPage extends StatelessWidget {
-  final List<dynamic> verses;
-  const SavedVersesPage({super.key, required this.verses});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.backgroundSlate,
-      appBar: AppBar(title: const Text('Saved Verses')),
-      body:
-          verses.isEmpty
-              ? const Center(
-                child: Text(
-                  'No saved verses.',
-                  style: TextStyle(color: AppColors.textSecondary),
-                ),
-              )
-              : ListView.builder(
-                padding: EdgeInsets.all(16.sp),
-                itemCount: verses.length,
-                itemBuilder: (context, index) {
-                  final verse = verses[index];
-                  return GlassBox(
-                    padding: EdgeInsets.all(16.w),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '${verse.surahName} (${verse.surahNumber}:${verse.ayahNumber})',
-                          style: const TextStyle(
-                            color: AppColors.secondaryGold,
-                            fontWeight: FontWeight.bold,
-                          ),
+              const Divider(height: 1),
+              ActionTile(
+                icon: Icons.history_rounded,
+                title: l10n.profile_activity_history,
+                subtitle:
+                    activities.isEmpty
+                        ? null
+                        : l10n.profileLastActivity(
+                          activityLabel(l10n, activities.first),
                         ),
-                        SizedBox(height: 8.h),
-                        Text(
-                          verse.text,
-                          style: TextStyle(
-                            color: AppColors.textMain,
-                            fontSize: 16.sp,
-                          ),
-                          textAlign: TextAlign.right,
-                        ),
-                        if (verse.translation != null) ...[
-                          SizedBox(height: 8.h),
-                          Text(
-                            verse.translation!,
-                            style: TextStyle(
-                              color: AppColors.textSecondary,
-                              fontSize: 14.sp,
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  );
-                },
+                onTap: () => _push(context, const ActivityHistoryPage()),
               ),
+              const Divider(height: 1),
+              ActionTile(
+                icon: Icons.settings_outlined,
+                title: l10n.settings,
+                onTap: () => MainNavigationScope.openTab(context, MainTab.settings, fallback: (_) => const SettingsPage()),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

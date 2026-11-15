@@ -65,7 +65,7 @@ class DefaultFirebaseOptions {
     projectId: 'barakahtime-cbfa8',
     storageBucket: 'barakahtime-cbfa8.firebasestorage.app',
     iosClientId: '630175539288-h16v371sst1fh3bnjo37joajoaplaqsd.apps.googleusercontent.com',
-    iosBundleId: 'com.example.barakahTime',
+    iosBundleId: 'com.tehreem.barakahTime',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
@@ -75,7 +75,7 @@ class DefaultFirebaseOptions {
     projectId: 'barakahtime-cbfa8',
     storageBucket: 'barakahtime-cbfa8.firebasestorage.app',
     iosClientId: '630175539288-h16v371sst1fh3bnjo37joajoaplaqsd.apps.googleusercontent.com',
-    iosBundleId: 'com.example.barakahTime',
+    iosBundleId: 'com.tehreem.barakahTime',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(

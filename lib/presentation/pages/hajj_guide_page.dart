@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../../core/theme/app_colors.dart';
-import '../widgets/glass_box.dart';
+
 import '../../core/localization/app_localizations.dart';
+import '../widgets/widgets.dart';
 
 class HajjGuidePage extends StatelessWidget {
   const HajjGuidePage({super.key});
@@ -48,80 +48,78 @@ class HajjGuidePage extends StatelessWidget {
       },
     ];
 
-    return Scaffold(
-      backgroundColor: AppColors.backgroundSlate,
-      appBar: AppBar(
-        title: Text(
-          context.l10n.hajj_guide,
-          style: const TextStyle(
-            color: AppColors.textMain,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: AppColors.secondaryGold),
-      ),
+    final textTheme = Theme.of(context).textTheme;
+    return AppScaffold(
+      title: context.l10n.hajj_guide,
       body: ListView.builder(
-        padding: EdgeInsets.all(24.w),
+        padding: AppSpacing.page,
         itemCount: steps.length,
         itemBuilder: (context, index) {
-          return Padding(
-            padding: EdgeInsets.only(bottom: 16.h),
+          final isLast = index == steps.length - 1;
+          return IntrinsicHeight(
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Column(
                   children: [
                     Container(
-                      width: 32.w,
-                      height: 32.w,
+                      width: 32.r,
+                      height: 32.r,
+                      alignment: Alignment.center,
                       decoration: const BoxDecoration(
                         color: AppColors.secondaryGold,
                         shape: BoxShape.circle,
                       ),
-                      child: Center(
-                        child: Text(
-                          '${index + 1}',
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                          ),
+                      child: Text(
+                        '${index + 1}',
+                        style: textTheme.labelLarge?.copyWith(
+                          color: AppColors.onGold,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
-                    if (index != steps.length - 1)
-                      Container(
-                        width: 2,
-                        height: 60.h,
-                        color: AppColors.secondaryGold.withOpacity(0.3),
-                      ),
+                    // Connector grows with the step card's height.
+                    Expanded(
+                      child:
+                          isLast
+                              ? const SizedBox.shrink()
+                              : Container(
+                                width: 2,
+                                margin: EdgeInsetsDirectional.symmetric(
+                                  vertical: AppSpacing.vXs,
+                                ),
+                                color: AppColors.secondaryGold.withValues(
+                                  alpha: 0.35,
+                                ),
+                              ),
+                    ),
                   ],
                 ),
-                SizedBox(width: 16.w),
+                SizedBox(width: AppSpacing.lg),
                 Expanded(
-                  child: GlassBox(
-                    padding: EdgeInsets.all(16.w),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          steps[index]['step']!,
-                          style: TextStyle(
-                            color: AppColors.textMain,
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.bold,
+                  child: Padding(
+                    padding: EdgeInsetsDirectional.only(
+                      bottom: isLast ? 0 : AppSpacing.vLg,
+                    ),
+                    child: AppCard(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            steps[index]['step']!,
+                            style: textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                        SizedBox(height: 8.h),
-                        Text(
-                          steps[index]['desc']!,
-                          style: TextStyle(
-                            color: AppColors.textSecondary,
-                            fontSize: 13.sp,
+                          SizedBox(height: AppSpacing.vSm),
+                          Text(
+                            steps[index]['desc']!,
+                            style: textTheme.bodyMedium?.copyWith(
+                              color: AppColors.textSecondary,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),

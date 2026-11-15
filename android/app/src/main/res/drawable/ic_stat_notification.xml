@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Monochrome status-bar icon (white silhouette: crescent above a mosque dome). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Crescent -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M12.6,1.2a3,3 0,1 0,2.4 5.1a2.4,2.4 0,1 1,-2.4 -5.1z" />
+    <!-- Dome -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M12,7.2c-3.3,1.6 -5.4,3.9 -5.4,6.6h10.8c0,-2.7 -2.1,-5 -5.4,-6.6z" />
+    <!-- Body with door -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M6,14.6h12v7.6h-4.4v-3.4a1.6,1.6 0,0 0,-3.2 0v3.4H6z" />
+    <!-- Minarets -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M2.4,10.4h2v11.8h-2zM19.6,10.4h2v11.8h-2zM3.4,8l1.2,2h-2.4zM20.6,8l1.2,2h-2.4z" />
+</vector>

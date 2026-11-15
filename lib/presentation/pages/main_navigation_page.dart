@@ -1,15 +1,22 @@
-import 'package:barakah_time/core/theme/app_colors.dart';
-import 'package:barakah_time/presentation/pages/home_page.dart';
-import 'package:barakah_time/presentation/pages/quran_page.dart';
-import 'package:barakah_time/presentation/widgets/audio_control_bar.dart';
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
+import '../../core/localization/app_localizations.dart';
+import '../../core/services/notification_service.dart';
+import '../../injection_container.dart';
+import '../widgets/audio_control_bar.dart';
+import 'home_page.dart';
+import 'main_navigation_scope.dart';
+import 'prayer_times_page.dart';
 import 'pulse_page.dart';
+import 'quran_page.dart';
 import 'settings_page.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import '../blocs/settings_bloc.dart';
-import '../blocs/prayer_bloc.dart';
 
+export 'main_navigation_scope.dart';
+
+/// Prayer-time reloading on settings changes lives in the app-level
+/// coordinator (main.dart), so it works no matter which page is visible.
 class MainNavigationPage extends StatefulWidget {
   const MainNavigationPage({super.key});
 
@@ -18,80 +25,119 @@ class MainNavigationPage extends StatefulWidget {
 }
 
 class _MainNavigationPageState extends State<MainNavigationPage> {
-  int _selectedIndex = 0;
+  MainTab _tab = MainTab.home;
 
-  final List<Widget> _pages = [
-    const HomePage(),
-    const QuranPage(),
-    const PulsePage(),
-    const SettingsPage(),
-  ];
+  /// Tabs are built lazily on first visit, then kept alive in the
+  /// IndexedStack so their state and scroll position survive tab switches.
+  final Set<MainTab> _visited = {MainTab.home};
+
+  StreamSubscription<String?>? _notificationSub;
+
+  static const Map<MainTab, Widget> _pages = {
+    MainTab.home: HomePage(),
+    MainTab.quran: QuranPage(),
+    MainTab.pulse: PulsePage(),
+    MainTab.settings: SettingsPage(),
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    if (sl.isRegistered<NotificationService>()) {
+      final notifications = sl<NotificationService>();
+      _notificationSub = notifications.onNotificationTap.listen(
+        _handleNotification,
+      );
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        _handleNotification(notifications.takeLaunchPayload());
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _notificationSub?.cancel();
+    super.dispose();
+  }
+
+  /// Pops everything above this page (pushed pages, sheets, dialogs).
+  void _popToMain() {
+    final route = ModalRoute.of(context);
+    final navigator = Navigator.of(context);
+    if (route == null) {
+      navigator.popUntil((r) => r.isFirst);
+    } else {
+      navigator.popUntil((r) => r == route || r.isFirst);
+    }
+  }
+
+  void _switchTo(MainTab tab) {
+    if (!mounted) return;
+    _popToMain();
+    if (_tab == tab) return;
+    setState(() {
+      _tab = tab;
+      _visited.add(tab);
+    });
+  }
+
+  void _handleNotification(String? payload) {
+    if (!mounted || !PrayerNotificationPayload.isPrayer(payload)) return;
+    _switchTo(MainTab.home);
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => const PrayerTimesPage()));
+  }
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<SettingsBloc, SettingsState>(
-      listenWhen:
-          (previous, current) =>
-              previous.calculationMethod != current.calculationMethod ||
-              previous.useAutoLocation != current.useAutoLocation ||
-              previous.manualLocation != current.manualLocation,
-      listener: (context, state) {
-        context.read<PrayerBloc>().add(
-          LoadPrayerTimesWithLocation(
-            method: state.calculationMethod,
-            latitude: state.useAutoLocation ? null : state.manualLatitude,
-            longitude: state.useAutoLocation ? null : state.manualLongitude,
-          ),
-        );
-      },
+    final l10n = context.l10n;
+    return MainNavigationScope(
+      currentTab: _tab,
+      onSwitch: _switchTo,
       child: Scaffold(
         body: Column(
           children: [
-            Expanded(child: _pages[_selectedIndex]),
+            Expanded(
+              child: IndexedStack(
+                index: _tab.index,
+                children: [
+                  for (final tab in MainTab.values)
+                    _visited.contains(tab)
+                        ? _pages[tab]!
+                        : const SizedBox.shrink(),
+                ],
+              ),
+            ),
             const AudioControlBar(),
           ],
         ),
-        bottomNavigationBar: Container(
-          decoration: BoxDecoration(
-            border: Border(
-              top: BorderSide(color: Colors.white.withOpacity(0.05), width: 1),
+        bottomNavigationBar: NavigationBar(
+          selectedIndex: _tab.index,
+          onDestinationSelected: (i) => _switchTo(MainTab.values[i]),
+          destinations: [
+            NavigationDestination(
+              icon: const Icon(Icons.home_outlined),
+              selectedIcon: const Icon(Icons.home_rounded),
+              label: l10n.home,
             ),
-          ),
-          child: BottomNavigationBar(
-            currentIndex: _selectedIndex,
-            onTap: (index) => setState(() => _selectedIndex = index),
-            backgroundColor: AppColors.backgroundSlate,
-            type: BottomNavigationBarType.fixed,
-            selectedItemColor: AppColors.secondaryGold,
-            unselectedItemColor: AppColors.textSecondary,
-            selectedLabelStyle: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 12,
+            NavigationDestination(
+              icon: const Icon(Icons.menu_book_outlined),
+              selectedIcon: const Icon(Icons.menu_book_rounded),
+              label: l10n.quran,
             ),
-            unselectedLabelStyle: const TextStyle(fontSize: 12),
-            items: const [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.home_outlined),
-                activeIcon: Icon(Icons.home),
-                label: 'Home',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.menu_book_outlined),
-                activeIcon: Icon(Icons.menu_book),
-                label: 'Quran',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.bolt_outlined),
-                activeIcon: Icon(Icons.bolt),
-                label: 'Pulse',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.settings_outlined),
-                activeIcon: Icon(Icons.settings),
-                label: 'Settings',
-              ),
-            ],
-          ),
+            NavigationDestination(
+              icon: const Icon(Icons.bolt_outlined),
+              selectedIcon: const Icon(Icons.bolt_rounded),
+              label: l10n.pulse,
+            ),
+            NavigationDestination(
+              icon: const Icon(Icons.settings_outlined),
+              selectedIcon: const Icon(Icons.settings_rounded),
+              label: l10n.settings,
+            ),
+          ],
         ),
       ),
     );

@@ -28,5 +28,7 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>NSLocationUsageDescription</key>
+	<string>Barakah Time uses your location to calculate accurate prayer times and the Qibla direction.</string>
 </dict>
 </plist>
