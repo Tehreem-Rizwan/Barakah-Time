@@ -1,111 +1,222 @@
 import 'package:hive/hive.dart';
+import '../../core/services/user_data_sync_service.dart';
+import '../../domain/entities/badge.dart';
 import '../../domain/entities/spiritual_activity.dart';
 import '../../domain/entities/spiritual_pulse.dart';
 import '../../domain/repositories/spiritual_pulse_repository.dart';
+import '../datasources/local/local_store.dart';
 
+/// Hive is the offline cache / source for the UI; every new activity and
+/// newly earned badge is also pushed to Firestore when signed in.
 class SpiritualPulseRepositoryImpl implements SpiritualPulseRepository {
-  static const String _boxName = 'spiritual_activities';
+  static const String _boxName = LocalBoxes.activities;
+
+  final UserDataSync? sync;
+
+  SpiritualPulseRepositoryImpl({this.sync});
+
+  /// Serializes writes so concurrent check-then-write can't create duplicates.
+  Future<void> _writeChain = Future.value();
 
   @override
   Future<SpiritualPulseEntity> getPulseData() async {
     final box = await Hive.openBox<SpiritualActivity>(_boxName);
-    final activities = box.values.toList();
-
-    // Calculate daily points for the last 7 days
+    // Hive orders values by key (and keys are ids), so sort chronologically.
+    final activities =
+        box.values.toList()..sort((a, b) => a.timestamp.compareTo(b.timestamp));
     final now = DateTime.now();
-    final dailyPoints = List.generate(7, (index) {
-      final date = now.subtract(Duration(days: 6 - index));
-      final dayActivities = activities.where((a) =>
-          a.timestamp.year == date.year &&
-          a.timestamp.month == date.month &&
-          a.timestamp.day == date.day);
 
-      int points = 0;
-      for (var activity in dayActivities) {
-        points += activity.points;
-      }
-      return points > 100 ? 100 : points;
-    });
-
+    final dailyPoints = dailyPointsForLastWeek(activities, now);
     final recentActivities = activities.reversed.take(10).toList();
-    final streak = _calculateStreak(activities);
+    final timestamps = activities.map((a) => a.timestamp);
+    final streak = calculateStreak(timestamps, now);
+    final longest = calculateLongestStreak(timestamps);
+    final total = activities.fold<int>(0, (s, a) => s + a.points);
 
-    // Badges logic
-    List<String> badges = [];
-    if (streak >= 7) badges.add('7 Day Streak');
-    if (streak >= 30) badges.add('Monthly Master');
-    if (dailyPoints.any((p) => p >= 100)) badges.add('Daily Achiever');
-    if (activities.length >= 50) badges.add('Spiritual Veteran');
+    final badges = await _updateBadges(
+      computeEarnedBadgeIds(activities, longestStreak: longest),
+      now,
+    );
 
     return SpiritualPulseEntity(
       dailyPoints: dailyPoints,
       currentStreak: streak,
-      motivationalMessage: _getMotivationalMessage(dailyPoints.last),
+      longestStreak: longest,
+      totalPoints: total,
+      motivation: MotivationLevelX.forPoints(dailyPoints.last),
       recentActivities: recentActivities,
       badges: badges,
     );
   }
 
-  @override
-  Future<void> logActivity(SpiritualActivity activity) async {
-    final box = await Hive.openBox<SpiritualActivity>(_boxName);
-    
-    // For prayers, we only want one entry per prayer per day
-    if (activity.type == 'prayer') {
-      final existing = box.values.where((a) => 
-        a.type == 'prayer' && 
-        a.subType == activity.subType && 
-        a.timestamp.year == activity.timestamp.year &&
-        a.timestamp.month == activity.timestamp.month &&
-        a.timestamp.day == activity.timestamp.day
-      );
-      if (existing.isNotEmpty) return; // Already logged
+  /// Persists newly earned badges (locally + cloud) and returns all earned
+  /// badge ids in display order.
+  Future<List<String>> _updateBadges(
+    Set<String> qualifying,
+    DateTime now,
+  ) async {
+    final meta = await Hive.openBox(LocalBoxes.pulseMeta);
+    final earned = UserDataSyncService.readLocalBadges(meta);
+    final newOnes = {
+      for (final id in qualifying)
+        if (!earned.containsKey(id)) id: now,
+    };
+    if (newOnes.isNotEmpty) {
+      earned.addAll(newOnes);
+      await UserDataSyncService.writeLocalBadges(meta, earned);
+      sync?.pushBadges(newOnes);
     }
-
-    await box.add(activity);
+    return sortBadgeIds(earned.keys);
   }
 
-  int _calculateStreak(List<SpiritualActivity> activities) {
-    if (activities.isEmpty) return 0;
-    
-    final dates = activities
-        .map((a) => DateTime(a.timestamp.year, a.timestamp.month, a.timestamp.day))
-        .toSet()
-        .toList()
-      ..sort((a, b) => b.compareTo(a));
+  @override
+  Future<List<SpiritualActivity>> getActivitiesOn(DateTime day) async {
+    final box = await Hive.openBox<SpiritualActivity>(_boxName);
+    return box.values.where((a) => isSameDay(a.timestamp, day)).toList();
+  }
 
-    int streak = 0;
-    DateTime today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
-    
-    if (dates.isEmpty) return 0;
+  @override
+  Future<bool> logActivity(SpiritualActivity activity) {
+    final result = _writeChain.then((_) => _logActivity(activity));
+    _writeChain = result.then<void>((_) {}, onError: (_) {});
+    return result;
+  }
 
-    // Check if the latest activity was today or yesterday
-    if (dates.first.isBefore(today.subtract(const Duration(days: 1)))) {
+  Future<bool> _logActivity(SpiritualActivity activity) async {
+    final box = await Hive.openBox<SpiritualActivity>(_boxName);
+
+    // Idempotent by id (e.g. deterministic "surah_<n>_<yyyyMMdd>" ids).
+    if (box.containsKey(activity.id) ||
+        box.values.any((a) => a.id == activity.id)) {
+      return false;
+    }
+
+    // For prayers, we only want one entry per prayer per day
+    if (activity.type == 'prayer' &&
+        box.values.any(
+          (a) =>
+              a.type == 'prayer' &&
+              a.subType == activity.subType &&
+              isSameDay(a.timestamp, activity.timestamp),
+        )) {
+      return false;
+    }
+
+    await box.put(activity.id, activity);
+    final s = sync;
+    if (s != null && s.currentUid != null) {
+      s.pushActivity(
+        activity,
+        longestStreak: calculateLongestStreak(
+          box.values.map((a) => a.timestamp),
+        ),
+      );
+    }
+    return true;
+  }
+
+  static bool isSameDay(DateTime a, DateTime b) =>
+      a.year == b.year && a.month == b.month && a.day == b.day;
+
+  /// Points (capped at 100) for each of the last 7 calendar days, oldest
+  /// first, ending with [now]'s day. Uses calendar-day arithmetic so DST
+  /// transitions don't skip or repeat a day.
+  static List<int> dailyPointsForLastWeek(
+    List<SpiritualActivity> activities,
+    DateTime now,
+  ) {
+    return List.generate(7, (index) {
+      final date = DateTime(now.year, now.month, now.day - (6 - index));
+      var points = 0;
+      for (final a in activities) {
+        if (isSameDay(a.timestamp, date)) points += a.points;
+      }
+      return points > 100 ? 100 : points;
+    });
+  }
+
+  /// Consecutive days with activity, ending today or yesterday.
+  static int calculateStreak(Iterable<DateTime> timestamps, DateTime now) {
+    final days =
+        timestamps.map((t) => DateTime(t.year, t.month, t.day)).toSet();
+    if (days.isEmpty) return 0;
+
+    final today = DateTime(now.year, now.month, now.day);
+    final yesterday = DateTime(now.year, now.month, now.day - 1);
+    DateTime cursor;
+    if (days.contains(today)) {
+      cursor = today;
+    } else if (days.contains(yesterday)) {
+      cursor = yesterday;
+    } else {
       return 0;
     }
 
-    DateTime current = dates.first;
-    streak = 1;
-
-    for (int i = 1; i < dates.length; i++) {
-        if (dates[i] == current.subtract(const Duration(days: 1))) {
-            streak++;
-            current = dates[i];
-        } else if (dates[i] == current) {
-            continue;
-        } else {
-            break;
-        }
+    var streak = 0;
+    while (days.contains(cursor)) {
+      streak++;
+      cursor = DateTime(cursor.year, cursor.month, cursor.day - 1);
     }
-
     return streak;
   }
 
-  String _getMotivationalMessage(int todayPoints) {
-    if (todayPoints >= 100) return "MashaAllah! You've achieved your spiritual goals for today. ✨";
-    if (todayPoints >= 75) return "Great progress! Just a little more to hit your target. 🚀";
-    if (todayPoints >= 50) return "You're halfway through! Keep up the momentum. 💪";
-    if (todayPoints > 0) return "Good start! Keep moving towards your goals. ⚡";
-    return "Start your spiritual journey for today. Every step counts! 🌱";
+  /// Longest run of consecutive calendar days with any activity.
+  static int calculateLongestStreak(Iterable<DateTime> timestamps) {
+    final days =
+        timestamps.map((t) => DateTime(t.year, t.month, t.day)).toSet().toList()
+          ..sort();
+    var best = 0;
+    var run = 0;
+    DateTime? prev;
+    for (final d in days) {
+      final expected =
+          prev == null ? null : DateTime(prev.year, prev.month, prev.day + 1);
+      run = (expected != null && expected == d) ? run + 1 : 1;
+      if (run > best) best = run;
+      prev = d;
+    }
+    return best;
+  }
+
+  /// Badge ids [activities] currently qualify for. Streak badges use the
+  /// longest streak ever, so they are never lost.
+  static Set<String> computeEarnedBadgeIds(
+    List<SpiritualActivity> activities, {
+    int? longestStreak,
+  }) {
+    final ids = <String>{};
+    if (activities.isEmpty) return ids;
+    ids.add(BadgeIds.firstStep);
+    final longest =
+        longestStreak ??
+        calculateLongestStreak(activities.map((a) => a.timestamp));
+    if (longest >= 7) ids.add(BadgeIds.streak7);
+    if (longest >= 30) ids.add(BadgeIds.streak30);
+    if (longest >= 100) ids.add(BadgeIds.streak100);
+
+    final perDay = <DateTime, int>{};
+    var total = 0;
+    for (final a in activities) {
+      final d = DateTime(a.timestamp.year, a.timestamp.month, a.timestamp.day);
+      perDay[d] = (perDay[d] ?? 0) + a.points;
+      total += a.points;
+    }
+    if (perDay.values.any((p) => p >= 100)) ids.add(BadgeIds.dailyAchiever);
+    if (activities.length >= 50) ids.add(BadgeIds.spiritualVeteran);
+    if (total >= 1000) ids.add(BadgeIds.points1000);
+    return ids;
+  }
+
+  /// Sorts known ids in [BadgeIds.all] order; unknown ids go last.
+  static List<String> sortBadgeIds(Iterable<String> ids) {
+    int rank(String id) {
+      final i = BadgeIds.all.indexOf(id);
+      return i < 0 ? BadgeIds.all.length : i;
+    }
+
+    return ids.toList()..sort((a, b) {
+      final r = rank(a).compareTo(rank(b));
+      return r != 0 ? r : a.compareTo(b);
+    });
   }
 }

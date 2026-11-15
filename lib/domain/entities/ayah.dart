@@ -36,9 +36,10 @@ class Ayah {
       ruku: json['ruku'],
       hizbQuarter: json['hizbQuarter'],
       audio: json['audio'],
-      audioSecondary: json['audioSecondary'] != null
-          ? List<String>.from(json['audioSecondary'])
-          : null,
+      audioSecondary:
+          json['audioSecondary'] != null
+              ? List<String>.from(json['audioSecondary'])
+              : null,
     );
   }
 

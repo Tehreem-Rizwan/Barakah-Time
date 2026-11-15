@@ -1,129 +1,204 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:adhan/adhan.dart';
-import 'package:hijri/hijri_calendar.dart';
-import '../../core/theme/app_colors.dart';
-import '../widgets/glass_box.dart';
-import 'names_all_page.dart';
-import 'tasbeeh_page.dart';
-import 'quran_page.dart';
-import 'pulse_page.dart';
-import 'prayer_times_page.dart';
+
+import '../../core/localization/app_localizations.dart';
+import '../widgets/widgets.dart';
 import 'duas_page.dart';
-import 'qibla_page.dart';
-import 'zakat_calculator_page.dart';
-import 'islamic_calendar_page.dart';
-import 'mosque_finder_page.dart';
 import 'hajj_guide_page.dart';
+import 'hijri_label.dart';
+import 'islamic_calendar_page.dart';
+import 'main_navigation_scope.dart';
+import 'mosque_finder_page.dart';
+import 'names_all_page.dart';
+import 'prayer_times_page.dart';
+import 'pulse_page.dart';
+import 'qibla_page.dart';
+import 'quran_page.dart';
+import 'settings_page.dart';
+import 'tasbeeh_page.dart';
+import 'zakat_calculator_page.dart';
+
+class _Tool {
+  const _Tool({
+    required this.icon,
+    required this.label,
+    required this.page,
+    this.tab,
+    this.subtitle,
+  });
+
+  final IconData icon;
+  final String label;
+  final String? subtitle;
+  final WidgetBuilder page;
+
+  /// Set for destinations that are bottom-navigation tabs.
+  final MainTab? tab;
+}
 
 class ToolsGridPage extends StatelessWidget {
   const ToolsGridPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final hijri = HijriCalendar.now();
-    final hijriLabel = '${hijri.hDay} ${hijri.longMonthName}';
+    final l10n = context.l10n;
 
-    final List<Map<String, dynamic>> tools = [
-      {
-        'icon': Icons.mosque,
-        'label': 'Prayer',
-        'page': const PrayerTimesPage(),
-      },
-      {'icon': Icons.menu_book, 'label': 'Quran', 'page': const QuranPage()},
-      {'icon': Icons.timer, 'label': 'Tasbeeh', 'page': const TasbeehPage()},
-      {
-        'icon': Icons.auto_awesome,
-        'label': '99 Names',
-        'page': const NamesOfAllahPage(),
-      },
-      {'icon': Icons.explore, 'label': 'Qibla', 'page': const QiblaPage()},
-      {'icon': Icons.favorite, 'label': 'Duas', 'page': const DuasPage()},
-      {
-        'icon': Icons.calculate,
-        'label': 'Zakat',
-        'page': const ZakatCalculatorPage(),
-      },
-      {
-        'icon': Icons.calendar_month,
-        'label': hijriLabel,
-        'page': const IslamicCalendarPage(),
-      },
-      {
-        'icon': Icons.location_on,
-        'label': 'Mosques',
-        'page': const MosqueFinderPage(),
-      },
-      {
-        'icon': Icons.directions_walk,
-        'label': 'Hajj Guide',
-        'page': const HajjGuidePage(),
-      },
-      {'icon': Icons.bolt, 'label': 'Pulse', 'page': const PulsePage()},
-      {'icon': Icons.settings, 'label': 'Settings', 'page': null},
+    final tools = <_Tool>[
+      _Tool(
+        icon: Icons.access_time_rounded,
+        label: l10n.prayer_times,
+        page: (_) => const PrayerTimesPage(),
+      ),
+      _Tool(
+        icon: Icons.menu_book_rounded,
+        label: l10n.quran,
+        page: (_) => const QuranPage(),
+        tab: MainTab.quran,
+      ),
+      _Tool(
+        icon: Icons.blur_circular_rounded,
+        label: l10n.tasbeeh,
+        page: (_) => const TasbeehPage(),
+      ),
+      _Tool(
+        icon: Icons.auto_awesome,
+        label: l10n.names_of_allah,
+        page: (_) => const NamesOfAllahPage(),
+      ),
+      _Tool(
+        icon: Icons.explore_outlined,
+        label: l10n.qibla_finder,
+        page: (_) => const QiblaPage(),
+      ),
+      _Tool(
+        icon: Icons.volunteer_activism_outlined,
+        label: l10n.daily_duas,
+        page: (_) => const DuasPage(),
+      ),
+      _Tool(
+        icon: Icons.calculate_outlined,
+        label: l10n.zakat_calculator,
+        page: (_) => const ZakatCalculatorPage(),
+      ),
+      _Tool(
+        icon: Icons.calendar_month_outlined,
+        label: l10n.islamic_calendar,
+        subtitle: hijriDateLabel(DateTime.now(), l10n, withYear: false),
+        page: (_) => const IslamicCalendarPage(),
+      ),
+      _Tool(
+        icon: Icons.mosque_outlined,
+        label: l10n.mosque_finder,
+        page: (_) => const MosqueFinderPage(),
+      ),
+      _Tool(
+        icon: Icons.directions_walk_rounded,
+        label: l10n.hajj_guide,
+        page: (_) => const HajjGuidePage(),
+      ),
+      _Tool(
+        icon: Icons.bolt_rounded,
+        label: l10n.pulse,
+        page: (_) => const PulsePage(),
+        tab: MainTab.pulse,
+      ),
+      _Tool(
+        icon: Icons.settings_outlined,
+        label: l10n.settings,
+        page: (_) => const SettingsPage(),
+        tab: MainTab.settings,
+      ),
     ];
 
-    return Scaffold(
-      backgroundColor: AppColors.backgroundSlate,
-      appBar: AppBar(
-        title: const Text('All Tools'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.secondaryGold),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: GridView.builder(
-        padding: EdgeInsets.all(24.sp),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
-          mainAxisSpacing: 20.h,
-          crossAxisSpacing: 16.w,
-          childAspectRatio: 0.85,
-        ),
-        itemCount: tools.length,
-        itemBuilder: (context, index) {
-          final tool = tools[index];
-          return GestureDetector(
-            onTap: () {
-              if (tool['page'] != null) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => tool['page']),
-                );
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('${tool['label']} coming soon!')),
-                );
-              }
-            },
-            child: Column(
-              children: [
-                Expanded(
-                  child: GlassBox(
-                    width: double.infinity,
-                    child: Center(
-                      child: Icon(
-                        tool['icon'],
-                        color: AppColors.secondaryGold,
-                        size: 32.sp,
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 8.h),
-                Text(
-                  tool['label'],
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: AppColors.textMain,
-                    fontSize: 13.sp,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
+    return AppScaffold(
+      title: l10n.all_tools,
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final columns = constraints.maxWidth >= 600 ? 4 : 3;
+          return GridView.builder(
+            padding: AppSpacing.page,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: columns,
+              mainAxisSpacing: AppSpacing.vMd,
+              crossAxisSpacing: AppSpacing.md,
+              // Taller cells when text is enlarged so labels never clip.
+              childAspectRatio:
+                  0.82 /
+                  MediaQuery.textScalerOf(context).scale(1).clamp(1, 1.6),
             ),
+            itemCount: tools.length,
+            itemBuilder: (context, index) => _ToolTile(tool: tools[index]),
           );
         },
+      ),
+    );
+  }
+}
+
+class _ToolTile extends StatelessWidget {
+  const _ToolTile({required this.tool});
+
+  final _Tool tool;
+
+  void _open(BuildContext context) {
+    final tab = tool.tab;
+    if (tab != null) {
+      MainNavigationScope.openTab(context, tab, fallback: tool.page);
+    } else {
+      Navigator.of(context).push(MaterialPageRoute(builder: tool.page));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    return AppCard(
+      onTap: () => _open(context),
+      borderRadius: AppRadius.mdAll,
+      padding: AppSpacing.all(8),
+      semanticLabel:
+          tool.subtitle == null
+              ? tool.label
+              : '${tool.label}, ${tool.subtitle}',
+      child: ExcludeSemantics(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 48.r,
+              height: 48.r,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.secondaryGold.withValues(alpha: 0.12),
+              ),
+              child: Icon(
+                tool.icon,
+                color: AppColors.secondaryGold,
+                size: 26.sp,
+              ),
+            ),
+            SizedBox(height: AppSpacing.vSm),
+            Flexible(
+              child: Text(
+                tool.label,
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: textTheme.labelMedium,
+              ),
+            ),
+            if (tool.subtitle != null)
+              Text(
+                tool.subtitle!,
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: textTheme.labelSmall?.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }

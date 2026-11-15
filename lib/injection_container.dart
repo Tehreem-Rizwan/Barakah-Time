@@ -1,4 +1,5 @@
 import 'package:barakah_time/data/datasources/remote/adhan_service.dart';
+import 'package:barakah_time/data/repositories/tasbeeh_repository.dart';
 import 'package:barakah_time/domain/repositories/spiritual_pulse_repository.dart';
 import 'package:barakah_time/presentation/blocs/auth_bloc.dart';
 import 'package:barakah_time/presentation/blocs/settings_bloc.dart';
@@ -9,6 +10,8 @@ import 'package:barakah_time/core/services/location_service.dart';
 import 'package:barakah_time/core/services/supabase_service.dart';
 import 'package:barakah_time/core/services/firebase_service.dart';
 import 'package:barakah_time/core/services/audio_service.dart';
+import 'package:barakah_time/core/services/notification_service.dart';
+import 'package:barakah_time/core/services/user_data_sync_service.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -24,29 +27,46 @@ final sl = GetIt.instance;
 
 Future<void> init() async {
   // Blocs
-  sl.registerFactory(() => AuthBloc(sl(), sl(), sl()));
-  sl.registerFactory(() => PrayerBloc(sl()));
+  sl.registerFactory(
+    () => AuthBloc(sl(), sl(), sl(), sync: sl<UserDataSyncService>()),
+  );
+  sl.registerFactory(() => PrayerBloc(sl(), sl()));
   sl.registerFactory(
     () => PulseBloc(repository: sl(), savedVersesRepository: sl()),
   );
   sl.registerFactory(() => QuranBloc(sl()));
-  sl.registerFactory(() => SettingsBloc(sl()));
+  sl.registerFactory(
+    () => SettingsBloc(
+      sl(),
+      notificationService: sl(),
+      geocoder: sl<LocationService>().geocode,
+      sync: sl<UserDataSyncService>(),
+    ),
+  );
   sl.registerFactory(() => LocationBloc(sl()));
 
   // Repositories
   sl.registerLazySingleton<PrayerRepository>(() => PrayerRepositoryImpl(sl()));
   sl.registerLazySingleton<SpiritualPulseRepository>(
-    () => SpiritualPulseRepositoryImpl(),
+    () => SpiritualPulseRepositoryImpl(sync: sl<UserDataSyncService>()),
   );
-  sl.registerLazySingleton<SavedVersesRepository>(() => SavedVersesRepositoryImpl());
+  sl.registerLazySingleton<SavedVersesRepository>(
+    () => SavedVersesRepositoryImpl(sync: sl<UserDataSyncService>()),
+  );
   sl.registerLazySingleton(() => QuranRepository());
+  sl.registerLazySingleton(
+    () => TasbeehRepository(sl(), sync: sl<UserDataSyncService>()),
+  );
 
-  // External & Services
+  // External & Services (all resolve SDK instances lazily, so a failed
+  // Firebase/Supabase init never breaks DI).
   final sharedPreferences = await SharedPreferences.getInstance();
   sl.registerLazySingleton(() => sharedPreferences);
   sl.registerLazySingleton(() => AdhanService());
-  sl.registerLazySingleton(() => LocationService());
+  sl.registerLazySingleton(() => LocationService(prefs: sl()));
   sl.registerLazySingleton(() => SupabaseService());
   sl.registerLazySingleton(() => FirebaseService());
+  sl.registerLazySingleton(() => UserDataSyncService(sl(), sl()));
   sl.registerLazySingleton(() => AudioService());
+  sl.registerLazySingleton(() => NotificationService());
 }

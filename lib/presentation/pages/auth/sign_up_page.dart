@@ -1,11 +1,12 @@
-import 'package:barakah_time/core/theme/app_colors.dart';
-import 'package:barakah_time/presentation/blocs/auth_bloc.dart';
-import 'package:barakah_time/presentation/widgets/glass_box.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../core/localization/app_localizations.dart';
+import '../../blocs/auth_bloc.dart';
+import '../../widgets/widgets.dart';
 import '../main_navigation_page.dart';
+import 'sign_in_page.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -15,275 +16,238 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
+  final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+  final _emailFocus = FocusNode();
+  final _passwordFocus = FocusNode();
+  final _confirmFocus = FocusNode();
+  bool _appleAvailable = false;
+  AuthAction? _action;
+
+  @override
+  void initState() {
+    super.initState();
+    appleSignInAvailable().then((available) {
+      if (mounted && available) setState(() => _appleAvailable = true);
+    });
+  }
 
   @override
   void dispose() {
     _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    _emailFocus.dispose();
+    _passwordFocus.dispose();
+    _confirmFocus.dispose();
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.backgroundSlate,
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios_new,
-            color: AppColors.secondaryGold,
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
-      extendBodyBehindAppBar: true,
-      body: BlocListener<AuthBloc, AuthState>(
-        listener: (context, state) {
-          if (state is Authenticated) {
-            Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (_) => const MainNavigationPage()),
-              (route) => false,
-            );
-          } else if (state is AuthError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: Colors.redAccent,
-              ),
-            );
-          }
-        },
-        child: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Color(0xFF00382E), AppColors.backgroundSlate],
-            ),
-          ),
-          child: SafeArea(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.symmetric(horizontal: 24.w),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Center(
-                    child: Container(
-                      padding: EdgeInsets.all(16.w),
-                      decoration: BoxDecoration(
-                        color: AppColors.secondaryGold.withOpacity(0.1),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.person_add_outlined,
-                        size: 50.sp,
-                        color: AppColors.secondaryGold,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 24.h),
-                  Center(
-                    child: Text(
-                      'Create Account',
-                      style: TextStyle(
-                        color: AppColors.textMain,
-                        fontSize: 28.sp,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 8.h),
-                  Center(
-                    child: Text(
-                      'Join our community and grow together',
-                      style: TextStyle(
-                        color: AppColors.textSecondary,
-                        fontSize: 14.sp,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 40.h),
-                  _buildTextField(
-                    controller: _nameController,
-                    hintText: 'Full Name',
-                    icon: Icons.person_outline,
-                  ),
-                  SizedBox(height: 16.h),
-                  _buildTextField(
-                    controller: _emailController,
-                    hintText: 'Email Address',
-                    icon: Icons.email_outlined,
-                  ),
-                  SizedBox(height: 16.h),
-                  _buildTextField(
-                    controller: _passwordController,
-                    hintText: 'Password',
-                    icon: Icons.lock_outline,
-                    isPassword: true,
-                  ),
-                  SizedBox(height: 32.h),
-                  BlocBuilder<AuthBloc, AuthState>(
-                    builder: (context, state) {
-                      return ElevatedButton(
-                        onPressed:
-                            state is AuthLoading
-                                ? null
-                                : () {
-                                  context.read<AuthBloc>().add(
-                                    SignUpRequested(
-                                      _nameController.text,
-                                      _emailController.text,
-                                      _passwordController.text,
-                                    ),
-                                  );
-                                },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.secondaryGold,
-                          foregroundColor: Colors.white,
-                          minimumSize: Size(double.infinity, 56.h),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16.r),
-                          ),
-                          elevation: 0,
-                        ),
-                        child:
-                            state is AuthLoading
-                                ? const CircularProgressIndicator(
-                                  color: Colors.white,
-                                )
-                                : Text(
-                                  'REGISTER',
-                                  style: TextStyle(
-                                    fontSize: 16.sp,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 1.2,
-                                  ),
-                                ),
-                      );
-                    },
-                  ),
-                  SizedBox(height: 24.h),
-                  Row(
-                    children: [
-                      const Expanded(child: Divider(color: AppColors.textSecondary)),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16.w),
-                        child: Text(
-                          'OR',
-                          style: TextStyle(
-                            color: AppColors.textSecondary,
-                            fontSize: 14.sp,
-                          ),
-                        ),
-                      ),
-                      const Expanded(child: Divider(color: AppColors.textSecondary)),
-                    ],
-                  ),
-                  SizedBox(height: 24.h),
-                  ElevatedButton(
-                    onPressed: () {
-                      context.read<AuthBloc>().add(GoogleSignInRequested());
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: Colors.black87,
-                      minimumSize: Size(double.infinity, 56.h),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16.r),
-                      ),
-                      elevation: 0,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          padding: EdgeInsets.all(4.w),
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.blue,
-                          ),
-                          child: Text(
-                            'G',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: 12.w),
-                        Text(
-                          'Continue with Google',
-                          style: TextStyle(
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 1.0,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 24.h),
-                  Center(
-                    child: GestureDetector(
-                      onTap: () => Navigator.pop(context),
-                      child: RichText(
-                        text: TextSpan(
-                          text: 'Already have an account? ',
-                          style: TextStyle(
-                            color: AppColors.textSecondary,
-                            fontSize: 14.sp,
-                          ),
-                          children: [
-                            TextSpan(
-                              text: 'Sign In',
-                              style: TextStyle(
-                                color: AppColors.secondaryGold,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 24.h),
-                ],
-              ),
-            ),
-          ),
-        ),
+  void _submit() {
+    FocusScope.of(context).unfocus();
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+    TextInput.finishAutofillContext();
+    setState(() => _action = AuthAction.email);
+    context.read<AuthBloc>().add(
+      SignUpRequested(
+        _nameController.text.trim(),
+        _emailController.text.trim(),
+        _passwordController.text,
       ),
     );
   }
 
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String hintText,
-    required IconData icon,
-    bool isPassword = false,
-  }) {
-    return GlassBox(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.h),
-      child: TextField(
-        controller: controller,
-        obscureText: isPassword,
-        style: const TextStyle(color: AppColors.textMain),
-        decoration: InputDecoration(
-          icon: Icon(icon, color: AppColors.secondaryGold, size: 20.sp),
-          hintText: hintText,
-          hintStyle: TextStyle(
-            color: AppColors.textSecondary.withOpacity(0.5),
-            fontSize: 14.sp,
-          ),
-          border: InputBorder.none,
-        ),
+  void _google() {
+    setState(() => _action = AuthAction.google);
+    context.read<AuthBloc>().add(GoogleSignInRequested());
+  }
+
+  void _apple() {
+    setState(() => _action = AuthAction.apple);
+    context.read<AuthBloc>().add(AppleSignInRequested());
+  }
+
+  void _goToSignIn() {
+    final navigator = Navigator.of(context);
+    if (navigator.canPop()) {
+      navigator.pop();
+    } else {
+      navigator.pushReplacement(
+        MaterialPageRoute<void>(builder: (_) => const SignInPage()),
+      );
+    }
+  }
+
+  void _listener(BuildContext context, AuthState state) {
+    if (ModalRoute.of(context)?.isCurrent == false) return;
+    final l10n = context.l10n;
+    if (state is Authenticated) {
+      // Email sign-ups get a verification link (provider accounts are
+      // already verified).
+      if (_action == AuthAction.email && !state.isEmailVerified) {
+        showAppSnackBar(
+          context,
+          l10n.authAccountCreatedVerify(state.user.email),
+          type: SnackType.success,
+          duration: const Duration(seconds: 6),
+        );
+      }
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute<void>(builder: (_) => const MainNavigationPage()),
+        (route) => false,
+      );
+    } else if (state is AuthError) {
+      showAppSnackBar(
+        context,
+        localizedAuthMessage(l10n, state.code, state.message),
+        type: SnackType.error,
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final textTheme = Theme.of(context).textTheme;
+
+    return AppScaffold(
+      gradientBackground: true,
+      // Empty title: gives an app bar with the automatic back button.
+      titleWidget: const SizedBox.shrink(),
+      body: BlocConsumer<AuthBloc, AuthState>(
+        listener: _listener,
+        builder: (context, state) {
+          final busy = state is AuthLoading;
+          return Center(
+            child: SingleChildScrollView(
+              padding: AppSpacing.page,
+              keyboardDismissBehavior:
+                  ScrollViewKeyboardDismissBehavior.onDrag,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 480),
+                child: AutofillGroup(
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const AuthLogo(),
+                        SizedBox(height: AppSpacing.vXl),
+                        Semantics(
+                          header: true,
+                          child: Text(
+                            l10n.auth_create_account,
+                            textAlign: TextAlign.center,
+                            style: textTheme.headlineMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: AppSpacing.vSm),
+                        Text(
+                          l10n.auth_sign_up_subtitle,
+                          textAlign: TextAlign.center,
+                          style: textTheme.bodyMedium?.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                        SizedBox(height: AppSpacing.vXl),
+                        AuthTextField(
+                          controller: _nameController,
+                          label: l10n.auth_full_name,
+                          icon: Icons.person_outline,
+                          keyboardType: TextInputType.name,
+                          textInputAction: TextInputAction.next,
+                          autofillHints: const [AutofillHints.name],
+                          onFieldSubmitted: (_) => _emailFocus.requestFocus(),
+                          validator: (v) => validateName(l10n, v),
+                        ),
+                        SizedBox(height: AppSpacing.vLg),
+                        AuthTextField(
+                          controller: _emailController,
+                          focusNode: _emailFocus,
+                          label: l10n.auth_email_address,
+                          icon: Icons.email_outlined,
+                          keyboardType: TextInputType.emailAddress,
+                          textInputAction: TextInputAction.next,
+                          autofillHints: const [AutofillHints.email],
+                          onFieldSubmitted:
+                              (_) => _passwordFocus.requestFocus(),
+                          validator: (v) => validateEmail(l10n, v),
+                        ),
+                        SizedBox(height: AppSpacing.vLg),
+                        AuthTextField(
+                          controller: _passwordController,
+                          focusNode: _passwordFocus,
+                          label: l10n.auth_password,
+                          icon: Icons.lock_outline,
+                          isPassword: true,
+                          textInputAction: TextInputAction.next,
+                          autofillHints: const [AutofillHints.newPassword],
+                          onFieldSubmitted: (_) => _confirmFocus.requestFocus(),
+                          validator: (v) => validatePassword(l10n, v),
+                        ),
+                        SizedBox(height: AppSpacing.vLg),
+                        AuthTextField(
+                          controller: _confirmPasswordController,
+                          focusNode: _confirmFocus,
+                          label: l10n.confirm_password,
+                          icon: Icons.lock_outline,
+                          isPassword: true,
+                          textInputAction: TextInputAction.done,
+                          autofillHints: const [AutofillHints.newPassword],
+                          onFieldSubmitted: (_) {
+                            if (!busy) _submit();
+                          },
+                          validator: (v) {
+                            if (v == null || v.isEmpty) {
+                              return l10n.password_required;
+                            }
+                            return v != _passwordController.text
+                                ? l10n.passwords_do_not_match
+                                : null;
+                          },
+                        ),
+                        SizedBox(height: AppSpacing.vXl),
+                        PrimaryButton(
+                          label: l10n.auth_register,
+                          loading: busy && _action == AuthAction.email,
+                          onPressed: busy ? null : _submit,
+                        ),
+                        SizedBox(height: AppSpacing.vXl),
+                        const AuthDivider(),
+                        SizedBox(height: AppSpacing.vXl),
+                        GoogleSignInButton(
+                          loading: busy && _action == AuthAction.google,
+                          onPressed: busy ? null : _google,
+                        ),
+                        if (_appleAvailable) ...[
+                          SizedBox(height: AppSpacing.vMd),
+                          AppleSignInButton(
+                            label: l10n.sign_in_with_apple,
+                            loading: busy && _action == AuthAction.apple,
+                            onPressed: busy ? null : _apple,
+                          ),
+                        ],
+                        SizedBox(height: AppSpacing.vLg),
+                        AuthSwitchPrompt(
+                          prompt: l10n.auth_have_account,
+                          action: l10n.auth_sign_in,
+                          onPressed: busy ? null : _goToSignIn,
+                        ),
+                        SizedBox(height: AppSpacing.vLg),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }

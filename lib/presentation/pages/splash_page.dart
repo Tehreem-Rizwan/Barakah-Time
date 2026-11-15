@@ -1,14 +1,22 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../core/theme/app_colors.dart';
-import 'onboarding_page.dart';
-import 'main_navigation_page.dart';
-import 'auth/sign_in_page.dart';
+import 'package:get_it/get_it.dart';
 
+import '../../core/localization/app_localizations.dart';
+import '../../core/services/entry_route.dart';
+import '../../core/services/firebase_service.dart';
+import '../widgets/widgets.dart';
+import 'auth/sign_in_page.dart';
+import 'main_navigation_page.dart';
+import 'onboarding_page.dart';
+
+/// Animated brand splash. Navigates once both the intro animation (~1.2s)
+/// and the entry-route resolution have finished.
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
+
+  /// Length of the intro animation.
+  static const Duration animationDuration = Duration(milliseconds: 1200);
 
   @override
   State<SplashPage> createState() => _SplashPageState();
@@ -16,71 +24,53 @@ class SplashPage extends StatefulWidget {
 
 class _SplashPageState extends State<SplashPage>
     with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _fadeAnimation;
-  late Animation<double> _scaleAnimation;
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: SplashPage.animationDuration,
+  );
+  late final Animation<double> _fade = CurvedAnimation(
+    parent: _controller,
+    curve: const Interval(0.0, 0.6, curve: Curves.easeIn),
+  );
+  late final Animation<double> _scale = Tween<double>(begin: 0.8, end: 1.0)
+      .animate(
+        CurvedAnimation(
+          parent: _controller,
+          curve: const Interval(0.0, 0.7, curve: Curves.easeOutBack),
+        ),
+      );
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 2),
-    );
-
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.0, 0.5, curve: Curves.easeIn),
-      ),
-    );
-
-    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.0, 0.5, curve: Curves.easeOutBack),
-      ),
-    );
-
-    _controller.forward();
-
-    Future.delayed(const Duration(seconds: 3), () async {
-      if (!mounted) return;
-      await _navigate();
-    });
+    _start();
   }
 
-  Future<void> _navigate() async {
-    final prefs = await SharedPreferences.getInstance();
-    final hasSeenOnboarding = prefs.getBool('has_seen_onboarding') ?? false;
-    final firebaseUser = FirebaseAuth.instance.currentUser;
-
+  Future<void> _start() async {
+    final animation = _controller.forward().orCancel.catchError((_) {});
+    final firebase =
+        GetIt.instance.isRegistered<FirebaseService>()
+            ? GetIt.instance<FirebaseService>()
+            : null;
+    final results = await Future.wait<Object?>([
+      animation,
+      resolveEntryRoute(firebaseService: firebase),
+    ]);
     if (!mounted) return;
-
-    if (!hasSeenOnboarding) {
-      // First-time install → show Onboarding
-      Navigator.of(context).pushReplacement(
-        _fadeRoute(const OnboardingPage()),
-      );
-    } else if (firebaseUser != null) {
-      // Already signed in → go straight to Home
-      Navigator.of(context).pushReplacement(
-        _fadeRoute(const MainNavigationPage()),
-      );
-    } else {
-      // Returning user, not signed in → Sign In page
-      Navigator.of(context).pushReplacement(
-        _fadeRoute(const SignInPage()),
-      );
-    }
-  }
-
-  PageRouteBuilder _fadeRoute(Widget page) {
-    return PageRouteBuilder(
-      pageBuilder: (_, __, ___) => page,
-      transitionsBuilder: (_, animation, __, child) =>
-          FadeTransition(opacity: animation, child: child),
-      transitionDuration: const Duration(milliseconds: 800),
+    final route = results[1] as AppEntryRoute;
+    final Widget page = switch (route) {
+      AppEntryRoute.onboarding => const OnboardingPage(),
+      AppEntryRoute.signIn => const SignInPage(),
+      AppEntryRoute.main => const MainNavigationPage(),
+    };
+    Navigator.of(context).pushReplacement(
+      PageRouteBuilder<void>(
+        pageBuilder: (_, _, _) => page,
+        transitionsBuilder:
+            (_, animation, _, child) =>
+                FadeTransition(opacity: animation, child: child),
+        transitionDuration: AppDurations.slow,
+      ),
     );
   }
 
@@ -92,26 +82,33 @@ class _SplashPageState extends State<SplashPage>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.backgroundSlate,
+    final l10n = context.l10n;
+    final textTheme = Theme.of(context).textTheme;
+    return AppScaffold(
+      gradientBackground: true,
       body: Center(
-        child: AnimatedBuilder(
-          animation: _controller,
-          builder: (context, child) {
-            return FadeTransition(
-              opacity: _fadeAnimation,
-              child: ScaleTransition(
-                scale: _scaleAnimation,
+        child: SingleChildScrollView(
+          padding: AppSpacing.page,
+          child: FadeTransition(
+            opacity: _fade,
+            child: ScaleTransition(
+              scale: _scale,
+              child: Semantics(
+                label: l10n.app_name,
+                excludeSemantics: true,
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Container(
-                      padding: EdgeInsets.all(24.w),
+                      padding: EdgeInsetsDirectional.all(AppSpacing.xl),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
+                        color: AppColors.secondaryGold.withValues(alpha: 0.08),
                         boxShadow: [
                           BoxShadow(
-                            color: AppColors.primaryEmerald.withOpacity(0.3),
+                            color: AppColors.primaryEmerald.withValues(
+                              alpha: 0.5,
+                            ),
                             blurRadius: 40,
                             spreadRadius: 10,
                           ),
@@ -123,29 +120,27 @@ class _SplashPageState extends State<SplashPage>
                         color: AppColors.secondaryGold,
                       ),
                     ),
-                    SizedBox(height: 24.h),
+                    SizedBox(height: AppSpacing.vXl),
                     Text(
-                      'Sakinah',
-                      style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                            color: AppColors.textMain,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 2,
-                          ),
+                      l10n.app_name,
+                      textAlign: TextAlign.center,
+                      style: textTheme.displaySmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                    SizedBox(height: 8.h),
+                    SizedBox(height: AppSpacing.vSm),
                     Text(
-                      'BARAKAH TIME',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: AppColors.secondaryGold,
-                            letterSpacing: 4,
-                            fontWeight: FontWeight.w300,
-                          ),
+                      l10n.app_tagline,
+                      textAlign: TextAlign.center,
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: AppColors.secondaryGold,
+                      ),
                     ),
                   ],
                 ),
               ),
-            );
-          },
+            ),
+          ),
         ),
       ),
     );

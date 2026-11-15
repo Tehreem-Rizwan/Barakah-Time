@@ -1,143 +1,475 @@
-import 'package:just_audio/just_audio.dart';
+import 'dart:async';
+
+import 'package:audio_session/audio_session.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:just_audio/just_audio.dart';
+
+/// Snapshot of what the app is currently playing.
+///
+/// UI should derive play/pause icons from this (via [AudioService.statusStream]
+/// or [AudioService.status]) instead of comparing `currentMediaId` alone,
+/// so icons stay correct for both recorded audio and text-to-speech and reset
+/// when playback finishes.
+@immutable
+class AudioStatus {
+  final String? mediaId;
+  final String? title;
+  final String? artist;
+
+  /// True while sound is actually being produced.
+  final bool isPlaying;
+
+  /// True when playback of [mediaId] is paused and can be resumed.
+  final bool isPaused;
+
+  /// True when the current media is text-to-speech (no seek bar).
+  final bool isTts;
+
+  const AudioStatus({
+    this.mediaId,
+    this.title,
+    this.artist,
+    this.isPlaying = false,
+    this.isPaused = false,
+    this.isTts = false,
+  });
+
+  static const idle = AudioStatus();
+
+  bool get isActive => mediaId != null && (isPlaying || isPaused);
+
+  /// Whether [id] is the item currently producing sound.
+  bool isPlayingMedia(String? id) => id != null && mediaId == id && isPlaying;
+
+  @override
+  bool operator ==(Object other) =>
+      other is AudioStatus &&
+      other.mediaId == mediaId &&
+      other.title == title &&
+      other.artist == artist &&
+      other.isPlaying == isPlaying &&
+      other.isPaused == isPaused &&
+      other.isTts == isTts;
+
+  @override
+  int get hashCode =>
+      Object.hash(mediaId, title, artist, isPlaying, isPaused, isTts);
+}
 
 class AudioService {
   final AudioPlayer _player = AudioPlayer();
   final FlutterTts _tts = FlutterTts();
-  
-  String? currentTitle;
-  String? currentArtist;
-  String? currentMediaId;
-  bool _isTtsActive = false;
+
+  final StreamController<AudioStatus> _statusController =
+      StreamController<AudioStatus>.broadcast();
+  final StreamController<String> _errorController =
+      StreamController<String>.broadcast();
+
+  AudioStatus _status = AudioStatus.idle;
+
+  /// Remaining TTS segments (e.g. Arabic then translation) and the one
+  /// currently being spoken, so TTS can be paused and resumed.
+  final List<_TtsSegment> _ttsQueue = [];
+  _TtsSegment? _currentSegment;
+
+  /// Increments on every new playback request so stale async callbacks
+  /// (e.g. a TTS completion from a previous item) are ignored.
+  int _session = 0;
 
   AudioService() {
+    _configureSession();
     _initTts();
+    _player.playerStateStream.listen(_onPlayerState);
   }
 
-  void _initTts() async {
-    await _tts.setLanguage("en-US");
-    await _tts.setSpeechRate(0.5);
-    await _tts.setVolume(1.0);
-    await _tts.setPitch(1.0);
-  }
-
-  AudioPlayer get player => _player;
-
-  Stream<PlayerState> get playerStateStream => _player.playerStateStream;
-  Stream<bool> get isPlayingStream => _player.playingStream;
-  Stream<Duration?> get durationStream => _player.durationStream;
-  Stream<Duration> get positionStream => _player.positionStream;
-
-  bool isCurrentlyPlaying(String? mediaId) {
-    return currentMediaId == mediaId && _player.playing;
-  }
-
-  Future<void> playUrl(String url, {String? title, String? artist, String? mediaId}) async {
-    if (isCurrentlyPlaying(mediaId)) {
-      await _player.pause();
-      return;
-    }
-
-    _isTtsActive = false;
-    currentMediaId = mediaId;
-    currentTitle = title ?? "Quran Recitation";
-    currentArtist = artist ?? "Mishary Rashid Alafasy";
-    await _tts.stop();
+  /// Declares the app as a long-form audio player (Quran recitation): plays
+  /// with the silent switch on and, with `UIBackgroundModes: audio` in
+  /// Info.plist, continues when the screen locks. Pauses when headphones
+  /// are unplugged.
+  Future<void> _configureSession() async {
     try {
-      await _player.setAudioSource(AudioSource.uri(Uri.parse(url)));
-      await _player.play();
+      final session = await AudioSession.instance;
+      await session.configure(const AudioSessionConfiguration.music());
+      session.becomingNoisyEventStream.listen((_) {
+        pause();
+      });
     } catch (e) {
-      print("Error playing audio: $e");
+      debugPrint('Audio session configuration failed: $e');
     }
   }
 
-  Future<void> playList(List<String> urls, {String? title, String? artist, String? mediaId}) async {
-    if (isCurrentlyPlaying(mediaId)) {
-      await _player.pause();
-      return;
-    }
-
-    _isTtsActive = false;
-    currentMediaId = mediaId;
-    currentTitle = title ?? "Surah Recitation";
-    currentArtist = artist ?? "Mishary Rashid Alafasy";
-    await _tts.stop();
+  Future<void> _initTts() async {
     try {
-      final playlist = ConcatenatingAudioSource(
-        children: urls.map((url) => AudioSource.uri(Uri.parse(url))).toList(),
-      );
-      await _player.setAudioSource(playlist);
-      await _player.play();
+      await _tts.setSpeechRate(0.5);
+      await _tts.setVolume(1.0);
+      await _tts.setPitch(1.0);
+      await _tts.awaitSpeakCompletion(false);
     } catch (e) {
-      print("Error playing playlist: $e");
+      debugPrint('TTS init failed: $e');
     }
-  }
-
-  Future<void> playTts(String text, {String? title, String? mediaId, String languageCode = 'en'}) async {
-    if (currentMediaId == mediaId && _isTtsActive) {
-      await _tts.stop();
-      _isTtsActive = false;
-      return;
-    }
-
-    await _player.stop();
-    _isTtsActive = true;
-    currentMediaId = mediaId;
-    currentTitle = title ?? "Translation";
-    currentArtist = "AI Voice";
-    
-    await _tts.setLanguage(languageCode == 'ar' ? 'ar-SA' : 'en-US');
-    await _tts.speak(text);
-  }
-
-  Future<void> playArabicThenTranslation(String arabicText, String translationText, {String? title, String? mediaId, String translationLang = 'en'}) async {
-    await _player.stop();
-    await _tts.stop();
-    _isTtsActive = true;
-    currentMediaId = mediaId;
-    currentTitle = title ?? "Dua Recitation";
-    currentArtist = "AI Voice";
-
-    // Play Arabic
-    await _tts.setLanguage('ar-SA');
-    await _tts.speak(arabicText);
-    
-    // We need a way to wait for Arabic to finish before playing translation.
-    // FlutterTts has a completion handler.
-    _tts.setCompletionHandler(() async {
-      if (_isTtsActive && currentMediaId == mediaId) {
-        await _tts.setLanguage(translationLang == 'ar' ? 'ar-SA' : 'en-US');
-        await _tts.speak(translationText);
-        _tts.setCompletionHandler(null);
-      }
+    _tts.setCompletionHandler(_onTtsSegmentDone);
+    _tts.setCancelHandler(() {});
+    _tts.setErrorHandler((msg) {
+      _errorController.add('Speech playback failed');
+      _setStatus(AudioStatus.idle);
     });
   }
 
-  Future<void> pause() async {
-    if (_isTtsActive) {
+  // ---------------------------------------------------------------------------
+  // Public state
+  // ---------------------------------------------------------------------------
+
+  AudioPlayer get player => _player;
+
+  AudioStatus get status => _status;
+
+  /// Emits the current status immediately, then every change.
+  Stream<AudioStatus> get statusStream async* {
+    yield _status;
+    yield* _statusController.stream;
+  }
+
+  /// User-facing error messages (e.g. "Could not play audio"). Pages may
+  /// listen and show a SnackBar.
+  Stream<String> get errorStream => _errorController.stream;
+
+  String? get currentMediaId => _status.mediaId;
+  String? get currentTitle => _status.title;
+  String? get currentArtist => _status.artist;
+
+  Stream<PlayerState> get playerStateStream => _player.playerStateStream;
+  Stream<Duration?> get durationStream => _player.durationStream;
+  Stream<Duration> get positionStream => _player.positionStream;
+
+  /// Kept for backwards compatibility: emits whether *anything* is playing.
+  Stream<bool> get isPlayingStream =>
+      statusStream.map((s) => s.isPlaying).distinct();
+
+  bool isCurrentlyPlaying(String? mediaId) => _status.isPlayingMedia(mediaId);
+
+  // ---------------------------------------------------------------------------
+  // Recorded audio
+  // ---------------------------------------------------------------------------
+
+  /// Plays a single URL. Tapping the same [mediaId] again toggles pause/resume.
+  Future<void> playUrl(
+    String url, {
+    String? title,
+    String? artist,
+    String? mediaId,
+  }) {
+    return _playSources(
+      [url],
+      title: title ?? 'Quran Recitation',
+      artist: artist ?? 'Mishary Rashid Alafasy',
+      mediaId: mediaId ?? url,
+    );
+  }
+
+  /// Plays a list of URLs back to back. Same toggle behaviour as [playUrl].
+  Future<void> playList(
+    List<String> urls, {
+    String? title,
+    String? artist,
+    String? mediaId,
+  }) {
+    return _playSources(
+      urls,
+      title: title ?? 'Surah Recitation',
+      artist: artist ?? 'Mishary Rashid Alafasy',
+      mediaId: mediaId ?? urls.join('|'),
+    );
+  }
+
+  Future<void> _playSources(
+    List<String> urls, {
+    required String title,
+    required String artist,
+    required String mediaId,
+  }) async {
+    if (urls.isEmpty) return;
+
+    // Toggle behaviour for the same item.
+    if (_status.mediaId == mediaId && !_status.isTts) {
+      if (_status.isPlaying) {
+        await pause();
+        return;
+      }
+      if (_status.isPaused) {
+        await resume();
+        return;
+      }
+    }
+
+    final session = ++_session;
+    await _stopTts();
+    _setStatus(
+      AudioStatus(
+        mediaId: mediaId,
+        title: title,
+        artist: artist,
+        isPlaying: true,
+      ),
+    );
+
+    try {
+      if (urls.length == 1) {
+        await _player.setAudioSource(AudioSource.uri(Uri.parse(urls.first)));
+      } else {
+        await _player.setAudioSources(
+          urls.map((u) => AudioSource.uri(Uri.parse(u))).toList(),
+        );
+      }
+      if (session != _session) return;
+      // play() completes when playback stops; don't await it.
+      unawaited(_player.play());
+    } catch (e) {
+      debugPrint('Error playing audio: $e');
+      if (session != _session) return;
+      _errorController.add('Could not play audio. Check your connection.');
+      await _player.stop();
+      _setStatus(AudioStatus.idle);
+    }
+  }
+
+  void _onPlayerState(PlayerState state) {
+    if (_status.isTts || _status.mediaId == null) return;
+
+    if (state.processingState == ProcessingState.completed) {
+      // Finished: reset everything so icons go back to "play" and the
+      // control bar hides.
+      unawaited(stop());
+      return;
+    }
+
+    final playing =
+        state.playing && state.processingState != ProcessingState.idle;
+    if (playing != _status.isPlaying) {
+      _setStatus(
+        AudioStatus(
+          mediaId: _status.mediaId,
+          title: _status.title,
+          artist: _status.artist,
+          isPlaying: playing,
+          isPaused: !playing && state.processingState != ProcessingState.idle,
+        ),
+      );
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Text to speech
+  // ---------------------------------------------------------------------------
+
+  /// Speaks [text]. [languageCode] is the language the *text* is written in
+  /// (not the UI language). Tapping the same [mediaId] again stops it.
+  Future<void> playTts(
+    String text, {
+    String? title,
+    String? mediaId,
+    String languageCode = 'en',
+  }) {
+    return _startTts(
+      [_TtsSegment(text, _ttsLocale(languageCode))],
+      title: title ?? 'Translation',
+      mediaId: mediaId ?? text,
+    );
+  }
+
+  /// Speaks the Arabic text, then the translation.
+  ///
+  /// [translationLang] is the language the *translation text* is written in.
+  /// The app's dua/ayah translations are English, so this defaults to 'en'.
+  Future<void> playArabicThenTranslation(
+    String arabicText,
+    String translationText, {
+    String? title,
+    String? mediaId,
+    String translationLang = 'en',
+  }) {
+    return _startTts(
+      [
+        _TtsSegment(arabicText, 'ar-SA'),
+        _TtsSegment(translationText, _ttsLocale(translationLang)),
+      ],
+      title: title ?? 'Dua Recitation',
+      mediaId: mediaId ?? arabicText,
+    );
+  }
+
+  Future<void> _startTts(
+    List<_TtsSegment> segments, {
+    required String title,
+    required String mediaId,
+  }) async {
+    // Toggle: same item playing -> stop, paused -> resume.
+    if (_status.mediaId == mediaId && _status.isTts) {
+      if (_status.isPlaying) {
+        await stop();
+        return;
+      }
+      if (_status.isPaused) {
+        await resume();
+        return;
+      }
+    }
+
+    ++_session;
+    await _player.stop();
+    await _stopTts();
+
+    _ttsQueue
+      ..clear()
+      ..addAll(segments.where((s) => s.text.trim().isNotEmpty));
+    _setStatus(
+      AudioStatus(
+        mediaId: mediaId,
+        title: title,
+        artist: 'AI Voice',
+        isPlaying: true,
+        isTts: true,
+      ),
+    );
+    await _speakNext();
+  }
+
+  Future<void> _speakNext() async {
+    if (_ttsQueue.isEmpty) {
+      _currentSegment = null;
+      _setStatus(AudioStatus.idle);
+      return;
+    }
+    final session = _session;
+    final segment = _ttsQueue.removeAt(0);
+    _currentSegment = segment;
+    try {
+      await _tts.setLanguage(segment.locale);
+      if (session != _session) return;
+      final result = await _tts.speak(segment.text);
+      if (result == 0) {
+        throw Exception('speak returned 0');
+      }
+    } catch (e) {
+      debugPrint('TTS error: $e');
+      if (session != _session) return;
+      _errorController.add('Speech playback failed');
+      _ttsQueue.clear();
+      _currentSegment = null;
+      _setStatus(AudioStatus.idle);
+    }
+  }
+
+  void _onTtsSegmentDone() {
+    if (!_status.isTts || !_status.isPlaying) return;
+    unawaited(_speakNext());
+  }
+
+  Future<void> _stopTts() async {
+    _ttsQueue.clear();
+    _currentSegment = null;
+    try {
       await _tts.stop();
+    } catch (_) {}
+  }
+
+  String _ttsLocale(String languageCode) {
+    switch (languageCode) {
+      case 'ar':
+        return 'ar-SA';
+      case 'ur':
+        return 'ur-PK';
+      case 'fa':
+        return 'fa-IR';
+      case 'tr':
+        return 'tr-TR';
+      default:
+        return 'en-US';
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Transport controls
+  // ---------------------------------------------------------------------------
+
+  Future<void> pause() async {
+    if (!_status.isPlaying) return;
+    if (_status.isTts) {
+      // TTS can't reliably pause mid-sentence on all platforms; stop and
+      // remember the current segment so resume() repeats it.
+      final current = _currentSegment;
+      ++_session;
+      try {
+        await _tts.stop();
+      } catch (_) {}
+      if (current != null) _ttsQueue.insert(0, current);
+      _currentSegment = null;
+      _setStatus(
+        AudioStatus(
+          mediaId: _status.mediaId,
+          title: _status.title,
+          artist: _status.artist,
+          isPaused: true,
+          isTts: true,
+        ),
+      );
     } else {
       await _player.pause();
     }
   }
 
   Future<void> resume() async {
-    if (!_isTtsActive) {
-      await _player.play();
+    if (!_status.isPaused) return;
+    if (_status.isTts) {
+      ++_session;
+      _setStatus(
+        AudioStatus(
+          mediaId: _status.mediaId,
+          title: _status.title,
+          artist: _status.artist,
+          isPlaying: true,
+          isTts: true,
+        ),
+      );
+      await _speakNext();
+    } else {
+      if (_player.processingState == ProcessingState.completed) {
+        await _player.seek(Duration.zero, index: 0);
+      }
+      unawaited(_player.play());
     }
   }
 
   Future<void> stop() async {
-    await _player.stop();
-    await _tts.stop();
-    _isTtsActive = false;
+    ++_session;
+    _setStatus(AudioStatus.idle);
+    await _stopTts();
+    try {
+      await _player.stop();
+    } catch (_) {}
   }
 
   Future<void> seek(Duration position) async {
+    if (_status.isTts) return;
     await _player.seek(position);
+  }
+
+  void _setStatus(AudioStatus status) {
+    if (status == _status) return;
+    _status = status;
+    _statusController.add(status);
   }
 
   void dispose() {
     _player.dispose();
+    _tts.stop();
+    _statusController.close();
+    _errorController.close();
   }
+}
+
+class _TtsSegment {
+  final String text;
+  final String locale;
+  const _TtsSegment(this.text, this.locale);
 }

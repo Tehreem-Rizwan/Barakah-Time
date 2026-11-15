@@ -1,5 +1,5 @@
 name: barakah_time
-description: "A new Flutter project."
+description: "Barakah Time — prayer times, Quran, duas and daily Islamic tools."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -41,16 +41,13 @@ dependencies:
   flutter_bloc: ^8.1.6
   equatable: ^2.0.5
 
-  # Service Locator & Functional Programming
+  # Service Locator
   get_it: ^8.0.3
-  dartz: ^0.10.1
 
   # UI & Responsiveness
   flutter_screenutil: ^5.9.3
   google_fonts: ^6.2.1
-  cached_network_image: ^3.4.1
   shimmer: ^3.0.0
-  lottie: ^3.1.2
 
   # Deen Features
   adhan: ^2.0.0+1
@@ -66,7 +63,6 @@ dependencies:
   hive_flutter: ^1.1.0
   image_picker: ^1.1.2
   path_provider: ^2.1.4
-  path: ^1.9.0
   firebase_core: ^4.6.0
   firebase_auth: ^6.3.0
   supabase_flutter: ^2.12.2
@@ -77,6 +73,14 @@ dependencies:
   audio_session: ^0.2.3
   audio_video_progress_bar: ^2.0.3
   flutter_tts: ^4.2.5
+  url_launcher: ^6.3.3
+  flutter_compass: ^0.8.1
+  flutter_local_notifications: ^22.3.3
+  timezone: ^0.11.2
+  flutter_timezone: ^5.1.1
+  sign_in_with_apple: ^8.1.0
+  crypto: ^3.0.8
+  package_info_plus: ^9.0.1
 
 dev_dependencies:
   flutter_test:
