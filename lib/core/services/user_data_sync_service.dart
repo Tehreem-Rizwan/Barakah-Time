@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
@@ -7,7 +8,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../data/datasources/local/local_store.dart';
 import '../../data/datasources/local/settings_prefs.dart';
+import '../../data/repositories/memorial_repository.dart';
 import '../../data/sync/sync_mappers.dart';
+import '../../domain/entities/qaza_state.dart';
 import '../../domain/entities/saved_verse.dart';
 import '../../domain/entities/spiritual_activity.dart';
 import 'app_init_status.dart';
@@ -29,6 +32,12 @@ abstract class UserDataSync {
   void pushBadges(Map<String, DateTime> badges);
   void pushSettings(Map<String, dynamic> settings);
   void pushTasbeeh(int count, int loggedCount);
+
+  /// [data] is [QazaState.toJson].
+  void pushQaza(Map<String, dynamic> data);
+
+  /// [log] is the whole Ramadan fasting log (hijri year → days).
+  void pushRamadanLog(Map<String, dynamic> log);
 }
 
 /// Everything stored for a user in Firestore.
@@ -39,6 +48,8 @@ class CloudUserData {
   final Map<String, DateTime> badges;
   final Map<String, dynamic>? settings;
   final ({int count, int loggedCount})? tasbeeh;
+  final QazaState? qaza;
+  final Map<String, dynamic>? ramadanLog;
 
   const CloudUserData({
     this.profile,
@@ -47,6 +58,8 @@ class CloudUserData {
     this.badges = const {},
     this.settings,
     this.tasbeeh,
+    this.qaza,
+    this.ramadanLog,
   });
 
   int get totalPoints {
@@ -67,6 +80,8 @@ class CloudUserData {
 /// * `users/{uid}/badges/{badgeId}`: earnedAt
 /// * `users/{uid}/settings/app`
 /// * `users/{uid}/state/tasbeeh`: count, loggedCount, updatedAt
+/// * `users/{uid}/state/qaza`: remaining, done (maps prayer → count)
+/// * `users/{uid}/state/ramadan`: log (hijri year → day → status)
 class UserDataSyncService implements UserDataSync {
   final SharedPreferences prefs;
   final FirebaseService firebaseService;
@@ -79,6 +94,7 @@ class UserDataSyncService implements UserDataSync {
     'badges',
     'settings',
     'state',
+    'memorials',
   ];
 
   final Map<String, Future<bool>> _syncInFlight = {};
@@ -193,6 +209,30 @@ class UserDataSyncService implements UserDataSync {
     });
   }
 
+  @override
+  void pushQaza(Map<String, dynamic> data) {
+    final uid = currentUid;
+    if (uid == null) return;
+    _run('pushQaza', () async {
+      await _user(uid).collection('state').doc('qaza').set({
+        ...data,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+    });
+  }
+
+  @override
+  void pushRamadanLog(Map<String, dynamic> log) {
+    final uid = currentUid;
+    if (uid == null) return;
+    _run('pushRamadanLog', () async {
+      await _user(uid).collection('state').doc('ramadan').set({
+        'log': log,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+    });
+  }
+
   // ── Pull ──────────────────────────────────────────────────────────────────
   /// Reads everything for [uid] from the server (not the cache, so an
   /// offline device never mistakes "nothing cached" for "no cloud data").
@@ -207,6 +247,8 @@ class UserDataSyncService implements UserDataSync {
       user.collection('badges').get(server),
       user.collection('settings').doc('app').get(server),
       user.collection('state').doc('tasbeeh').get(server),
+      user.collection('state').doc('qaza').get(server),
+      user.collection('state').doc('ramadan').get(server),
     ]);
     final profile = results[0] as DocumentSnapshot<Map<String, dynamic>>;
     final activities = results[1] as QuerySnapshot<Map<String, dynamic>>;
@@ -214,6 +256,9 @@ class UserDataSyncService implements UserDataSync {
     final badges = results[3] as QuerySnapshot<Map<String, dynamic>>;
     final settings = results[4] as DocumentSnapshot<Map<String, dynamic>>;
     final tasbeeh = results[5] as DocumentSnapshot<Map<String, dynamic>>;
+    final qaza = results[6] as DocumentSnapshot<Map<String, dynamic>>;
+    final ramadan = results[7] as DocumentSnapshot<Map<String, dynamic>>;
+    final ramadanLog = ramadan.data()?['log'];
     return CloudUserData(
       profile: profile.data(),
       activities: [
@@ -229,6 +274,9 @@ class UserDataSyncService implements UserDataSync {
       ),
       settings: settings.data(),
       tasbeeh: SyncMappers.tasbeehFromCloud(tasbeeh.data()),
+      qaza: qaza.exists ? QazaState.fromJson(qaza.data()) : null,
+      ramadanLog:
+          ramadanLog is Map ? Map<String, dynamic>.from(ramadanLog) : null,
     );
   }
 
@@ -299,6 +347,14 @@ class UserDataSyncService implements UserDataSync {
     if (t != null) {
       await prefs.setInt(UserPrefsKeys.tasbeehCount, t.count);
       await prefs.setInt(UserPrefsKeys.tasbeehLoggedCount, t.loggedCount);
+    }
+    final q = cloud.qaza;
+    if (q != null) {
+      await prefs.setString(UserPrefsKeys.qaza, jsonEncode(q.toJson()));
+    }
+    final r = cloud.ramadanLog;
+    if (r != null) {
+      await prefs.setString(UserPrefsKeys.ramadanLog, jsonEncode(r));
     }
     return true;
   }
@@ -387,6 +443,33 @@ class UserDataSyncService implements UserDataSync {
         );
       }
     }
+    if (cloud.qaza == null) {
+      final raw = prefs.getString(UserPrefsKeys.qaza);
+      final decoded = raw == null ? null : jsonDecode(raw);
+      final local = QazaState.fromJson(
+        decoded is Map<String, dynamic> ? decoded : null,
+      );
+      if (!local.isEmpty) {
+        writes.add(
+          user.collection('state').doc('qaza').set({
+            ...local.toJson(),
+            'updatedAt': FieldValue.serverTimestamp(),
+          }),
+        );
+      }
+    }
+    if (cloud.ramadanLog == null) {
+      final raw = prefs.getString(UserPrefsKeys.ramadanLog);
+      final decoded = raw == null ? null : jsonDecode(raw);
+      if (decoded is Map && decoded.isNotEmpty) {
+        writes.add(
+          user.collection('state').doc('ramadan').set({
+            'log': decoded,
+            'updatedAt': FieldValue.serverTimestamp(),
+          }),
+        );
+      }
+    }
     await Future.wait(writes).timeout(const Duration(seconds: 30));
   }
 
@@ -415,6 +498,8 @@ class UserDataSyncService implements UserDataSync {
   Future<void> deleteAllUserData(String uid) async {
     if (!_available) throw StateError('Firebase unavailable');
     final user = _user(uid);
+    // Esaal-e-Sawab pages this user created (others' pages are kept).
+    await MemorialRepository(db: () => _db).deleteAllFor((uid: uid, name: ''));
     for (final name in _subcollections) {
       final col = user.collection(name);
       while (true) {

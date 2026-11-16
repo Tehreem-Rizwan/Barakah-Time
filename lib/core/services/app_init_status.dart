@@ -12,14 +12,12 @@ class AppInitStatus {
   static bool hiveReady = false;
 
   static bool firebaseReady = false;
-  static bool supabaseReady = false;
   static bool googleSignInReady = false;
 
   /// For tests.
   static void reset() {
     hiveReady = false;
     firebaseReady = false;
-    supabaseReady = false;
     googleSignInReady = false;
   }
 }

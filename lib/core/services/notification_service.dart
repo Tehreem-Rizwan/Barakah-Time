@@ -37,6 +37,31 @@ class ScheduledPrayer {
   int get hashCode => Object.hash(id, prayer, time);
 }
 
+/// A non-prayer reminder (Ramadan sehri/iftar, memorial dates).
+@immutable
+class ExtraReminder {
+  final DateTime time;
+  final String title;
+  final String body;
+  final String? payload;
+
+  const ExtraReminder({
+    required this.time,
+    required this.title,
+    required this.body,
+    this.payload,
+  });
+}
+
+/// Notification id ranges, so each group can be replaced on its own.
+/// Prayers use 0..69 (see [ScheduledPrayer.id]).
+abstract final class ReminderGroups {
+  static const int size = 1000;
+  static const int prayers = 0;
+  static const int ramadan = 1000;
+  static const int memorials = 2000;
+}
+
 /// Payload of prayer notifications: `prayer:<key>` (e.g. `prayer:fajr`).
 /// Tapping one should open the Prayer tab.
 class PrayerNotificationPayload {
@@ -301,7 +326,7 @@ class NotificationService {
     await init();
     if (!_initialized) return;
     try {
-      await _plugin.cancelAll();
+      await _cancelGroup(ReminderGroups.prayers);
       final l10n = AppLocalizations(Locale(languageCode));
       final exact = await canScheduleExactAlarms();
       final details = NotificationDetails(
@@ -348,6 +373,75 @@ class NotificationService {
       }
     } catch (e) {
       debugPrint('Scheduling prayer notifications failed: $e');
+    }
+  }
+
+  /// Cancels pending notifications whose id is in [base]'s group.
+  Future<void> _cancelGroup(int base) async {
+    final pending = await _plugin.pendingNotificationRequests();
+    for (final p in pending) {
+      if (p.id >= base && p.id < base + ReminderGroups.size) {
+        await _plugin.cancel(id: p.id);
+      }
+    }
+  }
+
+  /// Replaces the reminders of group [base] (see [ReminderGroups]) with
+  /// [items] (at most [ReminderGroups.size]; past times are skipped).
+  /// Serialised with prayer scheduling.
+  Future<void> scheduleGroup(
+    int base,
+    List<ExtraReminder> items, {
+    DateTime? now,
+  }) {
+    final run = _scheduleChain.then(
+      (_) => _scheduleGroup(base, items, now ?? DateTime.now()),
+    );
+    _scheduleChain = run.catchError((_) {});
+    return _scheduleChain;
+  }
+
+  Future<void> _scheduleGroup(
+    int base,
+    List<ExtraReminder> items,
+    DateTime now,
+  ) async {
+    await init();
+    if (!_initialized) return;
+    try {
+      await _cancelGroup(base);
+      final exact = await canScheduleExactAlarms();
+      const details = NotificationDetails(
+        android: AndroidNotificationDetails(
+          defaultChannelId,
+          'Prayer times',
+          icon: _smallIcon,
+          importance: Importance.high,
+          priority: Priority.high,
+          category: AndroidNotificationCategory.reminder,
+        ),
+        iOS: DarwinNotificationDetails(presentSound: true),
+        macOS: DarwinNotificationDetails(presentSound: true),
+      );
+      final future = items.where((r) => r.time.isAfter(now)).toList()
+        ..sort((a, b) => a.time.compareTo(b.time));
+      for (var i = 0; i < future.length && i < ReminderGroups.size; i++) {
+        final r = future[i];
+        await _plugin.zonedSchedule(
+          id: base + i,
+          scheduledDate: tz.TZDateTime.from(r.time, tz.local),
+          notificationDetails: details,
+          androidScheduleMode:
+              exact
+                  ? AndroidScheduleMode.exactAllowWhileIdle
+                  : AndroidScheduleMode.inexactAllowWhileIdle,
+          title: r.title,
+          body: r.body,
+          payload: r.payload,
+        );
+      }
+    } catch (e) {
+      debugPrint('Scheduling reminders ($base) failed: $e');
     }
   }
 

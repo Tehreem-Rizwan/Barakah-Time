@@ -24,6 +24,11 @@ class _FakeSync implements UserDataSync {
   @override
   void pushTasbeeh(int count, int loggedCount) =>
       tasbeeh.add((count, loggedCount));
+  final List<Map<String, dynamic>> qaza = [];
+  @override
+  void pushQaza(Map<String, dynamic> data) => qaza.add(data);
+  @override
+  void pushRamadanLog(Map<String, dynamic> log) {}
   @override
   void pushActivity(SpiritualActivity activity, {int? longestStreak}) {}
   @override

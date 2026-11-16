@@ -26,6 +26,7 @@ import 'profile_page.dart' show ProfilePage, UserAvatar;
 import 'pulse_page.dart';
 import 'qibla_page.dart';
 import 'quran_page.dart';
+import 'ramadan_page.dart';
 import 'tasbeeh_page.dart';
 import 'tools_grid_page.dart';
 
@@ -83,6 +84,7 @@ class HomePage extends StatelessWidget {
             padded(const _HomeHeader()),
             gap(AppSpacing.vXl),
             padded(const _PrayerHeroCard()),
+            padded(const RamadanHomeCard()),
             gap(AppSpacing.vXl),
             padded(
               SectionHeader(

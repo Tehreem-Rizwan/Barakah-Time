@@ -52,7 +52,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyCcE_VEirh5mnoR5WjdjNMDk0UVoiySuWU',
-    appId: '1:630175539288:android:aa573dbd4b9ea45f5eaa2d',
+    appId: '1:630175539288:android:f34051adac0bbb345eaa2d',
     messagingSenderId: '630175539288',
     projectId: 'barakahtime-cbfa8',
     storageBucket: 'barakahtime-cbfa8.firebasestorage.app',

@@ -114,6 +114,8 @@ class AboutPage extends StatelessWidget {
             ),
           ),
           SizedBox(height: AppSpacing.vXl),
+          const PrivacyPromiseCard(),
+          SizedBox(height: AppSpacing.vXl),
           SectionHeader(
             title: l10n.about_credits,
             icon: Icons.volunteer_activism_outlined,
