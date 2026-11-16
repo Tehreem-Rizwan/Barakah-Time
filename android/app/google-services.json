@@ -9,16 +9,60 @@
       "client_info": {
         "mobilesdk_app_id": "1:630175539288:android:aa573dbd4b9ea45f5eaa2d",
         "android_client_info": {
+          "package_name": "com.example.barakah_time"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "630175539288-l9v77b320ulqv402vu49eb2dlfm09nsb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.barakah_time",
+            "certificate_hash": "794dfd9a68ca1152fc06d11b253acdff9bbc3ece"
+          }
+        },
+        {
+          "client_id": "630175539288-ltan7qpt5old4qrtdrfem7jdlj8g0rqr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCcE_VEirh5mnoR5WjdjNMDk0UVoiySuWU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "630175539288-ltan7qpt5old4qrtdrfem7jdlj8g0rqr.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "630175539288-h16v371sst1fh3bnjo37joajoaplaqsd.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.barakahTime"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:630175539288:android:f34051adac0bbb345eaa2d",
+        "android_client_info": {
           "package_name": "com.tehreem.barakah_time"
         }
       },
       "oauth_client": [
         {
-          "client_id": "630175539288-fr6pvrvrdif21h3l4q021lv6pvssl3j8.apps.googleusercontent.com",
+          "client_id": "630175539288-j6cgsqm9vl1sg8i56lsmq6mao22v9d2k.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.tehreem.barakah_time",
-            "certificate_hash": "2f97297d38ed93a059fbeb0ef2dd5b7987b48d99"
+            "certificate_hash": "05f5546d496c811b213c5e0d34ba2c8f382deae1"
           }
         },
         {

@@ -62,19 +62,10 @@ void main() {
     expect(formatCompactNumber(2000000), '2M');
   });
 
-  test('storagePathFromPublicUrl', () {
-    expect(
-      SupabaseService.storagePathFromPublicUrl(
-        'https://x.supabase.co/storage/v1/object/public/images/profile_pics/u1/1.jpg',
-      ),
-      'profile_pics/u1/1.jpg',
-    );
-    expect(
-      SupabaseService.storagePathFromPublicUrl(
-        'https://lh3.googleusercontent.com/a/photo',
-      ),
-      isNull,
-    );
-    expect(SupabaseService.storagePathFromPublicUrl(null), isNull);
+  test('photo content type and extension', () {
+    expect(SupabaseService.extensionOf('/tmp/a/photo.JPEG'), 'jpg');
+    expect(SupabaseService.extensionOf('/tmp/a/photo'), 'jpg');
+    expect(SupabaseService.contentTypeFor('png'), 'image/png');
+    expect(SupabaseService.contentTypeFor('jpg'), 'image/jpeg');
   });
 }

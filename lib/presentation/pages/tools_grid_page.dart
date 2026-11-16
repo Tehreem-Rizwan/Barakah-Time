@@ -12,6 +12,9 @@ import 'mosque_finder_page.dart';
 import 'names_all_page.dart';
 import 'prayer_times_page.dart';
 import 'pulse_page.dart';
+import 'memorial_pages.dart';
+import 'qaza_tracker_page.dart';
+import 'ramadan_page.dart';
 import 'qibla_page.dart';
 import 'quran_page.dart';
 import 'settings_page.dart';
@@ -48,6 +51,23 @@ class ToolsGridPage extends StatelessWidget {
         icon: Icons.access_time_rounded,
         label: l10n.prayer_times,
         page: (_) => const PrayerTimesPage(),
+      ),
+      _Tool(
+        icon: Icons.history_rounded,
+        label: l10n.translate('qaza_tracker'),
+        subtitle: l10n.translate('qaza_tool_subtitle'),
+        page: (_) => const QazaTrackerPage(),
+      ),
+      _Tool(
+        icon: Icons.nightlight_round,
+        label: l10n.translate('ramadan_title'),
+        page: (_) => const RamadanPage(),
+      ),
+      _Tool(
+        icon: Icons.volunteer_activism_outlined,
+        label: l10n.translate('memorial_title'),
+        subtitle: l10n.translate('memorial_tool_subtitle'),
+        page: (_) => const MemorialsPage(),
       ),
       _Tool(
         icon: Icons.menu_book_rounded,

@@ -1,0 +1,5 @@
+# Only used if you deploy with the Supabase CLI.
+# The function verifies the Firebase ID token itself, so Supabase's own JWT
+# check must be off for it.
+[functions.profile-photo]
+verify_jwt = false

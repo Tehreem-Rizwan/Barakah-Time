@@ -25,6 +25,9 @@ class UserPrefsKeys {
   static const userProfilePic = 'user_profile_pic';
   static const tasbeehCount = 'tasbeeh_count';
   static const tasbeehLoggedCount = 'tasbeeh_logged_count';
+  static const qaza = 'qaza_state';
+  static const ramadanLog = 'ramadan_log';
+  static const memorialReminders = 'memorial_reminders';
 
   /// `migrated_<uid>`: local (guest/legacy) data was uploaded for this uid.
   static String migrated(String uid) => 'migrated_$uid';
@@ -37,5 +40,8 @@ class UserPrefsKeys {
     userProfilePic,
     tasbeehCount,
     tasbeehLoggedCount,
+    qaza,
+    ramadanLog,
+    memorialReminders,
   ];
 }

@@ -23,7 +23,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
   int _currentPage = 0;
   bool _finishing = false;
 
-  static const int _pageCount = 3;
+  static const int _pageCount = 4;
 
   @override
   void dispose() {
@@ -46,6 +46,11 @@ class _OnboardingPageState extends State<OnboardingPage> {
       title: l10n.onboarding_inspiration_title,
       description: l10n.onboarding_inspiration_desc,
       icon: Icons.auto_awesome,
+    ),
+    OnboardingData(
+      title: l10n.translate('onboarding_privacy_title'),
+      description: l10n.translate('onboarding_privacy_desc'),
+      icon: Icons.verified_user_outlined,
     ),
   ];
 

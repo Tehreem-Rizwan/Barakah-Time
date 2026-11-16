@@ -86,7 +86,7 @@ Future<void> _pump(
 
 Future<AuthBloc> _authBloc() async {
   final prefs = await SharedPreferences.getInstance();
-  return AuthBloc(prefs, SupabaseService(), FirebaseService());
+  return AuthBloc(prefs, SupabaseService(idTokenProvider: () async => null), FirebaseService());
 }
 
 void main() {
@@ -140,6 +140,14 @@ void main() {
         await tester.pump();
         await tester.pump(const Duration(seconds: 1));
         expect(find.text(l10n.onboarding_inspiration_title), findsOneWidget);
+
+        await tester.tap(find.text(l10n.onboarding_next));
+        await tester.pump();
+        await tester.pump(const Duration(seconds: 1));
+        expect(
+          find.text(l10n.translate('onboarding_privacy_title')),
+          findsOneWidget,
+        );
         expect(find.text(l10n.onboarding_get_started), findsOneWidget);
         expect(find.text(l10n.skip), findsNothing);
         expect(tester.takeException(), isNull);

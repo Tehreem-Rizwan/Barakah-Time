@@ -1,4 +1,5 @@
 import 'dart:convert';
+import '../constants/app_config.dart';
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -92,8 +93,8 @@ class FirebaseService {
     }
   }
 
-  /// The Firebase ID token for Supabase third-party auth (null when signed
-  /// out or Firebase is unavailable).
+  /// The Firebase ID token, sent to the profile-photo Edge Function (null
+  /// when signed out or Firebase is unavailable).
   Future<String?> idToken() async {
     final user = currentUser;
     if (user == null) return null;
@@ -180,6 +181,8 @@ class FirebaseService {
   /// True on iOS 13+/macOS 10.15+ when Firebase is available. Show the
   /// "Sign in with Apple" button only when this is true.
   Future<bool> isAppleSignInAvailable() async {
+    // Needs a paid Apple Developer account; see AppConfig.appleSignInEnabled.
+    if (!AppConfig.appleSignInEnabled) return false;
     if (!_isApplePlatform || !isAvailable) return false;
     try {
       return await SignInWithApple.isAvailable();

@@ -18,6 +18,7 @@ export 'audio_control_bar.dart';
 export 'auth_text_field.dart';
 export 'confirm_dialog.dart';
 export 'glass_box.dart';
+export 'privacy_promise_card.dart';
 export 'section_header.dart';
 export 'skeleton.dart';
 export 'stat_tile.dart';
