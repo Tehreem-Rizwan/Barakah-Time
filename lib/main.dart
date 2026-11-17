@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:barakah_time/core/services/app_init_status.dart';
 import 'package:barakah_time/core/services/home_widget_service.dart';
+import 'package:barakah_time/data/repositories/qaza_repository.dart';
+import 'package:barakah_time/data/repositories/tasbeeh_repository.dart';
 import 'package:barakah_time/core/services/memorial_reminder_service.dart';
 import 'package:barakah_time/core/services/ramadan_service.dart';
 import 'package:barakah_time/core/services/notification_service.dart';
@@ -35,6 +37,10 @@ const Duration _initTimeout = Duration(seconds: 15);
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Draw behind transparent status/navigation bars (no grey scrim).
+  unawaited(SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge));
+  SystemChrome.setSystemUIOverlayStyle(AppTheme.overlayOnLight);
 
   // Phone UI is portrait-only.
   unawaited(
@@ -196,7 +202,23 @@ class _AppCoordinatorState extends State<_AppCoordinator> {
   @override
   void initState() {
     super.initState();
-    _lifecycle = AppLifecycleListener(onResume: _onResume);
+    _lifecycle = AppLifecycleListener(
+      onResume: _onResume,
+      // Send debounced counter changes before the OS may kill the app.
+      onPause: () {
+        if (di.sl.isRegistered<QazaRepository>()) di.sl<QazaRepository>().flush();
+        if (di.sl.isRegistered<TasbeehRepository>()) {
+          di.sl<TasbeehRepository>().flush();
+        }
+      },
+    );
+    // A permission revoked in system settings kills the process, so check
+    // on cold start too (onResume doesn't fire for the first launch).
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        context.read<SettingsBloc>().add(const RecheckNotificationPermission());
+      }
+    });
   }
 
   @override

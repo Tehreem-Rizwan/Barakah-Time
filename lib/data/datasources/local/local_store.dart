@@ -27,6 +27,8 @@ class UserPrefsKeys {
   static const tasbeehLoggedCount = 'tasbeeh_logged_count';
   static const qaza = 'qaza_state';
   static const ramadanLog = 'ramadan_log';
+  static const qazaUpdatedAt = 'qaza_updated_at';
+  static const ramadanUpdatedAt = 'ramadan_updated_at';
   static const memorialReminders = 'memorial_reminders';
 
   /// `migrated_<uid>`: local (guest/legacy) data was uploaded for this uid.
@@ -42,6 +44,8 @@ class UserPrefsKeys {
     tasbeehLoggedCount,
     qaza,
     ramadanLog,
+    qazaUpdatedAt,
+    ramadanUpdatedAt,
     memorialReminders,
   ];
 }

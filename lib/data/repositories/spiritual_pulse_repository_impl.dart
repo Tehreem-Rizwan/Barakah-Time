@@ -45,6 +45,7 @@ class SpiritualPulseRepositoryImpl implements SpiritualPulseRepository {
       totalPoints: total,
       motivation: MotivationLevelX.forPoints(dailyPoints.last),
       recentActivities: recentActivities,
+      allActivities: activities.reversed.toList(),
       badges: badges,
     );
   }

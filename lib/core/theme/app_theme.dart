@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'app_colors.dart';
 import 'app_fonts.dart';
 import 'app_tokens.dart';
 
-/// App-wide dark "glass" theme.
+/// App-wide light "Islamic art" theme (stone, ivory, turquoise, brass).
 ///
 /// Use `AppTheme.dark(Locale(languageCode))` so Arabic-script locales get a
 /// font with the right glyphs. [darkTheme] is kept for backward
@@ -13,39 +14,60 @@ import 'app_tokens.dart';
 /// Theme values are intentionally unscaled (no ScreenUtil) so the theme can
 /// be built anywhere, including tests.
 abstract final class AppTheme {
+  /// Status bar over light pages: transparent, dark icons; the gesture /
+  /// navigation bar matches the ivory tab bar.
+  static const SystemUiOverlayStyle overlayOnLight = SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+    statusBarIconBrightness: Brightness.dark,
+    statusBarBrightness: Brightness.light,
+    systemNavigationBarColor: AppColors.cardDark,
+    systemNavigationBarIconBrightness: Brightness.dark,
+    systemNavigationBarDividerColor: Colors.transparent,
+  );
+
+  /// Status bar over the turquoise header band (Home, Pulse): light icons.
+  static const SystemUiOverlayStyle overlayOnBand = SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+    statusBarIconBrightness: Brightness.light,
+    statusBarBrightness: Brightness.dark,
+    systemNavigationBarColor: AppColors.cardDark,
+    systemNavigationBarIconBrightness: Brightness.dark,
+    systemNavigationBarDividerColor: Colors.transparent,
+  );
+
   static ThemeData get darkTheme => dark(const Locale('en'));
 
   static const ColorScheme colorScheme = ColorScheme(
-    brightness: Brightness.dark,
+    brightness: Brightness.light,
     primary: AppColors.secondaryGold,
     onPrimary: AppColors.onGold,
-    primaryContainer: Color(0xFF3D3220),
-    onPrimaryContainer: Color(0xFFF1DDB4),
+    primaryContainer: Color(0xFFD5EBEE),
+    onPrimaryContainer: Color(0xFF06323A),
     secondary: AppColors.success,
     onSecondary: AppColors.onGold,
-    secondaryContainer: AppColors.primaryEmerald,
-    onSecondaryContainer: AppColors.textMain,
+    secondaryContainer: Color(0xFFF1E5C8),
+    onSecondaryContainer: Color(0xFF3D2E0E),
     tertiary: AppColors.info,
     onTertiary: AppColors.onGold,
     error: AppColors.error,
     onError: AppColors.onGold,
-    errorContainer: Color(0xFF4C1020),
-    onErrorContainer: Color(0xFFFFD9DE),
+    errorContainer: Color(0xFFF9DEDC),
+    onErrorContainer: Color(0xFF410E0B),
     surface: AppColors.backgroundSlate,
     onSurface: AppColors.textMain,
     onSurfaceVariant: AppColors.textSecondary,
-    surfaceContainerLowest: Color(0xFF0B1222),
-    surfaceContainerLow: Color(0xFF131C31),
-    surfaceContainer: Color(0xFF172036),
+    surfaceContainerLowest: Color(0xFFFFFFFF),
+    surfaceContainerLow: Color(0xFFF7F8F4),
+    surfaceContainer: Color(0xFFF3F5F1),
     surfaceContainerHigh: AppColors.cardDark,
-    surfaceContainerHighest: Color(0xFF273449),
-    outline: Color(0xFF475569),
+    surfaceContainerHighest: Color(0xFFE6ECE8),
+    outline: Color(0xFF7C8C8B),
     outlineVariant: AppColors.glassStrokeStrong,
     shadow: Colors.black,
     scrim: Colors.black,
     inverseSurface: AppColors.textMain,
     onInverseSurface: AppColors.backgroundSlate,
-    inversePrimary: Color(0xFF7A5F2A),
+    inversePrimary: Color(0xFF8FD3DC),
     surfaceTint: Colors.transparent,
   );
 
@@ -119,7 +141,7 @@ abstract final class AppTheme {
 
     return ThemeData(
       useMaterial3: true,
-      brightness: Brightness.dark,
+      brightness: Brightness.light,
       colorScheme: cs,
       primaryColor: AppColors.secondaryGold,
       scaffoldBackgroundColor: AppColors.backgroundSlate,
@@ -158,6 +180,7 @@ abstract final class AppTheme {
         iconTheme: const IconThemeData(color: AppColors.secondaryGold),
         actionsIconTheme: const IconThemeData(color: AppColors.secondaryGold),
         titleTextStyle: text.titleLarge,
+        systemOverlayStyle: AppTheme.overlayOnLight,
       ),
 
       cardTheme: CardThemeData(
@@ -293,7 +316,7 @@ abstract final class AppTheme {
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadius.lgRaw),
-          side: const BorderSide(color: AppColors.glassStroke),
+          side: const BorderSide(color: AppColors.brass),
         ),
         titleTextStyle: text.titleLarge,
         contentTextStyle: text.bodyMedium,
@@ -312,9 +335,9 @@ abstract final class AppTheme {
       ),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
-        backgroundColor: AppColors.cardDark,
-        contentTextStyle: text.bodyMedium!.copyWith(color: AppColors.textMain),
-        actionTextColor: AppColors.secondaryGold,
+        backgroundColor: AppColors.textMain,
+        contentTextStyle: text.bodyMedium!.copyWith(color: AppColors.cardDark),
+        actionTextColor: AppColors.brass,
         closeIconColor: AppColors.textSecondary,
         elevation: 4,
         insetPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -437,7 +460,7 @@ abstract final class AppTheme {
       ),
 
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
-        backgroundColor: AppColors.backgroundSlate,
+        backgroundColor: AppColors.cardDark,
         selectedItemColor: AppColors.secondaryGold,
         unselectedItemColor: AppColors.textSecondary,
         selectedLabelStyle: text.labelSmall!.copyWith(fontWeight: FontWeight.w600),
@@ -447,9 +470,9 @@ abstract final class AppTheme {
         showUnselectedLabels: true,
       ),
       navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: AppColors.backgroundSlate,
+        backgroundColor: AppColors.cardDark,
         surfaceTintColor: Colors.transparent,
-        indicatorColor: AppColors.secondaryGold.withValues(alpha: 0.18),
+        indicatorColor: AppColors.secondaryGold.withValues(alpha: 0.14),
         elevation: 0,
         height: 68,
         labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,

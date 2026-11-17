@@ -148,12 +148,14 @@ class ProfilePage extends StatelessWidget {
         final Widget body;
         if (authState is Authenticated) {
           body = _AuthenticatedProfile(state: authState);
-        } else if (authState is GuestMode || authState is Unauthenticated) {
+        } else if (authState is AuthInitial || authState is AuthLoading) {
+          body = const StateView.loading();
+        } else {
+          // Guest, signed out, or a failed sign-in / password reset started
+          // from here: show the sign-in options, never an endless spinner.
           body = _GuestProfile(
             authUnavailable: authState is GuestMode && authState.authUnavailable,
           );
-        } else {
-          body = const StateView.loading();
         }
         return AppScaffold(
           title: l10n.my_profile,

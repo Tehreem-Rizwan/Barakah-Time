@@ -83,13 +83,33 @@ class NearbyMosquesService {
         if (shouldTryNextEndpoint(response.statusCode)) continue;
         throw lastError;
       }
+      final body = utf8.decode(response.bodyBytes);
+      // Overpass reports server-side timeouts/out-of-memory as HTTP 200
+      // with a "remark" and no results: try the mirror instead of showing
+      // "no mosques nearby".
+      if (isServerError(body)) {
+        lastError = const MosqueLookupException('server');
+        continue;
+      }
       try {
-        return parse(utf8.decode(response.bodyBytes), lat, lng);
+        return parse(body, lat, lng);
       } catch (_) {
         throw const MosqueLookupException('parse');
       }
     }
     throw lastError ?? const MosqueLookupException('network');
+  }
+
+  static bool isServerError(String body) {
+    try {
+      final decoded = json.decode(body);
+      final remark = decoded is Map ? decoded['remark'] : null;
+      return remark is String &&
+          RegExp('runtime error|timed out|out of memory', caseSensitive: false)
+              .hasMatch(remark);
+    } catch (_) {
+      return false;
+    }
   }
 
   /// Parses an Overpass JSON response, computes distances, removes

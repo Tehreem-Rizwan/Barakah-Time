@@ -7,6 +7,7 @@ import '../../core/localization/app_localizations.dart';
 import '../../core/services/audio_service.dart';
 import '../../core/utils/arabic_text.dart' as arabic_utils;
 import '../../injection_container.dart';
+import '../../core/constants/content_translations.dart';
 import '../widgets/widgets.dart';
 
 class DuasPage extends StatefulWidget {
@@ -34,6 +35,7 @@ class _DuasPageState extends State<DuasPage> {
       final index = [
         l10n.translate(d['key']!).toLowerCase(),
         d['meaning']!.toLowerCase(),
+        duaMeaning(d, l10n.locale.languageCode).toLowerCase(),
         _latinKey(d['transliteration']!),
         arabic_utils.ArabicText.normalize(d['arabic']!),
       ].join('\n');
@@ -45,7 +47,7 @@ class _DuasPageState extends State<DuasPage> {
 
   String _shareText(AppLocalizations l10n, Map<String, String> dua) =>
       '🤲 ${l10n.translate(dua['key']!)}\n\n${dua['arabic']}\n\n'
-      '${dua['transliteration']}\n\n${dua['meaning']}\n\n'
+      '${dua['transliteration']}\n\n${duaMeaning(dua, l10n.locale.languageCode)}\n\n'
       '${l10n.shared_from_app} ✨';
 
   Future<void> _copy(Map<String, String> dua) async {
@@ -160,13 +162,16 @@ class _DuaCard extends StatelessWidget {
                       if (isPlaying) {
                         audioService.stop();
                       } else {
-                        // Dua meanings are English text.
+                        final lang =
+                            Localizations.localeOf(context).languageCode;
+                        final translated =
+                            kDuaMeanings[lang]?[dua['key']] != null;
                         audioService.playArabicThenTranslation(
                           dua['arabic']!,
-                          dua['meaning']!,
+                          duaMeaning(dua, lang),
                           title: title,
                           mediaId: mediaId,
-                          translationLang: 'en',
+                          translationLang: translated ? lang : 'en',
                         );
                       }
                     },
@@ -186,7 +191,16 @@ class _DuaCard extends StatelessWidget {
             ),
           ),
           SizedBox(height: AppSpacing.vSm),
-          TranslationText(dua['meaning']!),
+          Builder(
+            builder: (context) {
+              final lang = Localizations.localeOf(context).languageCode;
+              final meaning = duaMeaning(dua, lang);
+              return TranslationText(
+                meaning,
+                isLtr: meaning == dua['meaning'] || !_isRtl(lang),
+              );
+            },
+          ),
           if (reference != null) ...[
             SizedBox(height: AppSpacing.vXs),
             Text(
@@ -227,7 +241,14 @@ class _DuaCard extends StatelessWidget {
   }
 }
 
-/// Dua data. Titles are l10n keys; meanings are English.
+/// Meaning of [dua] in [lang] (English when no translation exists).
+String duaMeaning(Map<String, String> dua, String lang) =>
+    kDuaMeanings[lang]?[dua['key']] ?? dua['meaning']!;
+
+bool _isRtl(String lang) => const {'ar', 'fa', 'ur'}.contains(lang);
+
+/// Dua data. Titles are l10n keys; meanings here are English, other
+/// languages are in `kDuaMeanings`.
 const List<Map<String, String>> kDuas = [
   {
     'key': 'dua_before_sleeping',

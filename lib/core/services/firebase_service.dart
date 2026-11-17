@@ -310,14 +310,24 @@ class FirebaseService {
         email: email.trim(),
         password: password,
       );
-      await cred.user!.updateDisplayName(name.trim());
+      // The account exists now: everything below is best-effort, so a
+      // network hiccup can't leave a signed-in user stuck on an error.
+      try {
+        await cred.user!.updateDisplayName(name.trim());
+      } catch (e) {
+        debugPrint('updateDisplayName failed: $e');
+      }
       try {
         await cred.user!.sendEmailVerification();
       } catch (e) {
         debugPrint('sendEmailVerification failed: $e');
       }
-      await cred.user!.reload();
-      return _auth.currentUser!;
+      try {
+        await cred.user!.reload();
+      } catch (e) {
+        debugPrint('reload after sign-up failed: $e');
+      }
+      return _auth.currentUser ?? cred.user!;
     } on FirebaseAuthException catch (e) {
       throw mapAuthException(e);
     }

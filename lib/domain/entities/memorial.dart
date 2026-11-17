@@ -122,13 +122,21 @@ class Memorial {
       ownerUid: m['ownerUid'] is String ? m['ownerUid'] as String : '',
       name: m['name'] is String ? m['name'] as String : '',
       subtitle: m['subtitle'] is String ? m['subtitle'] as String : '',
-      deathDate: death is DateTime ? death : _toDate(death),
+      deathDate: _calendarDate(death is DateTime ? death : _toDate(death)),
       showDates: m['showDates'] != false,
       goals: _ints(m['goals']),
       counts: _ints(m['counts']),
       paras: paras,
       khatams: khatams is num ? khatams.toInt() : 0,
     );
+  }
+
+  /// The death date is saved as 12:00 UTC of the chosen day; read the day
+  /// back in UTC so it doesn't shift in time zones beyond ±12 h.
+  static DateTime? _calendarDate(DateTime? d) {
+    if (d == null) return null;
+    final u = d.toUtc();
+    return DateTime(u.year, u.month, u.day);
   }
 
   /// Firestore Timestamp (or anything with `toDate()`) → DateTime.

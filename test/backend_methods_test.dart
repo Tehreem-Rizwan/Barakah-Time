@@ -128,4 +128,17 @@ void main() {
       },
     );
   });
+
+  test('time zone picks the region when the phone locale is en_US', () {
+    expect(SettingsBloc.countryForUtcOffset(const Duration(hours: 5)), 'PK');
+    expect(
+      SettingsBloc.countryForUtcOffset(const Duration(hours: 5, minutes: 30)),
+      'IN',
+    );
+    expect(SettingsBloc.countryForUtcOffset(const Duration(hours: -5)), isNull);
+    expect(
+      SettingsBloc.deviceCountryCode(utcOffset: const Duration(hours: 5)),
+      'PK',
+    );
+  });
 }

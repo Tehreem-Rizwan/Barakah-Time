@@ -16,7 +16,7 @@
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:maxLines">1</item>
-        <item name="android:textColor">#94A3B8</item>
+        <item name="android:textColor">#B9D0CF</item>
         <item name="android:textSize">11sp</item>
     </style>
 
@@ -24,7 +24,7 @@
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:maxLines">1</item>
-        <item name="android:textColor">#F8FAFC</item>
+        <item name="android:textColor">#FFFDF6</item>
         <item name="android:textSize">12sp</item>
         <item name="android:textStyle">bold</item>
     </style>

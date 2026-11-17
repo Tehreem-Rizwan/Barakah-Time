@@ -129,7 +129,10 @@ class RamadanService {
       year: year,
       isRamadan: false,
       day: 0,
-      daysUntil: start.difference(today).inDays,
+      daysUntil:
+          DateTime.utc(start.year, start.month, start.day)
+              .difference(DateTime.utc(today.year, today.month, today.day))
+              .inDays,
       length: cal.getDaysInMonth(year, 9),
       start: start,
     );
@@ -176,6 +179,10 @@ class RamadanService {
     }
     all['$year'] = y;
     await prefs.setString(UserPrefsKeys.ramadanLog, jsonEncode(all));
+    await prefs.setInt(
+      UserPrefsKeys.ramadanUpdatedAt,
+      DateTime.now().millisecondsSinceEpoch,
+    );
     sync?.pushRamadanLog(all);
   }
 

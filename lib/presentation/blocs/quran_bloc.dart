@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../data/repositories/quran_repository.dart';
 import '../../domain/entities/surah.dart';
 
@@ -19,6 +20,14 @@ class LoadSurahs extends QuranEvent {
 class ChangeQuranLanguage extends QuranEvent {
   final String languageCode;
   ChangeQuranLanguage(this.languageCode);
+}
+
+/// The user's own choice of translation language, independent of the app
+/// language (e.g. English app, Urdu Quran translation). null = follow the
+/// app language.
+class SetTranslationLanguage extends QuranEvent {
+  final String? languageCode;
+  SetTranslationLanguage(this.languageCode);
 }
 
 // States
@@ -61,10 +70,27 @@ class QuranBloc extends Bloc<QuranEvent, QuranState> {
   /// Current translation edition (see [QuranRepository.translationEditionFor]).
   String get translationEdition => _edition;
 
-  QuranBloc(this.repository) : super(QuranInitial()) {
+  /// Stores [SetTranslationLanguage]; optional so tests can omit it.
+  final SharedPreferences? prefs;
+  static const translationLangKey = 'quran_translation_lang';
+
+  String _appLanguage = 'en';
+
+  /// Translation language chosen by the user, or null (follows the app).
+  String? get chosenTranslationLanguage => prefs?.getString(translationLangKey);
+
+  /// Language actually used for the translation.
+  String get translationLanguage => chosenTranslationLanguage ?? _appLanguage;
+
+  void _updateEdition() {
+    _edition = QuranRepository.translationEditionFor(translationLanguage);
+  }
+
+  QuranBloc(this.repository, {this.prefs}) : super(QuranInitial()) {
     on<LoadSurahs>((event, emit) async {
       if (event.languageCode != null) {
-        _edition = QuranRepository.translationEditionFor(event.languageCode!);
+        _appLanguage = event.languageCode!;
+        _updateEdition();
       }
       // Keep showing an already-loaded list during a pull-to-refresh.
       if (state is! QuranLoaded) emit(QuranLoading());
@@ -92,7 +118,22 @@ class QuranBloc extends Bloc<QuranEvent, QuranState> {
     });
 
     on<ChangeQuranLanguage>((event, emit) {
-      _edition = QuranRepository.translationEditionFor(event.languageCode);
+      _appLanguage = event.languageCode;
+      _updateEdition();
+      final current = state;
+      if (current is QuranLoaded) {
+        emit(QuranLoaded(current.surahs, translationEdition: _edition));
+      }
+    });
+
+    on<SetTranslationLanguage>((event, emit) async {
+      final code = event.languageCode;
+      if (code == null) {
+        await prefs?.remove(translationLangKey);
+      } else {
+        await prefs?.setString(translationLangKey, code);
+      }
+      _updateEdition();
       final current = state;
       if (current is QuranLoaded) {
         emit(QuranLoaded(current.surahs, translationEdition: _edition));

@@ -88,9 +88,16 @@ class NotificationService {
   Future<void>? _initFuture;
   Future<void> _scheduleChain = Future.value();
 
+  /// Bumped by [cancelAll]; queued or running schedule jobs from before a
+  /// cancel stop instead of re-adding reminders the user just turned off.
+  int _cancelGeneration = 0;
+
   static const int daysAhead = 7;
 
-  static const String adhanChannelId = 'prayer_adhan_v2';
+  /// v3: the adhan follows the phone's ring/silent mode (notification
+  /// audio). v2 used the alarm stream, which played even on silent.
+  static const String adhanChannelId = 'prayer_adhan_v3';
+  static const List<String> _oldAdhanChannelIds = ['prayer_adhan_v2'];
   static const String defaultChannelId = 'prayer_default_v2';
   static const String _legacyChannelId = 'prayer_times';
   static const String _smallIcon = 'ic_stat_notification';
@@ -172,7 +179,7 @@ class NotificationService {
             description: 'Plays the adhan when each prayer time begins',
             importance: Importance.high,
             sound: RawResourceAndroidNotificationSound('adhan'),
-            audioAttributesUsage: AudioAttributesUsage.alarm,
+            audioAttributesUsage: AudioAttributesUsage.notification,
           ),
         );
         await android.createNotificationChannel(
@@ -185,6 +192,9 @@ class NotificationService {
         );
         try {
           await android.deleteNotificationChannel(channelId: _legacyChannelId);
+          for (final id in _oldAdhanChannelIds) {
+            await android.deleteNotificationChannel(channelId: id);
+          }
         } catch (_) {}
       }
     } catch (e) {
@@ -310,8 +320,15 @@ class NotificationService {
     bool adhanSound = true,
     DateTime? now,
   }) {
+    final gen = _cancelGeneration;
     final run = _scheduleChain.then(
-      (_) => _schedule(days, languageCode, adhanSound, now ?? DateTime.now()),
+      (_) => _schedule(
+        days,
+        languageCode,
+        adhanSound,
+        now ?? DateTime.now(),
+        gen,
+      ),
     );
     _scheduleChain = run.catchError((_) {});
     return _scheduleChain;
@@ -322,9 +339,10 @@ class NotificationService {
     String languageCode,
     bool adhanSound,
     DateTime now,
+    int gen,
   ) async {
     await init();
-    if (!_initialized) return;
+    if (!_initialized || gen != _cancelGeneration) return;
     try {
       await _cancelGroup(ReminderGroups.prayers);
       final l10n = AppLocalizations(Locale(languageCode));
@@ -341,10 +359,7 @@ class NotificationService {
               adhanSound
                   ? const RawResourceAndroidNotificationSound('adhan')
                   : null,
-          audioAttributesUsage:
-              adhanSound
-                  ? AudioAttributesUsage.alarm
-                  : AudioAttributesUsage.notification,
+          audioAttributesUsage: AudioAttributesUsage.notification,
         ),
         iOS: DarwinNotificationDetails(
           presentSound: true,
@@ -353,6 +368,7 @@ class NotificationService {
         macOS: const DarwinNotificationDetails(presentSound: true),
       );
       for (final item in computeSchedule(days, now)) {
+        if (gen != _cancelGeneration) return;
         final name = l10n.translate(item.prayer.key);
         await _plugin.zonedSchedule(
           id: item.id,
@@ -394,8 +410,9 @@ class NotificationService {
     List<ExtraReminder> items, {
     DateTime? now,
   }) {
+    final gen = _cancelGeneration;
     final run = _scheduleChain.then(
-      (_) => _scheduleGroup(base, items, now ?? DateTime.now()),
+      (_) => _scheduleGroup(base, items, now ?? DateTime.now(), gen),
     );
     _scheduleChain = run.catchError((_) {});
     return _scheduleChain;
@@ -405,9 +422,10 @@ class NotificationService {
     int base,
     List<ExtraReminder> items,
     DateTime now,
+    int gen,
   ) async {
     await init();
-    if (!_initialized) return;
+    if (!_initialized || gen != _cancelGeneration) return;
     try {
       await _cancelGroup(base);
       final exact = await canScheduleExactAlarms();
@@ -426,6 +444,7 @@ class NotificationService {
       final future = items.where((r) => r.time.isAfter(now)).toList()
         ..sort((a, b) => a.time.compareTo(b.time));
       for (var i = 0; i < future.length && i < ReminderGroups.size; i++) {
+        if (gen != _cancelGeneration) return;
         final r = future[i];
         await _plugin.zonedSchedule(
           id: base + i,
@@ -445,13 +464,19 @@ class NotificationService {
     }
   }
 
-  Future<void> cancelAll() async {
-    await init();
-    if (!_initialized) return;
-    try {
-      await _plugin.cancelAll();
-    } catch (e) {
-      debugPrint('Cancelling notifications failed: $e');
-    }
+  /// Cancels everything, including schedule jobs still queued or running.
+  Future<void> cancelAll() {
+    _cancelGeneration++;
+    final run = _scheduleChain.then((_) async {
+      await init();
+      if (!_initialized) return;
+      try {
+        await _plugin.cancelAll();
+      } catch (e) {
+        debugPrint('Cancelling notifications failed: $e');
+      }
+    });
+    _scheduleChain = run.catchError((_) {});
+    return _scheduleChain;
   }
 }

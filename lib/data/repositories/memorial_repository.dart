@@ -277,7 +277,42 @@ class MemorialRepository {
         .add(_entry(me, 'deed', t.length > 500 ? t.substring(0, 500) : t));
   }
 
-  /// Account deletion: deletes memorials the user owns and their list.
+  /// On someone else's page: deletes the user's feed entries (which show
+  /// their name) and gives back paras they took but hadn't finished.
+  /// Finished paras stay, as they're part of the completed khatam count.
+  Future<void> _removeMyTraces(
+    MemorialActor me,
+    String id,
+    Map<String, dynamic> data,
+  ) async {
+    final ref = _col.doc(id);
+    while (true) {
+      final q =
+          await ref
+              .collection('entries')
+              .where('uid', isEqualTo: me.uid)
+              .limit(400)
+              .get();
+      if (q.docs.isEmpty) break;
+      final batch = _db.batch();
+      for (final e in q.docs) {
+        batch.delete(e.reference);
+      }
+      await batch.commit();
+      if (q.docs.length < 400) break;
+    }
+    final m = Memorial.fromMap(id, data);
+    for (final e in m.paras.entries) {
+      if (e.value.uid == me.uid && !e.value.done) {
+        try {
+          await releasePara(me, id, e.key);
+        } catch (_) {}
+      }
+    }
+  }
+
+  /// Account deletion: deletes memorials the user owns, removes the user's
+  /// entries and unfinished paras from pages they joined, and their list.
   Future<void> deleteAllFor(MemorialActor me) async {
     final mine = await _index(me.uid).get();
     for (final d in mine.docs) {
@@ -286,6 +321,7 @@ class MemorialRepository {
         if (snap.exists && snap.data()?['ownerUid'] == me.uid) {
           await delete(me, d.id);
         } else {
+          if (snap.exists) await _removeMyTraces(me, d.id, snap.data()!);
           await d.reference.delete();
         }
       } catch (_) {

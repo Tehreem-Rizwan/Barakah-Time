@@ -30,6 +30,10 @@ class _ZakatCalculatorPageState extends State<ZakatCalculatorPage> {
   final GlobalKey _resultKey = GlobalKey();
   final Set<_Field> _invalid = {};
   NisabStandard _standard = NisabStandard.silver;
+
+  /// Price per gram typed for each metal, so switching silver ↔ gold never
+  /// applies one metal's price to the other.
+  final Map<NisabStandard, String> _metalPrices = {};
   ZakatResult? _result;
 
   SharedPreferences? get _prefs =>
@@ -226,8 +230,14 @@ class _ZakatCalculatorPageState extends State<ZakatCalculatorPage> {
               ],
               selected: {_standard},
               onSelectionChanged: (s) {
-                setState(() => _standard = s.first);
-                if (_result != null) _calculateZakat();
+                final price = _controllers[_Field.metalPrice]!;
+                setState(() {
+                  _metalPrices[_standard] = price.text;
+                  _standard = s.first;
+                  price.text = _metalPrices[_standard] ?? '';
+                  _invalid.remove(_Field.metalPrice);
+                  _result = null; // recalculate with the right metal price
+                });
               },
             ),
             SizedBox(height: AppSpacing.vLg),

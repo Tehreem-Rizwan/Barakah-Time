@@ -43,14 +43,18 @@ class IslamicEvents {
 
   /// Returns the next occurrence (today or later) of each event, sorted by
   /// date. Events that fall today are included with `daysRemaining == 0`.
-  static List<UpcomingIslamicEvent> upcoming(DateTime now) {
+  /// [adjust] shifts the Hijri calendar by local moon sighting (-2..+2).
+  static List<UpcomingIslamicEvent> upcoming(DateTime now, {int adjust = 0}) {
     final today = DateTime(now.year, now.month, now.day);
-    final hToday = HijriCalendar.fromDate(today);
+    final hToday = HijriCalendar.fromDate(
+      DateTime(today.year, today.month, today.day + adjust),
+    );
     final result = <UpcomingIslamicEvent>[];
     for (final def in all) {
       for (var year = hToday.hYear; year <= hToday.hYear + 1; year++) {
-        final date = _toGregorian(year, def.hijriMonth, def.hijriDay);
-        if (date == null) continue;
+        final calc = _toGregorian(year, def.hijriMonth, def.hijriDay);
+        if (calc == null) continue;
+        final date = DateTime(calc.year, calc.month, calc.day - adjust);
         if (date.isBefore(today)) continue;
         result.add(
           UpcomingIslamicEvent(
