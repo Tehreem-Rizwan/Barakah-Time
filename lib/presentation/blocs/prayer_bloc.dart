@@ -163,6 +163,12 @@ class PrayerBloc extends Bloc<PrayerEvent, PrayerState> {
     if (config == null) return;
     final lat = _lat, lng = _lng;
     final current = state;
+    // Resuming after the permission dialog (or with a load still running)
+    // must not ask again: a denied permission is retried only via Retry.
+    if (current is PrayerLoading ||
+        (current is PrayerError && current.locationFailure != null)) {
+      return;
+    }
     if (lat == null || lng == null || current is! PrayerLoaded) {
       add(LoadPrayerTimes(config));
       return;

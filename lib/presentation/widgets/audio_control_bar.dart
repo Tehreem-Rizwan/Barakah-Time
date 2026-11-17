@@ -38,7 +38,10 @@ class _AudioControlBarState extends State<AudioControlBar> {
     ScaffoldMessenger.maybeOf(context)
       ?..hideCurrentSnackBar()
       ..showSnackBar(
-        SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
+        SnackBar(
+          content: Text(context.l10n.translate(message)),
+          behavior: SnackBarBehavior.floating,
+        ),
       );
   }
 
@@ -63,14 +66,14 @@ class _AudioControlBarState extends State<AudioControlBar> {
         return Container(
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
           decoration: BoxDecoration(
-            color: AppColors.backgroundSlate.withValues(alpha: 0.95),
+            color: AppColors.cardDark,
             border: Border(
-              top: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+              top: BorderSide(color: AppColors.glassStroke),
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.3),
-                blurRadius: 10,
+                color: AppColors.textMain.withValues(alpha: 0.08),
+                blurRadius: 12,
                 offset: const Offset(0, -5),
               ),
             ],
@@ -96,9 +99,9 @@ class _AudioControlBarState extends State<AudioControlBar> {
                             progress: position,
                             total: duration,
                             onSeek: _audioService.seek,
-                            baseBarColor: Colors.white.withValues(alpha: 0.1),
+                            baseBarColor: AppColors.glassFill,
                             progressBarColor: AppColors.secondaryGold,
-                            bufferedBarColor: Colors.white.withValues(alpha: 0.2),
+                            bufferedBarColor: AppColors.glassStrokeStrong,
                             thumbColor: AppColors.secondaryGold,
                             barHeight: 3.h,
                             thumbRadius: 6.r,

@@ -61,6 +61,24 @@ class QuranRepository {
 
   static const String arabicEdition = 'quran-uthmani';
   static const String audioEdition = 'ar.alafasy';
+
+  /// Human-voice translation recitations on the Islamic Network CDN
+  /// (language → "bitrate/edition"). Urdu: Shamshad Ali Khan; English:
+  /// Ibrahim Walk; Farsi: Hedayatfar (Fooladvand); Turkish: Diyanet Vakfı.
+  static const Map<String, String> _translationAudio = {
+    'ur': '64/ur.khan',
+    'en': '192/en.walk',
+    'fa': '40/fa.hedayatfarfooladvand',
+    'tr': '128/tr.vakfi-audio',
+  };
+
+  /// MP3 of the translation of ayah [globalAyahNumber] (1..6236) read by a
+  /// person, or null when there is none for [languageCode] (then use TTS).
+  static String? translationAudioUrl(String languageCode, int globalAyahNumber) {
+    final path = _translationAudio[languageCode];
+    if (path == null || globalAyahNumber < 1) return null;
+    return 'https://cdn.islamic.network/quran/audio/$path/$globalAyahNumber.mp3';
+  }
   static const String defaultTranslationEdition = 'en.asad';
 
   /// alquran.cloud translation edition for an app language.

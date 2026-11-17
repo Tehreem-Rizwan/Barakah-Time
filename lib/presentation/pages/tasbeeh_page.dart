@@ -131,6 +131,9 @@ class _TasbeehPageState extends State<TasbeehPage> {
     final pending = _counter - _loggedCount;
     if (pending <= 0) return 0;
     final points = _pointsFor(_counter) - _pointsFor(_loggedCount);
+    // Under 33 new dhikr earns no points: keep it pending instead of adding
+    // an empty "+0" entry (which would also extend the streak).
+    if (points <= 0) return 0;
     _pulseBloc?.add(
       LogActivity(
         SpiritualActivity(
@@ -158,8 +161,7 @@ class _TasbeehPageState extends State<TasbeehPage> {
       destructive: true,
     );
     if (!confirmed || !mounted) return;
-    final total = _counter;
-    _logPending();
+    final total = _logPending();
     setState(() {
       _counter = 0;
       _loggedCount = 0;

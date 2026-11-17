@@ -187,9 +187,14 @@ class _ToolTile extends StatelessWidget {
             Container(
               width: 48.r,
               height: 48.r,
+              // Small mihrab-shaped tile, as on Home.
               decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.secondaryGold.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(24.r),
+                  bottom: Radius.circular(8.r),
+                ),
+                color: AppColors.secondaryGold.withValues(alpha: 0.06),
+                border: Border.all(color: AppColors.brass, width: 1.2),
               ),
               child: Icon(
                 tool.icon,

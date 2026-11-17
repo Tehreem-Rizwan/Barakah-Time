@@ -25,6 +25,7 @@ class AppScaffold extends StatelessWidget {
     this.gradientBackground = false,
     this.showBack,
     this.safeAreaBottom = true,
+    this.safeAreaTop = true,
     this.resizeToAvoidBottomInset,
   });
 
@@ -48,6 +49,10 @@ class AppScaffold extends StatelessWidget {
 
   /// Apply the bottom safe-area inset to the body (ignored with [bottomBar]).
   final bool safeAreaBottom;
+
+  /// Apply the top safe-area inset (without an app bar). Set false when the
+  /// page paints its own band under the status bar (Home).
+  final bool safeAreaTop;
   final bool? resizeToAvoidBottomInset;
 
   bool get _hasAppBar => title != null || titleWidget != null || actions != null;
@@ -73,7 +78,7 @@ class AppScaffold extends StatelessWidget {
       floatingActionButton: floatingActionButton,
       bottomNavigationBar: bottomBar,
       body: SafeArea(
-        top: appBar == null,
+        top: appBar == null && safeAreaTop,
         bottom: bottomBar == null && safeAreaBottom,
         child: body,
       ),

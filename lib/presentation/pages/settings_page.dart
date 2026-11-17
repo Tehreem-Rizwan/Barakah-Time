@@ -406,13 +406,17 @@ class SettingsPage extends StatelessWidget {
             initialUseAuto: state.useAutoLocation,
             initialManualLocation: state.manualLocation,
             onSave: (useAuto, city) {
-              if (useAuto != state.useAutoLocation) {
-                settingsBloc.add(ToggleLocationMode(useAuto));
-              }
-              if (!useAuto &&
-                  (city != state.manualLocation ||
-                      useAuto != state.useAutoLocation)) {
-                settingsBloc.add(UpdateManualLocation(city));
+              final switching = useAuto != state.useAutoLocation;
+              if (useAuto) {
+                if (switching) settingsBloc.add(const ToggleLocationMode(true));
+              } else if (city != state.manualLocation) {
+                // Look the city up first; manual mode turns on only if found.
+                settingsBloc.add(
+                  UpdateManualLocation(city, switchToManual: switching),
+                );
+              } else if (switching) {
+                // Same, already looked-up city: its coordinates are valid.
+                settingsBloc.add(const ToggleLocationMode(false));
               }
             },
           ),
@@ -534,7 +538,7 @@ class _ProfileTile extends StatelessWidget {
       padding: AppSpacing.only(start: 16, top: 12, end: 4, bottom: 12),
       child: Row(
         children: [
-          UserAvatar(imagePath: user.profilePicPath, radius: 28.r),
+          UserAvatar(imagePath: user.profilePicPath, radius: 22.r),
           SizedBox(width: AppSpacing.lg),
           Expanded(
             child: Column(

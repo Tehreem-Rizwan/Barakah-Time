@@ -91,6 +91,8 @@ class _RamadanPageState extends State<RamadanPage> {
   Future<void> _editDay(int year, int day, FastDay current) async {
     final result = await showModalBottomSheet<FastDay>(
       context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
       builder: (_) => _FastDaySheet(day: day, initial: current),
     );
     if (result == null) return;
@@ -171,7 +173,7 @@ class _RamadanPageState extends State<RamadanPage> {
               ),
             ],
           ),
-          if (info.isRamadan && info.day >= 21 && info.day.isOdd) ...[
+          if (info.isRamadan && _isOddNightTonight(context, info)) ...[
             SizedBox(height: AppSpacing.vSm),
             Text(
               l10n.translate('ramadan_qadr_tonight'),
@@ -216,6 +218,18 @@ class _RamadanPageState extends State<RamadanPage> {
         ],
       ),
     );
+  }
+
+  /// Islamic nights start at Maghrib: until Fajr it's still the night of
+  /// today's date, after that "tonight" is the night of tomorrow's date.
+  bool _isOddNightTonight(BuildContext context, RamadanInfo info) {
+    final prayer = context.read<PrayerBloc>().state;
+    final beforeFajr =
+        prayer is PrayerLoaded
+            ? _now.isBefore(prayer.prayerTimes.today.fajr)
+            : _now.hour < 5;
+    final night = beforeFajr ? info.day : info.day + 1;
+    return night >= 21 && night <= info.length && night.isOdd;
   }
 
   Widget _sehriIftarCard(BuildContext context) {
@@ -563,7 +577,7 @@ class _FastDaySheetState extends State<_FastDaySheet> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     return SafeArea(
-      child: Padding(
+      child: SingleChildScrollView(
         padding: AppSpacing.page,
         child: Column(
           mainAxisSize: MainAxisSize.min,

@@ -19,8 +19,10 @@ import '../widgets/widgets.dart';
 import 'auth/sign_in_page.dart';
 import 'hijri_label.dart';
 
-MemorialActor _actor(UserEntity u, AppLocalizations l10n) =>
-    (uid: u.id, name: u.displayNameOr(l10n.translate('default_user_name')));
+MemorialActor _actor(UserEntity u, AppLocalizations l10n) => (
+  uid: u.id,
+  name: u.displayNameOr(l10n.translate('default_user_name')),
+);
 
 String _errorText(Object e, AppLocalizations l10n) {
   if (e is MemorialException) {
@@ -160,9 +162,7 @@ class _MemorialList extends StatelessWidget {
               if (snap.hasError) {
                 return Text(
                   l10n.translate('memorial_error_generic'),
-                  style: textTheme.bodyMedium?.copyWith(
-                    color: AppColors.error,
-                  ),
+                  style: textTheme.bodyMedium?.copyWith(color: AppColors.error),
                 );
               }
               if (!snap.hasData) {
@@ -520,6 +520,19 @@ class MemorialDetailPage extends StatelessWidget {
               actionLabel: l10n.translate('memorial_remove_from_list'),
               onAction: () async {
                 await sl<MemorialRepository>().leave(me, id);
+                final reminders = sl<MemorialReminderService>();
+                if (reminders.isEnabled(id)) {
+                  await reminders.setEnabled(
+                    Memorial(id: id, ownerUid: '', name: ''),
+                    false,
+                  );
+                  if (context.mounted) {
+                    await reminders.reschedule(
+                      sl<NotificationService>(),
+                      Localizations.localeOf(context).languageCode,
+                    );
+                  }
+                }
                 if (context.mounted) Navigator.of(context).pop();
               },
             ),
@@ -633,37 +646,41 @@ class _MemorialViewState extends State<_MemorialView> {
     }
     final action = await showModalBottomSheet<String>(
       context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
       builder:
           (sheet) => SafeArea(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListTile(
-                  title: Text(label),
-                  subtitle: Text(
-                    mine
-                        ? l10n.translate('memorial_para_yours')
-                        : l10n
-                            .translate('memorial_para_taken_by')
-                            .replaceAll('{n}', '$para')
-                            .replaceAll('{name}', claim.name),
-                  ),
-                ),
-                if (mine)
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
                   ListTile(
-                    leading: const Icon(
-                      Icons.check_circle_outline,
-                      color: AppColors.success,
+                    title: Text(label),
+                    subtitle: Text(
+                      mine
+                          ? l10n.translate('memorial_para_yours')
+                          : l10n
+                              .translate('memorial_para_taken_by')
+                              .replaceAll('{n}', '$para')
+                              .replaceAll('{name}', claim.name),
                     ),
-                    title: Text(l10n.translate('memorial_mark_read')),
-                    onTap: () => Navigator.of(sheet).pop('done'),
                   ),
-                ListTile(
-                  leading: const Icon(Icons.undo_rounded),
-                  title: Text(l10n.translate('memorial_release_para')),
-                  onTap: () => Navigator.of(sheet).pop('release'),
-                ),
-              ],
+                  if (mine)
+                    ListTile(
+                      leading: const Icon(
+                        Icons.check_circle_outline,
+                        color: AppColors.success,
+                      ),
+                      title: Text(l10n.translate('memorial_mark_read')),
+                      onTap: () => Navigator.of(sheet).pop('done'),
+                    ),
+                  ListTile(
+                    leading: const Icon(Icons.undo_rounded),
+                    title: Text(l10n.translate('memorial_release_para')),
+                    onTap: () => Navigator.of(sheet).pop('release'),
+                  ),
+                ],
+              ),
             ),
           ),
     );
@@ -731,16 +748,36 @@ class _MemorialViewState extends State<_MemorialView> {
         destructive: true,
       );
       if (!ok || !mounted) return;
-      await _run(() async {
-        await _repo.delete(widget.me, m.id);
-        if (mounted) Navigator.of(context).pop();
-      });
+      final messenger = ScaffoldMessenger.of(context);
+      final error = l10n.translate('memorial_error_generic');
+      final memorial = m;
+      final me = widget.me;
+      // Leave first: deleting makes this page's stream emit "deleted".
+      Navigator.of(context).pop();
+      await _stopReminders(memorial);
+      try {
+        await _repo.delete(me, memorial.id);
+      } catch (_) {
+        messenger.showSnackBar(SnackBar(content: Text(error)));
+      }
     } else if (value == 'leave') {
       await _run(() async {
         await _repo.leave(widget.me, m.id);
+        await _stopReminders(m);
         if (mounted) Navigator.of(context).pop();
       });
     }
+  }
+
+  /// Removes this page's remembrance-day reminders from this device.
+  Future<void> _stopReminders(Memorial memorial) async {
+    final reminders = sl<MemorialReminderService>();
+    if (!reminders.isEnabled(memorial.id)) return;
+    await reminders.setEnabled(memorial, false);
+    await reminders.reschedule(
+      sl<NotificationService>(),
+      Localizations.localeOf(context).languageCode,
+    );
   }
 
   @override
@@ -1012,10 +1049,7 @@ class _MemorialViewState extends State<_MemorialView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            l10n.translate('memorial_goals'),
-            style: textTheme.titleMedium,
-          ),
+          Text(l10n.translate('memorial_goals'), style: textTheme.titleMedium),
           for (final e in m.goals.entries) ...[
             SizedBox(height: AppSpacing.vMd),
             Builder(
@@ -1064,7 +1098,9 @@ class _MemorialViewState extends State<_MemorialView> {
                         minHeight: 6,
                         backgroundColor: AppColors.glassFill,
                         color:
-                            reached ? AppColors.success : AppColors.secondaryGold,
+                            reached
+                                ? AppColors.success
+                                : AppColors.secondaryGold,
                       ),
                     ),
                     SizedBox(height: AppSpacing.vXs),
@@ -1109,10 +1145,13 @@ class _MemorialDatesCardState extends State<_MemorialDatesCard> {
       return;
     }
     await _reminders.setEnabled(widget.memorial, on);
-    await _reminders.reschedule(
-      sl<NotificationService>(),
-      settings.languageCode,
-    );
+    // With notifications off everything stays cancelled.
+    if (settings.notificationsEnabled) {
+      await _reminders.reschedule(
+        sl<NotificationService>(),
+        settings.languageCode,
+      );
+    }
     if (mounted) setState(() {});
   }
 
@@ -1128,10 +1167,7 @@ class _MemorialDatesCardState extends State<_MemorialDatesCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            l10n.translate('memorial_dates'),
-            style: textTheme.titleMedium,
-          ),
+          Text(l10n.translate('memorial_dates'), style: textTheme.titleMedium),
           SizedBox(height: AppSpacing.vSm),
           for (final d in dates)
             Padding(
@@ -1188,9 +1224,7 @@ class _MemorialFeed extends StatelessWidget {
             .replaceAll('{name}', e.name)
             .replaceAll('{n}', e.text);
       case 'khatam':
-        return l10n
-            .translate('memorial_feed_khatam')
-            .replaceAll('{n}', e.text);
+        return l10n.translate('memorial_feed_khatam').replaceAll('{n}', e.text);
       case 'dhikr':
         final preset = DhikrPreset.byId(e.text);
         return l10n
@@ -1211,6 +1245,12 @@ class _MemorialFeed extends StatelessWidget {
       stream: sl<MemorialRepository>().watchEntries(id),
       builder: (context, snap) {
         final items = snap.data ?? const [];
+        if (snap.hasError && items.isEmpty) {
+          return Text(
+            l10n.translate('memorial_error_generic'),
+            style: textTheme.bodyMedium?.copyWith(color: AppColors.error),
+          );
+        }
         if (items.isEmpty) {
           return Text(
             snap.hasData
@@ -1241,7 +1281,10 @@ class _MemorialFeed extends StatelessWidget {
                     ),
                     SizedBox(width: AppSpacing.sm),
                     Expanded(
-                      child: Text(_text(context, e), style: textTheme.bodyMedium),
+                      child: Text(
+                        _text(context, e),
+                        style: textTheme.bodyMedium,
+                      ),
                     ),
                     if (e.createdAt != null)
                       Text(

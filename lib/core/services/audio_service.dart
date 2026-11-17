@@ -81,6 +81,13 @@ class AudioService {
     _configureSession();
     _initTts();
     _player.playerStateStream.listen(_onPlayerState);
+    // just_audio 0.10 reports mid-playback failures (e.g. network lost)
+    // only here; without this the bar stalls silently.
+    _player.errorStream.listen((e) {
+      debugPrint('Audio playback error: ${e.code} ${e.message}');
+      _errorController.add('audio_error_play');
+      stop();
+    });
   }
 
   /// Declares the app as a long-form audio player (Quran recitation): plays
@@ -111,7 +118,7 @@ class AudioService {
     _tts.setCompletionHandler(_onTtsSegmentDone);
     _tts.setCancelHandler(() {});
     _tts.setErrorHandler((msg) {
-      _errorController.add('Speech playback failed');
+      _errorController.add('audio_error_speech');
       _setStatus(AudioStatus.idle);
     });
   }
@@ -130,8 +137,8 @@ class AudioService {
     yield* _statusController.stream;
   }
 
-  /// User-facing error messages (e.g. "Could not play audio"). Pages may
-  /// listen and show a SnackBar.
+  /// Error l10n keys ('audio_error_play', 'audio_error_speech'); translate
+  /// with `l10n.translate(key)` before showing.
   Stream<String> get errorStream => _errorController.stream;
 
   String? get currentMediaId => _status.mediaId;
@@ -227,7 +234,7 @@ class AudioService {
     } catch (e) {
       debugPrint('Error playing audio: $e');
       if (session != _session) return;
-      _errorController.add('Could not play audio. Check your connection.');
+      _errorController.add('audio_error_play');
       await _player.stop();
       _setStatus(AudioStatus.idle);
     }
@@ -344,6 +351,17 @@ class AudioService {
     final segment = _ttsQueue.removeAt(0);
     _currentSegment = segment;
     try {
+      // Without a voice for this language the phone would read the text
+      // with another language's voice (e.g. Urdu read as English).
+      final available = await _isVoiceAvailable(segment.locale);
+      if (session != _session) return;
+      if (!available) {
+        _errorController.add('audio_error_voice_missing');
+        _ttsQueue.clear();
+        _currentSegment = null;
+        _setStatus(AudioStatus.idle);
+        return;
+      }
       await _tts.setLanguage(segment.locale);
       if (session != _session) return;
       final result = await _tts.speak(segment.text);
@@ -353,7 +371,7 @@ class AudioService {
     } catch (e) {
       debugPrint('TTS error: $e');
       if (session != _session) return;
-      _errorController.add('Speech playback failed');
+      _errorController.add('audio_error_speech');
       _ttsQueue.clear();
       _currentSegment = null;
       _setStatus(AudioStatus.idle);
@@ -371,6 +389,15 @@ class AudioService {
     try {
       await _tts.stop();
     } catch (_) {}
+  }
+
+  Future<bool> _isVoiceAvailable(String locale) async {
+    try {
+      final r = await _tts.isLanguageAvailable(locale);
+      return r != false && r != 0;
+    } catch (_) {
+      return true; // unknown: try speaking anyway
+    }
   }
 
   String _ttsLocale(String languageCode) {

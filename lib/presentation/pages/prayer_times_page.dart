@@ -240,6 +240,7 @@ class PrayerLocationText extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Icon(
           Icons.location_on_outlined,

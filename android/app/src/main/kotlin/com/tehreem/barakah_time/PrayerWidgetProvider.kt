@@ -59,9 +59,9 @@ class PrayerWidgetProvider : AppWidgetProvider() {
         private val TIME_IDS = intArrayOf(
             R.id.p0_time, R.id.p1_time, R.id.p2_time, R.id.p3_time, R.id.p4_time,
         )
-        private val GOLD = Color.parseColor("#C5A059")
-        private val TEXT = Color.parseColor("#F8FAFC")
-        private val MUTED = Color.parseColor("#94A3B8")
+        private val GOLD = Color.parseColor("#F2D79B")
+        private val TEXT = Color.parseColor("#FFFDF6")
+        private val MUTED = Color.parseColor("#B9D0CF")
 
         /** Stores new data from the app and redraws every widget. */
         fun save(context: Context, json: String) {
@@ -199,7 +199,9 @@ class PrayerWidgetProvider : AppWidgetProvider() {
                 if (exactAllowed && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     am.setExactAndAllowWhileIdle(AlarmManager.RTC, at, pi)
                 } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    am.setAndAllowWhileIdle(AlarmManager.RTC, at, pi)
+                    // No exact-alarm permission: a short window keeps the
+                    // refresh within a minute instead of "whenever".
+                    am.setWindow(AlarmManager.RTC, at, 60_000L, pi)
                 } else {
                     am.set(AlarmManager.RTC, at, pi)
                 }

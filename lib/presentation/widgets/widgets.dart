@@ -18,6 +18,8 @@ export 'audio_control_bar.dart';
 export 'auth_text_field.dart';
 export 'confirm_dialog.dart';
 export 'glass_box.dart';
+export 'islamic_nav_bar.dart';
+export 'islamic_ornament.dart';
 export 'privacy_promise_card.dart';
 export 'section_header.dart';
 export 'skeleton.dart';

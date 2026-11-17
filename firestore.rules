@@ -94,7 +94,7 @@ service cloud.firestore {
         allow read, delete: if isOwner(uid);
         allow create, update: if isOwner(uid)
           && memorialId.size() == 8
-          && optString('name', 100)
+          && optString('name', 300)
           && optBool('owner');
       }
     }
@@ -112,21 +112,70 @@ service cloud.firestore {
         && memorialId.size() == 8
         && incoming().ownerUid == request.auth.uid
         && incoming().name is string
-        && incoming().name.size() > 0 && incoming().name.size() <= 100
-        && optString('subtitle', 150)
+        && incoming().name.size() > 0 && incoming().name.size() <= 300
+        && optString('subtitle', 450)
         && incoming().goals is map && incoming().goals.size() <= 10
         && incoming().khatams == 0;
       allow delete: if ownsIt();
-      // Owner: anything except ownership. Others: only khatam paras,
-      // dhikr counts and the khatam counter.
+      // Owner: anything except ownership. Others: one change at a time,
+      // and only their own: take / give back / finish their own para,
+      // add to one dhikr count, or close a finished khatam.
       allow update: if signedIn()
         && incoming().ownerUid == memorial().ownerUid
-        && incoming().name is string && incoming().name.size() <= 100
-        && incoming().khatams is int && incoming().khatams >= memorial().khatams
+        && incoming().name is string && incoming().name.size() <= 300
+        && incoming().khatams is int
+        && incoming().khatams >= memorial().khatams
         && incoming().khatams <= memorial().khatams + 1
-        && (ownsIt() ||
-            incoming().diff(memorial()).affectedKeys()
-              .hasOnly(['paras', 'counts', 'khatams', 'updatedAt']));
+        && (ownsIt() || memberChangeOk());
+
+      function memberChangeOk() {
+        let keys = incoming().diff(memorial()).affectedKeys();
+        return keys.hasOnly(['paras', 'counts', 'khatams', 'updatedAt'])
+          && (!keys.hasAny(['counts']) || countsChangeOk())
+          && (!keys.hasAny(['paras', 'khatams']) || parasChangeOk());
+      }
+
+      // Exactly one dhikr count goes up, by at most 1,000,000.
+      function countsChangeOk() {
+        let changed = incoming().counts.diff(memorial().counts).affectedKeys();
+        let k = changed.toList()[0];
+        return changed.size() == 1
+          && incoming().counts[k] is int
+          && incoming().counts[k] > memorial().counts.get(k, 0)
+          && incoming().counts[k] <= memorial().counts.get(k, 0) + 1000000;
+      }
+
+      function parasChangeOk() {
+        return khatamClosedOk() ||
+          (incoming().khatams == memorial().khatams && oneParaChangeOk());
+      }
+
+      // The last para was finished: all 30 claimed, paras reset, +1 khatam.
+      function khatamClosedOk() {
+        return memorial().paras.size() == 30
+          && incoming().paras.size() == 0
+          && incoming().khatams == memorial().khatams + 1;
+      }
+
+      function oneParaChangeOk() {
+        let changed = incoming().paras.diff(memorial().paras).affectedKeys();
+        let k = changed.toList()[0];
+        let before = memorial().paras.get(k, null);
+        let after = incoming().paras.get(k, null);
+        return changed.size() == 1 && (
+          // take a free para
+          (before == null && after != null
+            && after.uid == request.auth.uid && after.done == false
+            && after.name is string && after.name.size() <= 100) ||
+          // give back your unfinished para
+          (before != null && after == null
+            && before.uid == request.auth.uid && before.done == false) ||
+          // mark your para as read
+          (before != null && after != null
+            && before.uid == request.auth.uid && after.uid == request.auth.uid
+            && before.done == false && after.done == true
+            && after.name == before.name));
+      }
 
       match /entries/{entryId} {
         allow read: if signedIn();

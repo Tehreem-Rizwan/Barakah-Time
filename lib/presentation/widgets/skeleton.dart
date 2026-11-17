@@ -7,7 +7,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_tokens.dart';
 
 const Color _skeletonBase = AppColors.cardDark;
-const Color _skeletonHighlight = Color(0xFF334155);
+const Color _skeletonHighlight = Color(0xFFF7F4EA);
 
 /// A single rounded placeholder block. Use inside a [Skeleton] (or any
 /// [Shimmer]) to animate.

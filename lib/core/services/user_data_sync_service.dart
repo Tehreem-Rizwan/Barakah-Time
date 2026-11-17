@@ -51,6 +51,10 @@ class CloudUserData {
   final QazaState? qaza;
   final Map<String, dynamic>? ramadanLog;
 
+  /// Device clock (ms) of the last local change behind the cloud copy.
+  final int qazaUpdatedAt;
+  final int ramadanUpdatedAt;
+
   const CloudUserData({
     this.profile,
     this.activities = const [],
@@ -60,6 +64,8 @@ class CloudUserData {
     this.tasbeeh,
     this.qaza,
     this.ramadanLog,
+    this.qazaUpdatedAt = 0,
+    this.ramadanUpdatedAt = 0,
   });
 
   int get totalPoints {
@@ -98,6 +104,11 @@ class UserDataSyncService implements UserDataSync {
   ];
 
   final Map<String, Future<bool>> _syncInFlight = {};
+
+  /// Bumped by every local wipe (sign-out / account deletion). A sign-in
+  /// sync that started before a wipe must not write anything afterwards,
+  /// or the previous account's data would come back on this device.
+  static int _wipeGeneration = 0;
 
   bool get _available => AppInitStatus.firebaseReady;
 
@@ -216,6 +227,7 @@ class UserDataSyncService implements UserDataSync {
     _run('pushQaza', () async {
       await _user(uid).collection('state').doc('qaza').set({
         ...data,
+        'clientUpdatedAt': prefs.getInt(UserPrefsKeys.qazaUpdatedAt) ?? 0,
         'updatedAt': FieldValue.serverTimestamp(),
       });
     });
@@ -228,6 +240,7 @@ class UserDataSyncService implements UserDataSync {
     _run('pushRamadanLog', () async {
       await _user(uid).collection('state').doc('ramadan').set({
         'log': log,
+        'clientUpdatedAt': prefs.getInt(UserPrefsKeys.ramadanUpdatedAt) ?? 0,
         'updatedAt': FieldValue.serverTimestamp(),
       });
     });
@@ -277,6 +290,8 @@ class UserDataSyncService implements UserDataSync {
       qaza: qaza.exists ? QazaState.fromJson(qaza.data()) : null,
       ramadanLog:
           ramadanLog is Map ? Map<String, dynamic>.from(ramadanLog) : null,
+      qazaUpdatedAt: _intOf(qaza.data()?['clientUpdatedAt']),
+      ramadanUpdatedAt: _intOf(ramadan.data()?['clientUpdatedAt']),
     );
   }
 
@@ -299,6 +314,8 @@ class UserDataSyncService implements UserDataSync {
 
   Future<bool> _syncOnSignIn(String uid) async {
     if (!_available || currentUid != uid) return false;
+    final generation = _wipeGeneration;
+    bool stale() => _wipeGeneration != generation || currentUid != uid;
     final CloudUserData cloud;
     try {
       cloud = await pullAll(uid).timeout(const Duration(seconds: 25));
@@ -306,6 +323,7 @@ class UserDataSyncService implements UserDataSync {
       debugPrint('UserDataSync.pullAll failed: $e');
       return false;
     }
+    if (stale()) return false;
 
     final activityBox = await Hive.openBox<SpiritualActivity>(
       LocalBoxes.activities,
@@ -313,6 +331,7 @@ class UserDataSyncService implements UserDataSync {
     final verseBox = await Hive.openBox<SavedVerse>(LocalBoxes.savedVerses);
     final metaBox = await Hive.openBox(LocalBoxes.pulseMeta);
     final localBadges = readLocalBadges(metaBox);
+    if (stale()) return false;
 
     // 1. One-time upload of local (guest / pre-sync) data.
     if (!(prefs.getBool(UserPrefsKeys.migrated(uid)) ?? false)) {
@@ -324,11 +343,13 @@ class UserDataSyncService implements UserDataSync {
           localVerses: verseBox.values.toList(),
           localBadges: localBadges,
         );
+        if (stale()) return false;
         await prefs.setBool(UserPrefsKeys.migrated(uid), true);
       } catch (e) {
         debugPrint('UserDataSync migration failed (will retry): $e');
       }
     }
+    if (stale()) return false;
 
     // 2. Cloud → local cache.
     await activityBox.putAll({for (final a in cloud.activities) a.id: a});
@@ -348,13 +369,26 @@ class UserDataSyncService implements UserDataSync {
       await prefs.setInt(UserPrefsKeys.tasbeehCount, t.count);
       await prefs.setInt(UserPrefsKeys.tasbeehLoggedCount, t.loggedCount);
     }
+    if (stale()) return false;
+    // Qaza / Ramadan: keep whichever copy changed last, so taps that never
+    // reached the cloud (app killed, offline) aren't overwritten.
     final q = cloud.qaza;
-    if (q != null) {
+    final localQazaAt = prefs.getInt(UserPrefsKeys.qazaUpdatedAt) ?? 0;
+    if (q != null && cloud.qazaUpdatedAt >= localQazaAt) {
       await prefs.setString(UserPrefsKeys.qaza, jsonEncode(q.toJson()));
+      await prefs.setInt(UserPrefsKeys.qazaUpdatedAt, cloud.qazaUpdatedAt);
+    } else if (prefs.getString(UserPrefsKeys.qaza) != null) {
+      final raw = jsonDecode(prefs.getString(UserPrefsKeys.qaza)!);
+      if (raw is Map<String, dynamic>) pushQaza(raw);
     }
     final r = cloud.ramadanLog;
-    if (r != null) {
+    final localRamadanAt = prefs.getInt(UserPrefsKeys.ramadanUpdatedAt) ?? 0;
+    if (r != null && cloud.ramadanUpdatedAt >= localRamadanAt) {
       await prefs.setString(UserPrefsKeys.ramadanLog, jsonEncode(r));
+      await prefs.setInt(UserPrefsKeys.ramadanUpdatedAt, cloud.ramadanUpdatedAt);
+    } else if (prefs.getString(UserPrefsKeys.ramadanLog) != null) {
+      final raw = jsonDecode(prefs.getString(UserPrefsKeys.ramadanLog)!);
+      if (raw is Map<String, dynamic>) pushRamadanLog(raw);
     }
     return true;
   }
@@ -473,6 +507,8 @@ class UserDataSyncService implements UserDataSync {
     await Future.wait(writes).timeout(const Duration(seconds: 30));
   }
 
+  static int _intOf(Object? v) => v is num ? v.toInt() : 0;
+
   // ── Local badge store ─────────────────────────────────────────────────────
   static Map<String, DateTime> readLocalBadges(Box metaBox) {
     final raw = metaBox.get(LocalBoxes.badgesKey);
@@ -523,6 +559,7 @@ class UserDataSyncService implements UserDataSync {
   Future<void> wipeLocalUserData() => wipeLocal(prefs);
 
   static Future<void> wipeLocal(SharedPreferences prefs) async {
+    _wipeGeneration++;
     for (final key in [
       ...UserPrefsKeys.all,
       ...prefs.getKeys().where(

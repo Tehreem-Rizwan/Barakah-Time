@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../core/localization/app_localizations.dart';
 import '../../core/utils/arabic_text.dart' as arabic_utils;
+import '../../core/constants/content_translations.dart';
 import '../widgets/widgets.dart';
 
 /// One of the 99 names with its real position (1-99).
@@ -28,9 +29,23 @@ final List<NameOfAllah> kNumberedNames = [
 String _latinKey(String s) =>
     s.toLowerCase().replaceAll(RegExp(r"[\-'’`ʿʾ\s]"), '');
 
+/// Meaning of [n] in [lang] (English when no translation exists).
+String nameMeaning(NameOfAllah n, String lang) {
+  final list = kNameMeanings[lang];
+  return (list != null && n.number <= list.length)
+      ? list[n.number - 1]
+      : n.meaning;
+}
+
+bool _isRtlLang(String lang) => const {'ar', 'fa', 'ur'}.contains(lang);
+
 /// Filters by transliteration, meaning, exact number or Arabic text.
 /// Filtering keeps each name's real number.
-List<NameOfAllah> filterNames(List<NameOfAllah> names, String rawQuery) {
+List<NameOfAllah> filterNames(
+  List<NameOfAllah> names,
+  String rawQuery, {
+  String lang = 'en',
+}) {
   final query = rawQuery.trim().toLowerCase();
   if (query.isEmpty) return names;
   final latin = _latinKey(query);
@@ -41,6 +56,7 @@ List<NameOfAllah> filterNames(List<NameOfAllah> names, String rawQuery) {
             '${n.number}' == query ||
             (latin.isNotEmpty && _latinKey(n.name).contains(latin)) ||
             n.meaning.toLowerCase().contains(query) ||
+            nameMeaning(n, lang).toLowerCase().contains(query) ||
             (arabic.isNotEmpty && n._arabicKey.contains(arabic)),
       )
       .toList();
@@ -68,7 +84,11 @@ class _NamesOfAllahPageState extends State<NamesOfAllahPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final visible = filterNames(kNumberedNames, _query);
+    final visible = filterNames(
+      kNumberedNames,
+      _query,
+      lang: Localizations.localeOf(context).languageCode,
+    );
     // Fixed tile height that grows with the user's text size.
     final textScaler = MediaQuery.textScalerOf(context);
     final tileExtent = 2 * AppSpacing.vMd + textScaler.scale(118.sp);
@@ -131,7 +151,9 @@ class _NameTile extends StatelessWidget {
       onTap: onTap,
       borderRadius: AppRadius.mdAll,
       padding: AppSpacing.symmetric(horizontal: 10, vertical: 12),
-      semanticLabel: '${name.number}. ${name.name}, ${name.meaning}',
+      semanticLabel:
+          '${name.number}. ${name.name}, '
+          '${nameMeaning(name, Localizations.localeOf(context).languageCode)}',
       child: ExcludeSemantics(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -170,9 +192,12 @@ class _NameTile extends StatelessWidget {
             ),
             SizedBox(height: 2.h),
             Text(
-              name.meaning,
+              nameMeaning(name, Localizations.localeOf(context).languageCode),
               textAlign: TextAlign.center,
-              textDirection: TextDirection.ltr,
+              textDirection:
+                  _isRtlLang(Localizations.localeOf(context).languageCode)
+                      ? TextDirection.rtl
+                      : TextDirection.ltr,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: textTheme.bodySmall?.copyWith(
@@ -239,7 +264,10 @@ class _NameDetailsSheet extends StatelessWidget {
               ),
             ),
             SizedBox(height: AppSpacing.vXs),
-            TranslationText(name.meaning),
+            TranslationText(
+              nameMeaning(name, Localizations.localeOf(context).languageCode),
+              isLtr: !_isRtlLang(Localizations.localeOf(context).languageCode),
+            ),
           ],
         ),
       ),
@@ -314,14 +342,14 @@ const List<Map<String, String>> kNamesOfAllah = [
   {'name': 'Al-Wajid', 'meaning': 'The Finder', 'arabic': 'الواجد'},
   {'name': 'Al-Majid', 'meaning': 'The Noble', 'arabic': 'الماجد'},
   {'name': 'Al-Wahid', 'meaning': 'The Unique', 'arabic': 'الواحد'},
-  {'name': 'Al-Ahad', 'meaning': 'The One', 'arabic': 'الاحد'},
+  {'name': 'Al-Ahad', 'meaning': 'The One', 'arabic': 'الأحد'},
   {'name': 'As-Samad', 'meaning': 'The Eternal', 'arabic': 'الصمد'},
   {'name': 'Al-Qadir', 'meaning': 'The Able', 'arabic': 'القادر'},
   {'name': 'Al-Muqtadir', 'meaning': 'The Powerful', 'arabic': 'المقتدر'},
   {'name': 'Al-Muqaddim', 'meaning': 'The Expediter', 'arabic': 'المقدم'},
   {'name': 'Al-Mu’akhkhir', 'meaning': 'The Delayer', 'arabic': 'المؤخر'},
   {'name': 'Al-Awwal', 'meaning': 'The First', 'arabic': 'الأول'},
-  {'name': 'Al-Akhir', 'meaning': 'The Last', 'arabic': 'الأخر'},
+  {'name': 'Al-Akhir', 'meaning': 'The Last', 'arabic': 'الآخر'},
   {'name': 'Az-Zahir', 'meaning': 'The Manifest', 'arabic': 'الظاهر'},
   {'name': 'Al-Batin', 'meaning': 'The Hidden', 'arabic': 'الباطن'},
   {'name': 'Al-Wali', 'meaning': 'The Governor', 'arabic': 'الوالي'},

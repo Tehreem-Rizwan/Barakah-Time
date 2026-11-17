@@ -34,11 +34,14 @@ class ToggleLocationMode extends SettingsEvent {
 /// Geocodes [location] and, on success, stores it with its coordinates.
 /// On failure, [SettingsState.locationError] is set and the previous manual
 /// location is kept.
+/// With [switchToManual], manual mode is turned on only after the lookup
+/// succeeds, so a failed lookup never leaves stale coordinates in use.
 class UpdateManualLocation extends SettingsEvent {
   final String location;
-  const UpdateManualLocation(this.location);
+  final bool switchToManual;
+  const UpdateManualLocation(this.location, {this.switchToManual = false});
   @override
-  List<Object?> get props => [location];
+  List<Object?> get props => [location, switchToManual];
 }
 
 class UpdateCalculationMethod extends SettingsEvent {
@@ -230,13 +233,32 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   }
 
   /// Device region (e.g. 'PK'), or null.
-  static String? deviceCountryCode() {
+  static String? deviceCountryCode({Duration? utcOffset}) {
+    // Many phones in South Asia use "English (United States)", so the
+    // locale alone would pick the North American method. The time zone is
+    // a better hint for these regions.
+    final fromZone = countryForUtcOffset(
+      utcOffset ?? DateTime.now().timeZoneOffset,
+    );
+    if (fromZone != null) return fromZone;
     try {
       return PlatformDispatcher.instance.locale.countryCode;
     } catch (_) {
       return null;
     }
   }
+
+  /// Country implied by a UTC offset where that is unambiguous enough to
+  /// pick a calculation method: +5:00 Pakistan, +5:30 India, +6:00
+  /// Bangladesh, +4:30 Afghanistan (all use the Karachi method).
+  static String? countryForUtcOffset(Duration offset) => switch (offset
+      .inMinutes) {
+    300 => 'PK',
+    330 => 'IN',
+    360 => 'BD',
+    270 => 'AF',
+    _ => null,
+  };
 
   /// Calculation method when the user hasn't chosen one.
   static String defaultMethodFor(String? countryCode) =>
@@ -380,12 +402,14 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         manualLocation: city,
         manualLatitude: result.latitude,
         manualLongitude: result.longitude,
+        useAutoLocation: event.switchToManual ? false : null,
         clearLocationError: true,
       ),
     );
     await prefs.setString(_kManualLocation, city);
     await prefs.setDouble(_kManualLat, result.latitude);
     await prefs.setDouble(_kManualLng, result.longitude);
+    if (event.switchToManual) await prefs.setBool(_kUseAuto, false);
   }
 
   Future<void> _onUpdateLanguage(

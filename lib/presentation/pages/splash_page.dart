@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get_it/get_it.dart';
 
@@ -84,63 +85,65 @@ class _SplashPageState extends State<SplashPage>
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final textTheme = Theme.of(context).textTheme;
-    return AppScaffold(
-      gradientBackground: true,
-      body: Center(
-        child: SingleChildScrollView(
-          padding: AppSpacing.page,
-          child: FadeTransition(
-            opacity: _fade,
-            child: ScaleTransition(
-              scale: _scale,
-              child: Semantics(
-                label: l10n.app_name,
-                excludeSemantics: true,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      padding: EdgeInsetsDirectional.all(AppSpacing.xl),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: AppColors.secondaryGold.withValues(alpha: 0.08),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.primaryEmerald.withValues(
-                              alpha: 0.5,
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: AppTheme.overlayOnBand,
+      child: Scaffold(
+        backgroundColor: AppColors.emeraldDeep,
+        body: Stack(
+          fit: StackFit.expand,
+          children: [
+            // Same turquoise tile pattern as Home and the app icon.
+            const IslamicHeaderBand(height: double.infinity),
+            Center(
+              child: SingleChildScrollView(
+                padding: AppSpacing.page,
+                child: FadeTransition(
+                  opacity: _fade,
+                  child: ScaleTransition(
+                    scale: _scale,
+                    child: Semantics(
+                      label: l10n.app_name,
+                      excludeSemantics: true,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Image.asset(
+                            'assets/images/brand_mark.png',
+                            width: 150.r,
+                            height: 150.r,
+                            errorBuilder:
+                                (_, _, _) => Icon(
+                                  Icons.mosque_rounded,
+                                  size: 80.sp,
+                                  color: AppColors.brass,
+                                ),
+                          ),
+                          SizedBox(height: AppSpacing.vLg),
+                          Text(
+                            l10n.app_name,
+                            textAlign: TextAlign.center,
+                            style: textTheme.displaySmall?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.ivoryOnTeal,
                             ),
-                            blurRadius: 40,
-                            spreadRadius: 10,
+                          ),
+                          SizedBox(height: AppSpacing.vSm),
+                          Text(
+                            l10n.app_tagline,
+                            textAlign: TextAlign.center,
+                            style: textTheme.bodyLarge?.copyWith(
+                              color: AppColors.brass,
+                              letterSpacing: 0.3,
+                            ),
                           ),
                         ],
                       ),
-                      child: Icon(
-                        Icons.mosque,
-                        size: 80.sp,
-                        color: AppColors.secondaryGold,
-                      ),
                     ),
-                    SizedBox(height: AppSpacing.vXl),
-                    Text(
-                      l10n.app_name,
-                      textAlign: TextAlign.center,
-                      style: textTheme.displaySmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: AppSpacing.vSm),
-                    Text(
-                      l10n.app_tagline,
-                      textAlign: TextAlign.center,
-                      style: textTheme.bodyMedium?.copyWith(
-                        color: AppColors.secondaryGold,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ),
-          ),
+          ],
         ),
       ),
     );

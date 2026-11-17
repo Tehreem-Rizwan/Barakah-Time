@@ -1,4 +1,7 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart' hide TextDirection;
@@ -49,7 +52,7 @@ IconData _activityIcon(String type) => switch (type) {
   'prayer' => Icons.mosque_outlined,
   'quran' => Icons.menu_book_outlined,
   'dhikr' => Icons.blur_circular_outlined,
-  _ => Icons.bolt_outlined,
+  _ => Icons.auto_graph_outlined,
 };
 
 IconData _badgeIcon(String id) => switch (id) {
@@ -63,52 +66,118 @@ IconData _badgeIcon(String id) => switch (id) {
   _ => Icons.military_tech_outlined,
 };
 
+/// Eight-pointed star (two overlapping squares) filling [size], point up.
+Path _starPath(Size size, double inset) {
+  final c = Offset(size.width / 2, size.height / 2);
+  final r = size.shortestSide / 2 - inset;
+  final path = Path();
+  for (final start in [0.0, math.pi / 4]) {
+    for (var i = 0; i < 4; i++) {
+      final a = start + i * math.pi / 2 - math.pi / 2;
+      final p = c + Offset(math.cos(a), math.sin(a)) * r;
+      if (i == 0) {
+        path.moveTo(p.dx, p.dy);
+      } else {
+        path.lineTo(p.dx, p.dy);
+      }
+    }
+    path.close();
+  }
+  return path;
+}
+
 class PulsePage extends StatelessWidget {
   const PulsePage({super.key});
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    return AppScaffold(
-      title: l10n.pulse,
-      body: BlocConsumer<PulseBloc, PulseState>(
-        listenWhen:
-            (p, c) =>
-                c is PulseLoaded &&
-                c.error != null &&
-                (p is! PulseLoaded || p.error != c.error),
-        listener: (context, state) {
-          showAppSnackBar(
-            context,
-            context.l10n.pulse_load_failed,
-            type: SnackType.error,
-          );
-        },
-        builder: (context, state) {
-          final Widget child;
-          if (state is PulseLoaded) {
-            child = _PulseContent(pulse: state.pulse);
-          } else if (state is PulseLoading) {
-            child = const StateView.loading();
-          } else {
-            child = StateView.error(
-              message:
-                  state is PulseError ? l10n.pulse_load_failed : l10n.no_data,
-              onRetry: () => context.read<PulseBloc>().add(LoadPulseData()),
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: AppTheme.overlayOnBand,
+      child: AppScaffold(
+        safeAreaTop: false,
+        body: BlocConsumer<PulseBloc, PulseState>(
+          listenWhen:
+              (p, c) =>
+                  c is PulseLoaded &&
+                  c.error != null &&
+                  (p is! PulseLoaded || p.error != c.error),
+          listener: (context, state) {
+            showAppSnackBar(
+              context,
+              context.l10n.pulse_load_failed,
+              type: SnackType.error,
             );
-          }
-          return RefreshIndicator(
-            onRefresh: () => refreshPulse(context),
-            child: child,
-          );
-        },
+          },
+          builder: (context, state) {
+            final Widget child;
+            if (state is PulseLoaded) {
+              child = _PulseContent(state: state);
+            } else if (state is PulseLoading) {
+              child = const StateView.loading();
+            } else {
+              child = SafeArea(
+                child: StateView.error(
+                  message:
+                      state is PulseError
+                          ? l10n.pulse_load_failed
+                          : l10n.no_data,
+                  onRetry: () => context.read<PulseBloc>().add(LoadPulseData()),
+                ),
+              );
+            }
+            return RefreshIndicator(
+              onRefresh: () => refreshPulse(context),
+              child: child,
+            );
+          },
+        ),
       ),
     );
   }
 }
 
 class _PulseContent extends StatelessWidget {
-  const _PulseContent({required this.pulse});
+  const _PulseContent({required this.state});
+
+  final PulseLoaded state;
+
+  @override
+  Widget build(BuildContext context) {
+    final pulse = state.pulse;
+    final gap = SizedBox(height: AppSpacing.vLg);
+    return ListView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      padding: EdgeInsets.zero,
+      children: [
+        _PulseHeader(pulse: pulse),
+        Padding(
+          padding: AppSpacing.page,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _TodayPrayersCard(state: state),
+              gap,
+              _StreakCard(pulse: pulse),
+              gap,
+              _WeekCard(pulse: pulse),
+              SizedBox(height: AppSpacing.vXl),
+              _BadgesSection(badges: pulse.badges),
+              SizedBox(height: AppSpacing.vXl),
+              _RecentActivitySection(activities: pulse.recentActivities),
+              gap,
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Turquoise tile band with today's progress drawn as an eight-pointed star
+/// that fills with brass as the day's points grow toward 100.
+class _PulseHeader extends StatelessWidget {
+  const _PulseHeader({required this.pulse});
 
   final SpiritualPulseEntity pulse;
 
@@ -116,139 +185,239 @@ class _PulseContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final textTheme = Theme.of(context).textTheme;
-    final gap = SizedBox(height: AppSpacing.vXl);
-
-    return ListView(
-      physics: const AlwaysScrollableScrollPhysics(),
-      padding: AppSpacing.page,
+    final top = MediaQuery.paddingOf(context).top;
+    final today = pulse.dailyPoints.isEmpty ? 0 : pulse.dailyPoints.last;
+    final progress = (today / 100).clamp(0.0, 1.0);
+    return Stack(
       children: [
-        AppCard(
+        Positioned.fill(child: IslamicHeaderBand(height: top + 320.h)),
+        Padding(
+          padding: EdgeInsets.fromLTRB(
+            AppSpacing.xl,
+            top + AppSpacing.vLg,
+            AppSpacing.xl,
+            AppSpacing.vXl,
+          ),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SectionHeader(
-                title: l10n.spiritual_insight,
-                icon: Icons.auto_awesome,
+              Semantics(
+                header: true,
+                child: Text(
+                  l10n.pulse,
+                  style: textTheme.headlineSmall?.copyWith(
+                    color: AppColors.ivoryOnTeal,
+                  ),
+                ),
+              ),
+              SizedBox(height: AppSpacing.vLg),
+              Semantics(
+                label: '${l10n.translate('pulse_today')}: $today / 100',
+                excludeSemantics: true,
+                child: SizedBox(
+                  width: 168.r,
+                  height: 168.r,
+                  child: CustomPaint(
+                    painter: _StarProgressPainter(progress),
+                    child: Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            '$today',
+                            style: textTheme.headlineMedium?.copyWith(
+                              color: AppColors.ivoryOnTeal,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          Text(
+                            '/ 100',
+                            textDirection: TextDirection.ltr,
+                            style: textTheme.labelSmall?.copyWith(
+                              color: AppColors.ivoryOnTeal.withValues(
+                                alpha: 0.85,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
               ),
               SizedBox(height: AppSpacing.vMd),
               Text(
                 l10n.translate(pulse.motivation.l10nKey),
-                style: textTheme.bodyLarge?.copyWith(
-                  color: AppColors.textSecondary,
+                textAlign: TextAlign.center,
+                style: textTheme.bodyMedium?.copyWith(
+                  color: AppColors.ivoryOnTeal.withValues(alpha: 0.9),
                 ),
               ),
             ],
           ),
         ),
-        SizedBox(height: AppSpacing.vLg),
-        StatRow(
-          children: [
-            StatTile(
-              value: '${weeklyPointsOf(pulse)}',
-              label: l10n.points_this_week,
-              icon: Icons.bolt_outlined,
-            ),
-            StatTile(
-              value: '${pulse.totalPoints}',
-              label: l10n.lifetime_points,
-              icon: Icons.stars_outlined,
-            ),
-          ],
-        ),
-        SizedBox(height: AppSpacing.vMd),
-        StatRow(
-          children: [
-            StatTile(
-              value: '${pulse.currentStreak}',
-              label: l10n.current_streak,
-              icon: Icons.local_fire_department_outlined,
-            ),
-            StatTile(
-              value: '${pulse.longestStreak}',
-              label: l10n.longest_streak,
-              icon: Icons.emoji_events_outlined,
-            ),
-          ],
-        ),
-        gap,
-        _StreakCard(streak: pulse.currentStreak),
-        gap,
-        AppCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SectionHeader(
-                title: l10n.weekly_activity,
-                icon: Icons.bar_chart_rounded,
-              ),
-              SizedBox(height: AppSpacing.vLg),
-              WeeklyBars(points: pulse.dailyPoints, showValues: true),
-            ],
-          ),
-        ),
-        gap,
-        _BadgesSection(badges: pulse.badges),
-        gap,
-        _RecentActivitySection(activities: pulse.recentActivities),
-        SizedBox(height: AppSpacing.vLg),
       ],
     );
   }
 }
 
-class _StreakCard extends StatelessWidget {
-  const _StreakCard({required this.streak});
+class _StarProgressPainter extends CustomPainter {
+  const _StarProgressPainter(this.progress);
 
-  final int streak;
+  final double progress;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    // Decorative star (khatam) with a progress ring inside, filling
+    // clockwise from the top like a clock.
+    final star = _starPath(size, 4);
+    canvas.drawPath(star, Paint()..color = AppColors.emeraldDeep);
+    canvas.drawPath(
+      star,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2
+        ..color = AppColors.brass,
+    );
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = size.shortestSide * 0.29;
+    final ring = Rect.fromCircle(center: center, radius: radius);
+    canvas.drawCircle(
+      center,
+      radius,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 7
+        ..color = AppColors.brass.withValues(alpha: 0.22),
+    );
+    if (progress > 0) {
+      canvas.drawArc(
+        ring,
+        -math.pi / 2,
+        2 * math.pi * progress,
+        false,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 7
+          ..strokeCap = StrokeCap.round
+          ..color = AppColors.brass,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(_StarProgressPainter old) => old.progress != progress;
+}
+
+class _MiniStarPainter extends CustomPainter {
+  const _MiniStarPainter({required this.filled, required this.strong});
+
+  final bool filled;
+  final bool strong;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final star = _starPath(size, 1);
+    if (filled) {
+      canvas.drawPath(star, Paint()..color = AppColors.secondaryGold);
+    }
+    canvas.drawPath(
+      star,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = strong ? 2 : 1.2
+        ..color = filled ? AppColors.brass : AppColors.glassStrokeStrong,
+    );
+  }
+
+  @override
+  bool shouldRepaint(_MiniStarPainter old) =>
+      old.filled != filled || old.strong != strong;
+}
+
+/// Today's five prayers as small mihrabs: filled when logged.
+class _TodayPrayersCard extends StatelessWidget {
+  const _TodayPrayersCard({required this.state});
+
+  final PulseLoaded state;
+
+  static const _prayers = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final textTheme = Theme.of(context).textTheme;
-    final nextMilestone = ((streak ~/ 7) + 1) * 7;
+    final done = _prayers.where(state.isPrayerLoggedToday).length;
     return AppCard(
-      blur: true,
-      color: AppColors.secondaryGold,
-      border: Border.all(
-        color: AppColors.secondaryGold.withValues(alpha: 0.45),
-        width: 1.5,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  l10n.translate('pulse_today_prayers'),
+                  style: textTheme.titleMedium,
+                ),
+              ),
+              Text(
+                '$done / 5',
+                textDirection: TextDirection.ltr,
+                style: textTheme.titleMedium?.copyWith(
+                  color: AppColors.secondaryGold,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: AppSpacing.vMd),
+          Row(
+            children: [
+              for (final p in _prayers)
+                Expanded(child: _prayerMihrab(context, p)),
+            ],
+          ),
+        ],
       ),
-      padding: AppSpacing.all(20),
-      child: Row(
+    );
+  }
+
+  Widget _prayerMihrab(BuildContext context, String prayer) {
+    final l10n = context.l10n;
+    final textTheme = Theme.of(context).textTheme;
+    final logged = state.isPrayerLoggedToday(prayer);
+    final name = l10n.translate(prayer);
+    return Semantics(
+      label: '$name${logged ? ', ${l10n.logged}' : ''}',
+      excludeSemantics: true,
+      child: Column(
         children: [
           Container(
-            width: 56.r,
-            height: 56.r,
+            width: 40.r,
+            height: 48.r,
             decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppColors.secondaryGold.withValues(alpha: 0.15),
-              border: Border.all(
-                color: AppColors.secondaryGold.withValues(alpha: 0.4),
+              color: logged ? AppColors.secondaryGold : Colors.transparent,
+              borderRadius: BorderRadius.vertical(
+                top: Radius.circular(20.r),
+                bottom: Radius.circular(6.r),
               ),
+              border: Border.all(color: AppColors.brass, width: 1.2),
             ),
             child: Icon(
-              Icons.local_fire_department_rounded,
-              color: AppColors.secondaryGold,
-              size: 30.sp,
+              logged ? Icons.check_rounded : Icons.remove,
+              size: 18.sp,
+              color:
+                  logged ? AppColors.ivoryOnTeal : AppColors.glassStrokeStrong,
             ),
           ),
-          SizedBox(width: AppSpacing.lg),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l10n.day_streak_count.replaceAll('{n}', '$streak'),
-                  style: textTheme.titleLarge,
-                ),
-                SizedBox(height: AppSpacing.vXs),
-                Text(
-                  '${l10n.milestone} $nextMilestone ${l10n.days}',
-                  style: textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-              ],
+          SizedBox(height: AppSpacing.vXs),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              name,
+              maxLines: 1,
+              style: textTheme.labelSmall?.copyWith(
+                color: logged ? AppColors.secondaryGold : AppColors.textSecondary,
+                fontWeight: logged ? FontWeight.w700 : FontWeight.w500,
+              ),
             ),
           ),
         ],
@@ -257,8 +426,147 @@ class _StreakCard extends StatelessWidget {
   }
 }
 
+/// Current streak with the last seven days as small stars.
+class _StreakCard extends StatelessWidget {
+  const _StreakCard({required this.pulse});
+
+  final SpiritualPulseEntity pulse;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final textTheme = Theme.of(context).textTheme;
+    final locale = Localizations.localeOf(context).languageCode;
+    final days = pulse.dailyPoints;
+    final labels = lastDaysWeekdayLabels(locale, count: days.length);
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                '${pulse.currentStreak}',
+                style: textTheme.displaySmall?.copyWith(
+                  color: AppColors.secondaryGold,
+                  fontWeight: FontWeight.w800,
+                  height: 1,
+                ),
+              ),
+              SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(l10n.current_streak, style: textTheme.titleSmall),
+                    Text(
+                      '${l10n.longest_streak}: ${pulse.longestStreak}',
+                      style: textTheme.labelMedium?.copyWith(
+                        color: AppColors.brassDeep,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: AppSpacing.vMd),
+          Row(
+            children: [
+              for (var i = 0; i < days.length; i++)
+                Expanded(
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        width: 26.r,
+                        height: 26.r,
+                        child: CustomPaint(
+                          painter: _MiniStarPainter(
+                            filled: days[i] > 0,
+                            strong: i == days.length - 1,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: AppSpacing.vXs),
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          labels[i],
+                          maxLines: 1,
+                          style: textTheme.labelSmall?.copyWith(
+                            color:
+                                i == days.length - 1
+                                    ? AppColors.secondaryGold
+                                    : AppColors.textSecondary,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Seven-day chart with the week's and lifetime totals underneath.
+class _WeekCard extends StatelessWidget {
+  const _WeekCard({required this.pulse});
+
+  final SpiritualPulseEntity pulse;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final textTheme = Theme.of(context).textTheme;
+    Widget total(String value, String label) => Expanded(
+      child: Column(
+        children: [
+          Text(
+            value,
+            style: textTheme.titleLarge?.copyWith(
+              color: AppColors.secondaryGold,
+            ),
+          ),
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            style: textTheme.labelSmall?.copyWith(
+              color: AppColors.textSecondary,
+            ),
+          ),
+        ],
+      ),
+    );
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(l10n.weekly_activity, style: textTheme.titleMedium),
+          SizedBox(height: AppSpacing.vLg),
+          WeeklyBars(points: pulse.dailyPoints, showValues: true),
+          SizedBox(height: AppSpacing.vMd),
+          const Divider(height: 1),
+          SizedBox(height: AppSpacing.vMd),
+          Row(
+            children: [
+              total('${weeklyPointsOf(pulse)}', l10n.points_this_week),
+              Container(width: 1, height: 32.h, color: AppColors.glassStroke),
+              total('${pulse.totalPoints}', l10n.lifetime_points),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 /// Seven-day bar chart (oldest first, ending today) with localized weekday
-/// labels and one semantics label per bar.
+/// labels and one semantics label per bar. Bars are arch-topped.
 class WeeklyBars extends StatelessWidget {
   const WeeklyBars({
     super.key,
@@ -296,6 +604,10 @@ class WeeklyBars extends StatelessWidget {
     }
     final maxValue = points.fold<int>(100, (m, p) => p > m ? p : m);
     final trackHeight = barHeight ?? 110.h;
+    final arch = BorderRadius.vertical(
+      top: Radius.circular(12.w),
+      bottom: Radius.circular(3.w),
+    );
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.end,
@@ -340,7 +652,7 @@ class WeeklyBars extends StatelessWidget {
                     alignment: Alignment.bottomCenter,
                     decoration: BoxDecoration(
                       color: AppColors.glassBase,
-                      borderRadius: AppRadius.pillAll,
+                      borderRadius: arch,
                     ),
                     child: AnimatedFractionallySizedBox(
                       duration: AppDurations.slow,
@@ -349,13 +661,17 @@ class WeeklyBars extends StatelessWidget {
                       widthFactor: 1,
                       child: DecoratedBox(
                         decoration: BoxDecoration(
-                          borderRadius: AppRadius.pillAll,
+                          borderRadius: arch,
                           color:
                               points[i] >= kActiveDayPoints
                                   ? AppColors.secondaryGold
                                   : AppColors.secondaryGold.withValues(
                                     alpha: 0.3,
                                   ),
+                          border:
+                              i == count - 1
+                                  ? Border.all(color: AppColors.brass)
+                                  : null,
                         ),
                       ),
                     ),
@@ -385,73 +701,91 @@ class WeeklyBars extends StatelessWidget {
   }
 }
 
+/// All badges as star medallions: earned ones filled, the rest locked.
 class _BadgesSection extends StatelessWidget {
   const _BadgesSection({required this.badges});
 
+  /// Earned badge ids.
   final List<String> badges;
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final textTheme = Theme.of(context).textTheme;
+    final earned = badges.toSet();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        SectionHeader(title: l10n.badges, icon: Icons.military_tech_outlined),
-        SizedBox(height: AppSpacing.vMd),
-        if (badges.isEmpty)
-          AppCard(
-            child: Text(
-              l10n.no_badges_yet,
-              style: textTheme.bodyMedium?.copyWith(
-                color: AppColors.textSecondary,
+        Row(
+          children: [
+            Expanded(child: Text(l10n.badges, style: textTheme.titleLarge)),
+            Text(
+              '${earned.length} / ${BadgeIds.all.length}',
+              textDirection: TextDirection.ltr,
+              style: textTheme.labelMedium?.copyWith(
+                color: AppColors.brassDeep,
               ),
             ),
-          )
-        else ...[
-          Text(
-            l10n
-                .translate('badges_earned')
-                .replaceAll('{n}', '${badges.length}'),
-            style: textTheme.bodySmall?.copyWith(
-              color: AppColors.textSecondary,
-            ),
-          ),
-          SizedBox(height: AppSpacing.vSm),
-          Wrap(
-            spacing: AppSpacing.sm,
-            runSpacing: AppSpacing.vSm,
+          ],
+        ),
+        SizedBox(height: AppSpacing.vMd),
+        Wrap(
+          spacing: AppSpacing.sm,
+          runSpacing: AppSpacing.vMd,
+          children: [
+            for (final id in BadgeIds.all)
+              _medallion(context, id, earned.contains(id)),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _medallion(BuildContext context, String id, bool isEarned) {
+    final l10n = context.l10n;
+    final textTheme = Theme.of(context).textTheme;
+    final name = l10n.translate(badgeL10nKey(id));
+    return SizedBox(
+      width: 78.w,
+      child: Tooltip(
+        message: l10n.translate(badgeDescriptionL10nKey(id)),
+        child: Semantics(
+          label:
+              isEarned ? name : '$name, ${l10n.translate('badge_locked')}',
+          excludeSemantics: true,
+          child: Column(
             children: [
-              for (final id in badges)
-                Tooltip(
-                  message: l10n.translate(badgeDescriptionL10nKey(id)),
-                  child: AppCard(
-                    borderRadius: AppRadius.pillAll,
-                    color: AppColors.secondaryGold,
-                    padding: AppSpacing.symmetric(horizontal: 12, vertical: 8),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          _badgeIcon(id),
-                          size: 18.sp,
-                          color: AppColors.secondaryGold,
-                        ),
-                        SizedBox(width: AppSpacing.xs),
-                        Flexible(
-                          child: Text(
-                            l10n.translate(badgeL10nKey(id)),
-                            style: textTheme.labelMedium,
-                          ),
-                        ),
-                      ],
+              SizedBox(
+                width: 56.r,
+                height: 56.r,
+                child: CustomPaint(
+                  painter: _MiniStarPainter(filled: isEarned, strong: isEarned),
+                  child: Center(
+                    child: Icon(
+                      isEarned ? _badgeIcon(id) : Icons.lock_outline_rounded,
+                      size: 20.sp,
+                      color:
+                          isEarned
+                              ? AppColors.ivoryOnTeal
+                              : AppColors.textTertiary,
                     ),
                   ),
                 ),
+              ),
+              SizedBox(height: AppSpacing.vXs),
+              Text(
+                name,
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: textTheme.labelSmall?.copyWith(
+                  color: isEarned ? AppColors.textMain : AppColors.textTertiary,
+                ),
+              ),
             ],
           ),
-        ],
-      ],
+        ),
+      ),
     );
   }
 }
@@ -476,7 +810,7 @@ class _RecentActivitySection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        SectionHeader(title: l10n.recent_activity, icon: Icons.history),
+        Text(l10n.recent_activity, style: textTheme.titleLarge),
         SizedBox(height: AppSpacing.vMd),
         if (activities.isEmpty)
           AppCard(
@@ -504,7 +838,8 @@ class _RecentActivitySection extends StatelessWidget {
                         '${activities[i].points}',
                       ),
                       style: textTheme.labelMedium?.copyWith(
-                        color: AppColors.secondaryGold,
+                        color: AppColors.brassDeep,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ),

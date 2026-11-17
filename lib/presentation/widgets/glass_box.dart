@@ -1,24 +1,24 @@
-import 'dart:ui';
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
+
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_tokens.dart';
 
-/// Frosted-glass surface used throughout the app.
+/// Card surface used throughout the app: flat ivory with a hairline border.
 ///
-/// Defaults: radius [AppRadius.lg] (24.r), [AppColors.glassStroke] border,
-/// white 10%→5% gradient fill. Pass [color] to tint the gradient.
+/// (Formerly a frosted-glass box; the blur was dropped because flat cards
+/// read better on the light theme and are cheaper to draw. [blur] and
+/// [blurSigma] are accepted for compatibility and ignored.)
+///
+/// Defaults: radius [AppRadius.lg], [AppColors.glassStroke] border.
+/// Pass [color] to tint the card lightly.
 class GlassBox extends StatelessWidget {
   final Widget child;
   final double? width;
   final double? height;
   final EdgeInsetsGeometry? padding;
 
-  /// Defaults to `AppRadius.lgAll` (24.r). Ignored for [BoxShape.circle].
+  /// Defaults to `AppRadius.lgAll`. Ignored for [BoxShape.circle].
   final BorderRadius? borderRadius;
-
-  /// When false, no BackdropFilter is used and a cheap translucent fill is
-  /// drawn instead. Use `blur: false` for items in long scrolling lists.
   final bool blur;
   final double blurSigma;
   final Color? color;
@@ -41,94 +41,23 @@ class GlassBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveBorderRadius =
-        shape == BoxShape.circle
-            ? null
-            : (borderRadius ?? AppRadius.lgAll);
-
-    final decoration = BoxDecoration(
-      shape: shape,
-      borderRadius: effectiveBorderRadius,
-      border:
-          border ??
-          Border.all(color: AppColors.glassStroke, width: 1.5),
-      gradient: LinearGradient(
-        begin: AlignmentDirectional.topStart,
-        end: AlignmentDirectional.bottomEnd,
-        colors: color == null
-            ? const [AppColors.glassFill, AppColors.glassBase]
-            : [
-                color!.withValues(alpha: 0.1),
-                color!.withValues(alpha: 0.05),
-              ],
-      ),
-    );
-
-    if (!blur) {
-      return Container(
-        width: width,
-        height: height,
-        padding: padding,
-        clipBehavior: Clip.antiAlias,
-        decoration: decoration,
-        child: child,
-      );
-    }
-
+    final c = color;
     return Container(
       width: width,
       height: height,
+      padding: padding,
+      clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         shape: shape,
-        borderRadius: effectiveBorderRadius,
+        borderRadius:
+            shape == BoxShape.circle ? null : (borderRadius ?? AppRadius.lgAll),
+        border: border ?? Border.all(color: AppColors.glassStroke),
+        color:
+            c == null
+                ? AppColors.cardDark
+                : Color.alphaBlend(c.withValues(alpha: 0.08), AppColors.cardDark),
       ),
-      child: ClipPath(
-        clipper: _GlassClipper(
-          shape: shape,
-          borderRadius: effectiveBorderRadius,
-        ),
-        child: Stack(
-          children: [
-            // Blur effect
-            Positioned.fill(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: blurSigma, sigmaY: blurSigma),
-                child: const ColoredBox(color: Colors.transparent),
-              ),
-            ),
-            // Gradient overlay with child
-            Container(padding: padding, decoration: decoration, child: child),
-          ],
-        ),
-      ),
+      child: child,
     );
   }
-}
-
-class _GlassClipper extends CustomClipper<Path> {
-  final BoxShape shape;
-  final BorderRadius? borderRadius;
-
-  _GlassClipper({required this.shape, this.borderRadius});
-
-  @override
-  Path getClip(Size size) {
-    final path = Path();
-    if (shape == BoxShape.circle) {
-      final center = Offset(size.width / 2, size.height / 2);
-      final radius = math.min(size.width / 2, size.height / 2);
-      path.addOval(Rect.fromCircle(center: center, radius: radius));
-    } else {
-      path.addRRect(
-        (borderRadius ?? BorderRadius.zero).toRRect(
-          Rect.fromLTWH(0, 0, size.width, size.height),
-        ),
-      );
-    }
-    return path;
-  }
-
-  @override
-  bool shouldReclip(covariant _GlassClipper oldClipper) =>
-      oldClipper.shape != shape || oldClipper.borderRadius != borderRadius;
 }

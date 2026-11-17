@@ -39,15 +39,59 @@ class ZakatCalculator {
     }
     s = buffer.toString();
     if (s.contains('-')) return null; // negatives are not allowed
-    // Strip currency symbols/letters, spaces and thousands separators.
-    s = s.replaceAll(RegExp(r'[^0-9.]'), '');
-    if (s.isEmpty) return null;
+    // Keep digits and separators only (drops currency symbols and spaces).
+    s = s.replaceAll(RegExp(r'[^0-9.,]'), '');
+    final normalized = _normalizeSeparators(s);
+    if (normalized == null || normalized.isEmpty) return null;
+    s = normalized;
     if ('.'.allMatches(s).length > 1) return null;
     final value = double.tryParse(s);
     if (value == null || value.isNaN || value.isInfinite || value < 0) {
       return null;
     }
     return value;
+  }
+
+  /// Works out which of `,` / `.` is the decimal mark, so both
+  /// "1,500.75" and "1.500,75" (Turkish/European) mean 1500.75.
+  /// Returns a string with only digits and at most one `.`, or null when
+  /// the separators make no sense (e.g. "1.2.3").
+  static String? _normalizeSeparators(String s) {
+    final lastComma = s.lastIndexOf(',');
+    final lastDot = s.lastIndexOf('.');
+    String decimal;
+    if (lastComma >= 0 && lastDot >= 0) {
+      // Both present: whichever comes last is the decimal mark.
+      decimal = lastComma > lastDot ? ',' : '.';
+    } else if (lastComma >= 0 || lastDot >= 0) {
+      final sep = lastComma >= 0 ? ',' : '.';
+      final count = sep.allMatches(s).length;
+      final digitsAfter = s.length - s.lastIndexOf(sep) - 1;
+      // "1.000.000" or "50,000": thousands. "1500,75" / "12.5": decimal.
+      decimal = (count == 1 && digitsAfter != 3) ? sep : '';
+    } else {
+      return s;
+    }
+    final thousands = decimal == ',' ? '.' : ',';
+    // Thousands separators must split the integer part into groups of 3.
+    final intPart =
+        decimal.isEmpty ? s : s.substring(0, s.lastIndexOf(decimal));
+    final groupSeps = decimal.isEmpty ? RegExp(r'[.,]') : RegExp(RegExp.escape(thousands));
+    if (groupSeps.hasMatch(intPart)) {
+      final groups = intPart.split(groupSeps);
+      if (groups.first.isEmpty ||
+          groups.first.length > 3 ||
+          groups.skip(1).any((g) => g.length != 3)) {
+        return null;
+      }
+    }
+    var out = s.replaceAll(thousands, '');
+    if (decimal.isEmpty) {
+      out = out.replaceAll(RegExp(r'[.,]'), '');
+    } else if (decimal == ',') {
+      out = out.replaceAll(',', '.');
+    }
+    return out;
   }
 
   static double nisabThreshold({

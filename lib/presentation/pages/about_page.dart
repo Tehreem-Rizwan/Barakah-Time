@@ -8,12 +8,11 @@ import '../widgets/widgets.dart';
 
 /// External links shown in Settings / About.
 ///
-/// OWNER ACTION: [privacyPolicy] and [terms] are placeholders — publish the
-/// documents and update these URLs before release (store listings require a
-/// working privacy policy).
+/// [privacyPolicy] and [terms] are hosted on GitHub Pages from the
+/// `barakah-time-legal` repository.
 abstract final class AppLinks {
-  static const String privacyPolicy = 'https://barakahtime.app/privacy';
-  static const String terms = 'https://barakahtime.app/terms';
+  static const String privacyPolicy = 'https://tehreem-rizwan.github.io/barakah-time-legal/privacy.html';
+  static const String terms = 'https://tehreem-rizwan.github.io/barakah-time-legal/terms.html';
 
   static const String quranApi = 'https://alquran.cloud';
   static const String osmCopyright = 'https://www.openstreetmap.org/copyright';

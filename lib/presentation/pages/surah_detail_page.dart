@@ -238,11 +238,14 @@ class _SurahDetailPageState extends State<SurahDetailPage> {
             widget.surah.englishName,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.titleMedium,
           ),
+          // Room for the Arabic diacritics so they don't touch the line above.
+          const SizedBox(height: 4),
           ArabicText(
             widget.surah.name,
-            fontSize: 14.sp,
-            height: 1.3,
+            fontSize: 13.sp,
+            height: 1.6,
             color: AppColors.secondaryGold,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -452,14 +455,31 @@ class _SurahDetailPageState extends State<SurahDetailPage> {
                             : l10n.listen_translation,
                         onPressed: (ayah.translation ?? '').isEmpty
                             ? null
-                            : () => audioService.playTts(
-                                ayah.translation!,
-                                title:
-                                    '${l10n.translation}: ${l10n.ayah} ${ayah.numberInSurah}',
-                                mediaId: transMediaId,
-                                // Speak in the translation's own language.
-                                languageCode: lang,
-                              ),
+                            : () {
+                                final title =
+                                    '${l10n.translation}: ${l10n.ayah} ${ayah.numberInSurah}';
+                                // Prefer a person reading the translation
+                                // (e.g. Urdu by Shamshad Ali Khan); fall back
+                                // to the phone's text-to-speech.
+                                final url = QuranRepository.translationAudioUrl(
+                                  lang,
+                                  ayah.number,
+                                );
+                                if (url != null) {
+                                  audioService.playUrl(
+                                    url,
+                                    title: title,
+                                    mediaId: transMediaId,
+                                  );
+                                } else {
+                                  audioService.playTts(
+                                    ayah.translation!,
+                                    title: title,
+                                    mediaId: transMediaId,
+                                    languageCode: lang,
+                                  );
+                                }
+                              },
                       ),
                     ],
                   );

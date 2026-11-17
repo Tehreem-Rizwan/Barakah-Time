@@ -14,6 +14,15 @@ void main() {
       expect(ZakatCalculator.parseAmount(''), 0);
       expect(ZakatCalculator.parseAmount(null), 0);
     });
+    test('decimal comma and dot thousands (Turkish/European style)', () {
+      expect(ZakatCalculator.parseAmount('1500,75'), 1500.75);
+      expect(ZakatCalculator.parseAmount('1.500,75'), 1500.75);
+      expect(ZakatCalculator.parseAmount('1.000.000'), 1000000);
+      expect(ZakatCalculator.parseAmount('1.500'), 1500);
+      expect(ZakatCalculator.parseAmount('1,234,567.89'), 1234567.89);
+      expect(ZakatCalculator.parseAmount('12.5'), 12.5);
+    });
+
     test('invalid or negative is null', () {
       expect(ZakatCalculator.parseAmount('-100'), isNull);
       expect(ZakatCalculator.parseAmount('abc'), isNull);

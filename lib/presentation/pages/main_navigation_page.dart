@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../core/localization/app_localizations.dart';
+import '../widgets/widgets.dart';
 import '../../core/services/notification_service.dart';
 import '../../injection_container.dart';
 import '../widgets/audio_control_bar.dart';
@@ -113,28 +114,28 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
             const AudioControlBar(),
           ],
         ),
-        bottomNavigationBar: NavigationBar(
+        bottomNavigationBar: IslamicNavBar(
           selectedIndex: _tab.index,
-          onDestinationSelected: (i) => _switchTo(MainTab.values[i]),
-          destinations: [
-            NavigationDestination(
-              icon: const Icon(Icons.home_outlined),
-              selectedIcon: const Icon(Icons.home_rounded),
+          onSelected: (i) => _switchTo(MainTab.values[i]),
+          items: [
+            IslamicNavItem(
+              icon: Icons.mosque_outlined,
+              selectedIcon: Icons.mosque_rounded,
               label: l10n.home,
             ),
-            NavigationDestination(
-              icon: const Icon(Icons.menu_book_outlined),
-              selectedIcon: const Icon(Icons.menu_book_rounded),
+            IslamicNavItem(
+              icon: Icons.menu_book_outlined,
+              selectedIcon: Icons.menu_book_rounded,
               label: l10n.quran,
             ),
-            NavigationDestination(
-              icon: const Icon(Icons.bolt_outlined),
-              selectedIcon: const Icon(Icons.bolt_rounded),
+            IslamicNavItem(
+              icon: Icons.auto_graph_outlined,
+              selectedIcon: Icons.auto_graph_rounded,
               label: l10n.pulse,
             ),
-            NavigationDestination(
-              icon: const Icon(Icons.settings_outlined),
-              selectedIcon: const Icon(Icons.settings_rounded),
+            IslamicNavItem(
+              icon: Icons.tune_outlined,
+              selectedIcon: Icons.tune_rounded,
               label: l10n.settings,
             ),
           ],

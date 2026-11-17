@@ -16,6 +16,10 @@ class SpiritualPulseEntity extends Equatable {
   final MotivationLevel motivation;
   final List<SpiritualActivity> recentActivities;
 
+  /// Every logged activity, newest first (Activity History page). Defaults
+  /// to [recentActivities] when not provided.
+  final List<SpiritualActivity> allActivities;
+
   /// Earned badge ids ([BadgeIds]), in display order. Once earned a badge
   /// is kept (it does not disappear when a streak breaks). Localize with
   /// [badgeL10nKey].
@@ -29,7 +33,8 @@ class SpiritualPulseEntity extends Equatable {
     this.motivation = MotivationLevel.start,
     required this.recentActivities,
     required this.badges,
-  });
+    List<SpiritualActivity>? allActivities,
+  }) : allActivities = allActivities ?? recentActivities;
 
   /// English fallback text for [motivation]. Prefer localizing
   /// `motivation.l10nKey`.
@@ -56,6 +61,7 @@ class SpiritualPulseEntity extends Equatable {
     totalPoints,
     motivation,
     recentActivities,
+    allActivities,
     badges,
   ];
 }

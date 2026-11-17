@@ -149,9 +149,10 @@ class GoogleSignInButton extends StatelessWidget {
   final String? label;
   final bool loading;
 
-  static const Color _fill = Color(0xFF131314);
-  static const Color _stroke = Color(0xFF8E918F);
-  static const Color _text = Color(0xFFE3E3E3);
+  // Google's light-theme button colours (brand guidelines).
+  static const Color _fill = Color(0xFFFFFFFF);
+  static const Color _stroke = Color(0xFF747775);
+  static const Color _text = Color(0xFF1F1F1F);
 
   @override
   Widget build(BuildContext context) {
@@ -178,7 +179,8 @@ class GoogleSignInButton extends StatelessWidget {
   }
 }
 
-/// "Continue with Apple" button (white fill, black text, Apple glyph).
+/// "Continue with Apple" button (black fill, white text, Apple glyph — the
+/// style Apple asks for on light backgrounds).
 /// [label] defaults to the localized `continue_with_apple`.
 class AppleSignInButton extends StatelessWidget {
   const AppleSignInButton({
@@ -199,16 +201,16 @@ class AppleSignInButton extends StatelessWidget {
       child: FilledButton(
         onPressed: loading ? null : onPressed,
         style: FilledButton.styleFrom(
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black,
-          disabledBackgroundColor: Colors.white.withValues(alpha: 0.7),
-          disabledForegroundColor: Colors.black54,
+          backgroundColor: Colors.black,
+          foregroundColor: Colors.white,
+          disabledBackgroundColor: Colors.black.withValues(alpha: 0.6),
+          disabledForegroundColor: Colors.white70,
           minimumSize: Size(64, AppSizes.buttonHeight.h),
         ),
         child: _ButtonContent(
           label: label ?? context.l10n.continue_with_apple,
           loading: loading,
-          spinnerColor: Colors.black,
+          spinnerColor: Colors.white,
           leading: Icon(Icons.apple, size: 22.sp),
         ),
       ),

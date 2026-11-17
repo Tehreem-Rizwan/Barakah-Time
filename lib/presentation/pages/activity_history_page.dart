@@ -63,7 +63,10 @@ class ActivityHistoryPage extends StatelessWidget {
     final l10n = context.l10n;
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    final diff = today.difference(day).inDays;
+    // Calendar-day difference (UTC avoids DST's 23/25-hour days).
+    final diff = DateTime.utc(today.year, today.month, today.day)
+        .difference(DateTime.utc(day.year, day.month, day.day))
+        .inDays;
     if (diff == 0) return l10n.today;
     if (diff == 1) return l10n.profile_yesterday;
     return formatLocalizedDate(context, day, (l) => DateFormat.yMMMEd(l));
@@ -86,7 +89,7 @@ class ActivityHistoryPage extends StatelessWidget {
             );
           }
           final activities = [
-            ...(state as PulseLoaded).pulse.recentActivities,
+            ...(state as PulseLoaded).pulse.allActivities,
           ]..sort((a, b) => b.timestamp.compareTo(a.timestamp));
           if (activities.isEmpty) {
             return StateView.empty(

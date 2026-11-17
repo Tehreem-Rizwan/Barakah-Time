@@ -65,11 +65,74 @@ class _QuranPageState extends State<QuranPage> {
     if (mounted) setState(() => _lastRead = QuranLastRead.load());
   }
 
+  /// Translation languages offered, by their own names.
+  static const Map<String, String> _translationLanguages = {
+    'ur': 'اردو',
+    'en': 'English',
+    'ar': 'العربية',
+    'fa': 'فارسی',
+    'tr': 'Türkçe',
+  };
+
+  Future<void> _pickTranslationLanguage(BuildContext context) async {
+    final l10n = context.l10n;
+    final bloc = context.read<QuranBloc>();
+    final chosen = bloc.chosenTranslationLanguage;
+    final result = await showModalBottomSheet<String>(
+      context: context,
+      // Let the sheet grow to fit all six options, and scroll on small
+      // screens or with large text.
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder:
+          (sheet) => SafeArea(
+            child: RadioGroup<String>(
+              groupValue: chosen ?? '',
+              onChanged: (v) => Navigator.of(sheet).pop(v),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ListTile(
+                      title: Text(
+                        l10n.translate('quran_translation_language'),
+                        style: Theme.of(sheet).textTheme.titleMedium,
+                      ),
+                      subtitle: Text(
+                        l10n.translate('quran_translation_audio_note'),
+                      ),
+                    ),
+                    RadioListTile<String>(
+                      value: '',
+                      title: Text(
+                        l10n.translate('quran_translation_same_as_app'),
+                      ),
+                    ),
+                    for (final e in _translationLanguages.entries)
+                      RadioListTile<String>(value: e.key, title: Text(e.value)),
+                    const SizedBox(height: 8),
+                  ],
+                ),
+              ),
+            ),
+          ),
+    );
+    if (result == null) return;
+    bloc.add(SetTranslationLanguage(result.isEmpty ? null : result));
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     return AppScaffold(
       title: l10n.quran,
+      actions: [
+        IconButton(
+          tooltip: l10n.translate('quran_translation_language'),
+          icon: const Icon(Icons.translate_rounded),
+          onPressed: () => _pickTranslationLanguage(context),
+        ),
+      ],
       body: BlocConsumer<QuranBloc, QuranState>(
         listenWhen: (prev, curr) => curr is QuranLoaded && curr.refreshFailed,
         listener: (context, state) {

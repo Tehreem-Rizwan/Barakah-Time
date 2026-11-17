@@ -37,6 +37,10 @@ class QazaRepository {
 
   Future<void> save(QazaState state) async {
     await prefs.setString(UserPrefsKeys.qaza, jsonEncode(state.toJson()));
+    await prefs.setInt(
+      UserPrefsKeys.qazaUpdatedAt,
+      DateTime.now().millisecondsSinceEpoch,
+    );
     if (sync == null) return;
     _pending = state;
     _timer?.cancel();

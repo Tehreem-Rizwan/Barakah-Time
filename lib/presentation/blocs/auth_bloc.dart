@@ -299,8 +299,16 @@ final RegExp _emailRegExp = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]{2,}$');
 bool isValidEmail(String? value) =>
     value != null && _emailRegExp.hasMatch(value.trim());
 
-String? validateName(AppLocalizations l10n, String? value) =>
-    (value == null || value.trim().isEmpty) ? l10n.name_required : null;
+/// Names are stored in Firestore, whose rules allow at most 100 characters.
+const int maxNameLength = 100;
+
+String? validateName(AppLocalizations l10n, String? value) {
+  if (value == null || value.trim().isEmpty) return l10n.name_required;
+  if (value.trim().length > maxNameLength) {
+    return l10n.translate('name_too_long');
+  }
+  return null;
+}
 
 String? validateEmail(AppLocalizations l10n, String? value) {
   if (value == null || value.trim().isEmpty) return l10n.email_required;
@@ -654,17 +662,26 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     _busy = true;
+    var cloudDataDeleted = false;
     try {
       // Data first (needs the signed-in user for Firestore rules and the
       // Supabase token), then the Auth account.
       final s = sync;
       if (s != null) {
         await s.deleteAllUserData(user.id).timeout(const Duration(seconds: 45));
+        cloudDataDeleted = true;
       }
       await supabaseService.deleteAllUserImages(user.id);
       await firebaseService.deleteCurrentUser();
     } catch (e) {
       _busy = false;
+      if (cloudDataDeleted) {
+        // The account survived but its cloud copy is gone: let the next
+        // sync upload this device's data again instead of losing it.
+        try {
+          await prefs.remove(UserPrefsKeys.migrated(user.id));
+        } catch (_) {}
+      }
       final failure = _toFailure(e, AuthCodes.deleteFailed);
       if (failure.code == 'requires-recent-login') {
         emit(_reauthRequired(user));
@@ -755,10 +772,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         uid: user.id,
         filePath: event.imagePath,
       );
-      await firebaseService.saveUserProfile(
-        uid: user.id,
-        profilePicUrl: imageUrl,
-      );
+      await firebaseService
+          .saveUserProfile(uid: user.id, profilePicUrl: imageUrl)
+          .timeout(const Duration(seconds: 20));
       try {
         await firebaseService.updatePhotoURL(imageUrl);
       } catch (_) {

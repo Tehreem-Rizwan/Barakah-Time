@@ -39,7 +39,7 @@ Future<void> init() async {
   sl.registerFactory(
     () => PulseBloc(repository: sl(), savedVersesRepository: sl()),
   );
-  sl.registerFactory(() => QuranBloc(sl()));
+  sl.registerFactory(() => QuranBloc(sl(), prefs: sl()));
   sl.registerFactory(
     () => SettingsBloc(
       sl(),

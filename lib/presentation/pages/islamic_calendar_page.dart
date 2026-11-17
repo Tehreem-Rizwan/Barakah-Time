@@ -5,6 +5,8 @@ import 'package:intl/intl.dart';
 
 import '../../core/localization/app_localizations.dart';
 import '../../core/utils/islamic_events.dart';
+import '../../core/services/ramadan_service.dart';
+import '../../injection_container.dart';
 import '../widgets/widgets.dart';
 
 /// Layout of a Hijri month for a 7-column grid.
@@ -29,10 +31,17 @@ class HijriMonthGrid {
 
   /// [firstDayOfWeekIndex]: 0 = Sunday … 6 = Saturday (as in
   /// `MaterialLocalizations.firstDayOfWeekIndex`).
-  factory HijriMonthGrid.forDate(DateTime today, int firstDayOfWeekIndex) {
-    final h = HijriCalendar.fromDate(today);
+  factory HijriMonthGrid.forDate(
+    DateTime today,
+    int firstDayOfWeekIndex, {
+    int adjust = 0,
+  }) {
+    final h = HijriCalendar.fromDate(
+      DateTime(today.year, today.month, today.day + adjust),
+    );
     final days = h.getDaysInMonth(h.hYear, h.hMonth);
-    final first = HijriCalendar().hijriToGregorian(h.hYear, h.hMonth, 1);
+    final calc = HijriCalendar().hijriToGregorian(h.hYear, h.hMonth, 1);
+    final first = DateTime(calc.year, calc.month, calc.day - adjust);
     final sundayIndex = first.weekday % 7; // DateTime: Mon=1 … Sun=7
     return HijriMonthGrid(
       year: h.hYear,
@@ -84,12 +93,21 @@ class IslamicCalendarPage extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final locale = Localizations.localeOf(context).languageCode;
     final now = DateTime.now();
-    final hijri = HijriCalendar.fromDate(now);
-    final events = IslamicEvents.upcoming(now);
+    // Same moon-sighting adjustment as the Ramadan page.
+    final adjust =
+        sl.isRegistered<RamadanService>() ? sl<RamadanService>().hijriAdjust : 0;
+    final hijri = HijriCalendar.fromDate(
+      DateTime(now.year, now.month, now.day + adjust),
+    );
+    final events = IslamicEvents.upcoming(now, adjust: adjust);
     final longDate = _dateFormat('EEEE, d MMMM yyyy', locale);
     final shortDate = _dateFormat('d MMM yyyy', locale);
     final materialL10n = MaterialLocalizations.of(context);
-    final grid = HijriMonthGrid.forDate(now, materialL10n.firstDayOfWeekIndex);
+    final grid = HijriMonthGrid.forDate(
+      now,
+      materialL10n.firstDayOfWeekIndex,
+      adjust: adjust,
+    );
 
     return AppScaffold(
       title: l10n.islamic_calendar,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart' hide TextDirection;
@@ -71,48 +72,77 @@ class HomePage extends StatelessWidget {
     SliverToBoxAdapter gap(double h) =>
         SliverToBoxAdapter(child: SizedBox(height: h));
 
-    return AppScaffold(
-      gradientBackground: true,
-      body: RefreshIndicator(
-        onRefresh: () => _refresh(context),
-        child: CustomScrollView(
-          physics: const AlwaysScrollableScrollPhysics(
-            parent: BouncingScrollPhysics(),
-          ),
-          slivers: [
-            gap(AppSpacing.vLg),
-            padded(const _HomeHeader()),
-            gap(AppSpacing.vXl),
-            padded(const _PrayerHeroCard()),
-            padded(const RamadanHomeCard()),
-            gap(AppSpacing.vXl),
-            padded(
-              SectionHeader(
-                title: l10n.essential_tools,
-                actionLabel: l10n.see_all,
-                onAction:
-                    () => Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const ToolsGridPage()),
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: AppTheme.overlayOnBand,
+      child: AppScaffold(
+        gradientBackground: true,
+        safeAreaTop: false,
+        body: RefreshIndicator(
+          onRefresh: () => _refresh(context),
+          child: CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(
+              parent: BouncingScrollPhysics(),
+            ),
+            slivers: [
+              SliverToBoxAdapter(
+                child: Stack(
+                  children: [
+                    // Turquoise tile band behind the greeting and the top of
+                    // the prayer arch.
+                    IslamicHeaderBand(
+                      height: MediaQuery.paddingOf(context).top + 190.h,
                     ),
+                    Padding(
+                      padding: EdgeInsetsDirectional.only(
+                        top: MediaQuery.paddingOf(context).top + AppSpacing.vLg,
+                        start: AppSpacing.xl,
+                        end: AppSpacing.xl,
+                      ),
+                      child: Column(
+                        children: [
+                          const _HomeHeader(),
+                          SizedBox(height: AppSpacing.vXl),
+                          const _PrayerHeroCard(),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            gap(AppSpacing.vMd),
-            padded(const HomeQuickActions()),
-            gap(AppSpacing.vXl),
-            padded(
-              SectionHeader(
-                title: l10n.daily_ayats,
-                icon: Icons.format_quote_rounded,
+              padded(const RamadanHomeCard()),
+              gap(AppSpacing.vXl),
+              padded(
+                SectionHeader(
+                  title: l10n.essential_tools,
+                  actionLabel: l10n.see_all,
+                  onAction:
+                      () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const ToolsGridPage(),
+                        ),
+                      ),
+                ),
               ),
-            ),
-            gap(AppSpacing.vMd),
-            const SliverToBoxAdapter(child: _DailyAyatCarousel()),
-            gap(AppSpacing.vXl),
-            padded(SectionHeader(title: l10n.pulse, icon: Icons.bolt_rounded)),
-            gap(AppSpacing.vMd),
-            padded(const _PulseSummaryCard()),
-            gap(AppSpacing.vXxl),
-          ],
+              gap(AppSpacing.vMd),
+              padded(const HomeQuickActions()),
+              gap(AppSpacing.vXl),
+              padded(
+                SectionHeader(
+                  title: l10n.daily_ayats,
+                  icon: Icons.format_quote_rounded,
+                ),
+              ),
+              gap(AppSpacing.vMd),
+              const SliverToBoxAdapter(child: _DailyAyatCarousel()),
+              gap(AppSpacing.vXl),
+              padded(
+                SectionHeader(title: l10n.pulse, icon: Icons.bolt_rounded),
+              ),
+              gap(AppSpacing.vMd),
+              padded(const _PulseSummaryCard()),
+              gap(AppSpacing.vXxl),
+            ],
+          ),
         ),
       ),
     );
@@ -149,7 +179,7 @@ class _HomeHeader extends StatelessWidget {
                   Text(
                     l10n.translate(homeGreetingKey(now)),
                     style: textTheme.bodyMedium?.copyWith(
-                      color: AppColors.textSecondary,
+                      color: AppColors.ivoryOnTeal.withValues(alpha: 0.85),
                     ),
                   ),
                   SizedBox(height: AppSpacing.vXs),
@@ -159,14 +189,16 @@ class _HomeHeader extends StatelessWidget {
                         : '${l10n.assalamualaikum}$comma$name',
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: textTheme.headlineSmall,
+                    style: textTheme.headlineSmall?.copyWith(
+                      color: AppColors.ivoryOnTeal,
+                    ),
                   ),
                   SizedBox(height: AppSpacing.vXs),
                   Text(
                     '${hijriDateLabel(now, l10n)}  ·  '
                     '${gregorianDateLabel(now, locale)}',
                     style: textTheme.bodySmall?.copyWith(
-                      color: AppColors.textSecondary,
+                      color: AppColors.ivoryOnTeal.withValues(alpha: 0.85),
                     ),
                   ),
                 ],
@@ -187,9 +219,18 @@ class _HomeHeader extends StatelessWidget {
                       ),
                   child: Padding(
                     padding: AppSpacing.all(4),
-                    child: UserAvatar(
-                      imagePath: user?.profilePicPath,
-                      radius: 22.r,
+                    // Ivory disc with a brass ring so it stands out on the
+                    // turquoise band.
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: AppColors.cardDark,
+                        border: Border.all(color: AppColors.brass, width: 1.5),
+                      ),
+                      child: UserAvatar(
+                        imagePath: user?.profilePicPath,
+                        radius: 22.r,
+                      ),
                     ),
                   ),
                 ),
@@ -250,60 +291,59 @@ class _PrayerHeroContent extends StatelessWidget {
     final name =
         next.isTomorrow ? l10n.tomorrow_fajr : l10n.translate(next.prayer.key);
 
-    return AppCard(
-      blur: true,
-      padding: AppSpacing.all(20),
-      onTap:
-          () => Navigator.of(
-            context,
-          ).push(MaterialPageRoute(builder: (_) => const PrayerTimesPage())),
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          PositionedDirectional(
-            end: -8,
-            top: -8,
-            child: ExcludeSemantics(
-              child: Icon(
-                Icons.mosque,
-                size: 96.sp,
-                color: AppColors.glassFill,
-              ),
+    return LayoutBuilder(
+      builder:
+          (context, constraints) => AppCard(
+            // Mihrab-shaped card with a brass outline.
+            borderRadius: archRadius(
+              width: constraints.maxWidth,
+              archHeight: 70.r,
+              bottom: 20.r,
+            ),
+            border: Border.all(color: AppColors.brass, width: 1.5),
+            padding: AppSpacing.only(start: 20, end: 20, top: 34, bottom: 20),
+            onTap:
+                () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const PrayerTimesPage()),
+                ),
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      l10n.prayer_in_label.replaceAll('{prayer}', name),
+                      textAlign: TextAlign.center,
+                      style: textTheme.titleSmall?.copyWith(
+                        color: AppColors.brassDeep,
+                        letterSpacing: 0.4,
+                      ),
+                    ),
+                    SizedBox(height: AppSpacing.vXs),
+                    Center(
+                      child: PrayerCountdown(
+                        target: next.time,
+                        style: textTheme.displayMedium?.copyWith(
+                          color: AppColors.secondaryGold,
+                          letterSpacing: 1.5,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: AppSpacing.vSm),
+                    const Center(child: PrayerLocationText()),
+                    Padding(
+                      padding: EdgeInsetsDirectional.symmetric(
+                        vertical: AppSpacing.vMd,
+                      ),
+                      child: const Divider(height: 1),
+                    ),
+                    _PrayerStrip(times: times, next: next),
+                  ],
+                ),
+              ],
             ),
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                l10n.prayer_in_label.replaceAll('{prayer}', name),
-                style: textTheme.titleSmall?.copyWith(
-                  color: AppColors.textSecondary,
-                ),
-              ),
-              SizedBox(height: AppSpacing.vXs),
-              SizedBox(
-                width: double.infinity,
-                child: PrayerCountdown(
-                  target: next.time,
-                  style: textTheme.displayMedium?.copyWith(
-                    color: AppColors.secondaryGold,
-                    letterSpacing: 1.5,
-                  ),
-                ),
-              ),
-              SizedBox(height: AppSpacing.vSm),
-              const PrayerLocationText(),
-              Padding(
-                padding: EdgeInsetsDirectional.symmetric(
-                  vertical: AppSpacing.vMd,
-                ),
-                child: const Divider(height: 1),
-              ),
-              _PrayerStrip(times: times, next: next),
-            ],
-          ),
-        ],
-      ),
     );
   }
 }
@@ -538,8 +578,12 @@ class _QuickActionTile extends StatelessWidget {
                 width: 60.r,
                 height: 60.r,
                 blur: false,
-                borderRadius: AppRadius.mdAll,
-                color: AppColors.secondaryGold,
+                // Small mihrab-shaped tile with a brass outline.
+                borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(30.r),
+                  bottom: Radius.circular(10.r),
+                ),
+                border: Border.all(color: AppColors.brass, width: 1.2),
                 child: Center(
                   child: Icon(
                     icon,
@@ -867,42 +911,48 @@ class _PulseSummaryCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Semantics(
-                      label: l10n.day_streak_count.replaceAll(
-                        '{n}',
-                        '${pulse.currentStreak}',
-                      ),
-                      excludeSemantics: true,
-                      child: Container(
-                        padding: AppSpacing.symmetric(
-                          horizontal: 10,
-                          vertical: 4,
+                    Flexible(
+                      child: Semantics(
+                        label: l10n.day_streak_count.replaceAll(
+                          '{n}',
+                          '${pulse.currentStreak}',
                         ),
-                        decoration: BoxDecoration(
-                          color: AppColors.secondaryGold.withValues(
-                            alpha: 0.12,
+                        excludeSemantics: true,
+                        child: Container(
+                          padding: AppSpacing.symmetric(
+                            horizontal: 10,
+                            vertical: 4,
                           ),
-                          borderRadius: AppRadius.pillAll,
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.local_fire_department_rounded,
-                              size: 16.sp,
-                              color: AppColors.secondaryGold,
+                          decoration: BoxDecoration(
+                            color: AppColors.secondaryGold.withValues(
+                              alpha: 0.12,
                             ),
-                            SizedBox(width: AppSpacing.xs),
-                            Text(
-                              l10n.day_streak_count.replaceAll(
-                                '{n}',
-                                '${pulse.currentStreak}',
-                              ),
-                              style: textTheme.labelMedium?.copyWith(
+                            borderRadius: AppRadius.pillAll,
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.local_fire_department_rounded,
+                                size: 16.sp,
                                 color: AppColors.secondaryGold,
                               ),
-                            ),
-                          ],
+                              SizedBox(width: AppSpacing.xs),
+                              Flexible(
+                                child: Text(
+                                  l10n.day_streak_count.replaceAll(
+                                    '{n}',
+                                    '${pulse.currentStreak}',
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: textTheme.labelMedium?.copyWith(
+                                    color: AppColors.secondaryGold,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
