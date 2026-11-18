@@ -385,7 +385,10 @@ class UserDataSyncService implements UserDataSync {
     final localRamadanAt = prefs.getInt(UserPrefsKeys.ramadanUpdatedAt) ?? 0;
     if (r != null && cloud.ramadanUpdatedAt >= localRamadanAt) {
       await prefs.setString(UserPrefsKeys.ramadanLog, jsonEncode(r));
-      await prefs.setInt(UserPrefsKeys.ramadanUpdatedAt, cloud.ramadanUpdatedAt);
+      await prefs.setInt(
+        UserPrefsKeys.ramadanUpdatedAt,
+        cloud.ramadanUpdatedAt,
+      );
     } else if (prefs.getString(UserPrefsKeys.ramadanLog) != null) {
       final raw = jsonDecode(prefs.getString(UserPrefsKeys.ramadanLog)!);
       if (raw is Map<String, dynamic>) pushRamadanLog(raw);

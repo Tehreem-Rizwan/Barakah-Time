@@ -95,55 +95,12 @@ class UserAvatar extends StatelessWidget {
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
-  static bool _listenWhen(AuthState previous, AuthState current) {
-    if (current is Unauthenticated) return previous is Authenticated;
-    return current is Authenticated &&
-        current.feedback != null &&
-        (previous is! Authenticated || previous.feedback != current.feedback);
-  }
-
-  void _listener(BuildContext context, AuthState state) {
-    final l10n = context.l10n;
-    if (state is Unauthenticated) {
-      // Signed out / deleted / session ended: clear stale pulse data, then
-      // reset the stack to Sign In so back can't return into the app.
-      context.read<PulseBloc>().add(LoadPulseData());
-      if (state is AccountDeleted) {
-        showAppSnackBar(context, l10n.account_deleted, type: SnackType.success);
-      } else if (state is SessionExpired) {
-        showAppSnackBar(
-          context,
-          l10n.session_expired,
-          type: SnackType.warning,
-        );
-      }
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute<void>(builder: (_) => const SignInPage()),
-        (route) => false,
-      );
-      return;
-    }
-    // Avoid duplicate handling when Settings is pushed on top.
-    if (ModalRoute.of(context)?.isCurrent == false) return;
-    final authState = state as Authenticated;
-    final feedback = authState.feedback!;
-    if (feedback.code == AuthCodes.reauthRequired) {
-      _promptReauth(context, authState.user);
-      return;
-    }
-    showAppSnackBar(
-      context,
-      localizedAuthMessage(l10n, feedback.code, feedback.message),
-      type: feedback.isError ? SnackType.error : SnackType.success,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     return BlocConsumer<AuthBloc, AuthState>(
-      listenWhen: _listenWhen,
-      listener: _listener,
+      listenWhen: accountAuthListenWhen,
+      listener: accountAuthListener,
       builder: (context, authState) {
         final Widget body;
         if (authState is Authenticated) {
@@ -154,7 +111,8 @@ class ProfilePage extends StatelessWidget {
           // Guest, signed out, or a failed sign-in / password reset started
           // from here: show the sign-in options, never an endless spinner.
           body = _GuestProfile(
-            authUnavailable: authState is GuestMode && authState.authUnavailable,
+            authUnavailable:
+                authState is GuestMode && authState.authUnavailable,
           );
         }
         return AppScaffold(
@@ -163,7 +121,12 @@ class ProfilePage extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.settings_outlined),
               tooltip: l10n.settings,
-              onPressed: () => MainNavigationScope.openTab(context, MainTab.settings, fallback: (_) => const SettingsPage()),
+              onPressed:
+                  () => MainNavigationScope.openTab(
+                    context,
+                    MainTab.settings,
+                    fallback: (_) => const SettingsPage(),
+                  ),
             ),
           ],
           body: body,
@@ -178,6 +141,49 @@ void _push(BuildContext context, Widget page) {
 }
 
 // ─── Account deletion ─────────────────────────────────────────────────────────
+
+/// Reacts to sign-out, account deletion and account feedback (e.g. the
+/// re-authentication step before deleting). Used by My Profile and the
+/// Settings tab, which both offer Sign out / Delete account.
+bool accountAuthListenWhen(AuthState previous, AuthState current) {
+  if (current is Unauthenticated) return previous is Authenticated;
+  return current is Authenticated &&
+      current.feedback != null &&
+      (previous is! Authenticated || previous.feedback != current.feedback);
+}
+
+void accountAuthListener(BuildContext context, AuthState state) {
+  // Only the visible page reacts (Profile pushed over Settings, or the
+  // Settings tab itself), so nothing runs twice.
+  if (ModalRoute.of(context)?.isCurrent == false) return;
+  final l10n = context.l10n;
+  if (state is Unauthenticated) {
+    // Signed out / deleted / session ended: clear stale pulse data, then
+    // reset the stack to Sign In so back can't return into the app.
+    context.read<PulseBloc>().add(LoadPulseData());
+    if (state is AccountDeleted) {
+      showAppSnackBar(context, l10n.account_deleted, type: SnackType.success);
+    } else if (state is SessionExpired) {
+      showAppSnackBar(context, l10n.session_expired, type: SnackType.warning);
+    }
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute<void>(builder: (_) => const SignInPage()),
+      (route) => false,
+    );
+    return;
+  }
+  final authState = state as Authenticated;
+  final feedback = authState.feedback!;
+  if (feedback.code == AuthCodes.reauthRequired) {
+    _promptReauth(context, authState.user);
+    return;
+  }
+  showAppSnackBar(
+    context,
+    localizedAuthMessage(l10n, feedback.code, feedback.message),
+    type: feedback.isError ? SnackType.error : SnackType.success,
+  );
+}
 
 /// Step 1: destructive confirmation (type DELETE), then [DeleteAccountRequested].
 Future<void> confirmDeleteAccount(BuildContext context) async {
@@ -285,9 +291,9 @@ class _ReauthPasswordDialogState extends State<_ReauthPasswordDialog> {
         ),
         FilledButton(
           onPressed: _submit,
-          style: FilledButton.styleFrom(
-            backgroundColor: AppColors.error,
-            foregroundColor: AppColors.onGold,
+          style: dialogActionStyle(
+            background: AppColors.error,
+            foreground: AppColors.onGold,
           ),
           child: Text(l10n.delete_account),
         ),
@@ -392,6 +398,22 @@ class _ProfileHeader extends StatelessWidget {
     return '${context.l10n.member_since} $formatted';
   }
 
+  void _editProfile(BuildContext context) {
+    final authBloc = context.read<AuthBloc>();
+    showDialog<void>(
+      context: context,
+      builder:
+          (_) => EditProfileDialog(
+            currentName: user.name,
+            currentEmail: user.email,
+            onSave:
+                (name, email) => authBloc.add(
+                  UpdateProfileRequested(name: name, email: email),
+                ),
+          ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
@@ -423,9 +445,7 @@ class _ProfileHeader extends StatelessWidget {
                           color: Colors.black.withValues(alpha: 0.45),
                           shape: BoxShape.circle,
                         ),
-                        child: const Center(
-                          child: CircularProgressIndicator(),
-                        ),
+                        child: const Center(child: CircularProgressIndicator()),
                       ),
                   ],
                 ),
@@ -451,10 +471,27 @@ class _ProfileHeader extends StatelessWidget {
           ],
         ),
         SizedBox(height: AppSpacing.vLg),
-        Text(
-          user.displayNameOr(l10n.default_user_name),
-          textAlign: TextAlign.center,
-          style: textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+        // Name with an edit button: photo (camera above) and name/email
+        // are all changed here.
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const SizedBox(width: AppSizes.minTapTarget),
+            Flexible(
+              child: Text(
+                user.displayNameOr(l10n.default_user_name),
+                textAlign: TextAlign.center,
+                style: textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            IconButton(
+              tooltip: l10n.edit_profile,
+              onPressed: isUpdating ? null : () => _editProfile(context),
+              icon: Icon(Icons.edit_outlined, size: 20.sp),
+            ),
+          ],
         ),
         if (user.email.isNotEmpty) ...[
           SizedBox(height: AppSpacing.vXs),
@@ -514,7 +551,8 @@ class _ProfileHeader extends StatelessWidget {
                     icon: Icons.photo_camera_outlined,
                     title: l10n.profile_take_photo,
                     trailing: const SizedBox.shrink(),
-                    onTap: () => Navigator.pop(sheetContext, ImageSource.camera),
+                    onTap:
+                        () => Navigator.pop(sheetContext, ImageSource.camera),
                   ),
                   ActionTile(
                     icon: Icons.photo_library_outlined,
@@ -657,7 +695,7 @@ class _PulseSummary extends StatelessWidget {
                   label: l10n.lifetime_points,
                 ),
                 StatTile(
-                  icon: Icons.bolt_rounded,
+                  icon: Icons.local_fire_department_rounded,
                   value: '${pulse?.currentStreak ?? 0}',
                   label: l10n.current_streak,
                 ),
@@ -667,7 +705,7 @@ class _PulseSummary extends StatelessWidget {
             StatRow(
               children: [
                 StatTile(
-                  icon: Icons.local_fire_department_outlined,
+                  icon: Icons.emoji_events_outlined,
                   value: '${pulse?.longestStreak ?? 0}',
                   label: l10n.longest_streak,
                 ),
@@ -758,7 +796,12 @@ class _ActivityLinks extends StatelessWidget {
               ActionTile(
                 icon: Icons.settings_outlined,
                 title: l10n.settings,
-                onTap: () => MainNavigationScope.openTab(context, MainTab.settings, fallback: (_) => const SettingsPage()),
+                onTap:
+                    () => MainNavigationScope.openTab(
+                      context,
+                      MainTab.settings,
+                      fallback: (_) => const SettingsPage(),
+                    ),
               ),
             ],
           ),
@@ -767,3 +810,106 @@ class _ActivityLinks extends StatelessWidget {
     );
   }
 }
+
+/// Edits the name (and email) of the signed-in user.
+class EditProfileDialog extends StatefulWidget {
+  final String currentName;
+  final String currentEmail;
+  final void Function(String name, String email) onSave;
+
+  const EditProfileDialog({
+    required this.currentName,
+    required this.currentEmail,
+    required this.onSave,
+  });
+
+  @override
+  State<EditProfileDialog> createState() => EditProfileDialogState();
+}
+
+class EditProfileDialogState extends State<EditProfileDialog> {
+  final _formKey = GlobalKey<FormState>();
+  late final TextEditingController _nameController = TextEditingController(
+    text: widget.currentName,
+  );
+  late final TextEditingController _emailController = TextEditingController(
+    text: widget.currentEmail,
+  );
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    super.dispose();
+  }
+
+  void _save() {
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+    final name = _nameController.text.trim();
+    final email = _emailController.text.trim();
+    Navigator.pop(context);
+    if (name == widget.currentName &&
+        email.toLowerCase() == widget.currentEmail.toLowerCase()) {
+      return;
+    }
+    widget.onSave(name, email);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    return AlertDialog(
+      title: Text(l10n.edit_profile),
+      scrollable: true,
+      // Wider than the default so a full email address fits.
+      insetPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 24.h),
+      contentPadding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 8.h),
+      content: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            TextFormField(
+              controller: _nameController,
+              textCapitalization: TextCapitalization.words,
+              textInputAction: TextInputAction.next,
+              autofillHints: const [AutofillHints.name],
+              decoration: InputDecoration(labelText: l10n.name),
+              validator: (v) => validateName(l10n, v),
+            ),
+            SizedBox(height: AppSpacing.vLg),
+            TextFormField(
+              controller: _emailController,
+              keyboardType: TextInputType.emailAddress,
+              // Long addresses wrap to a second line instead of being cut.
+              minLines: 1,
+              maxLines: 2,
+              style: Theme.of(context).textTheme.bodyLarge,
+              textInputAction: TextInputAction.done,
+              autofillHints: const [AutofillHints.email],
+              decoration: InputDecoration(labelText: l10n.email),
+              validator: (v) => validateEmail(l10n, v),
+              onFieldSubmitted: (_) => _save(),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          style: TextButton.styleFrom(foregroundColor: AppColors.textSecondary),
+          child: Text(l10n.cancel),
+        ),
+        FilledButton(
+          style: dialogActionStyle(),
+          onPressed: _save,
+          child: Text(l10n.save),
+        ),
+      ],
+    );
+  }
+}
+
+/// Location settings dialog. Toggling Auto off keeps the dialog open and
+/// reveals the manual city field; an empty city can't be saved.

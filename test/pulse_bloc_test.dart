@@ -55,42 +55,53 @@ void main() {
     points: 10,
   );
 
-  test('LogActivity with an existing id is a no-op, even when spammed', () async {
-    final repo = _FakePulseRepo();
-    final bloc = PulseBloc(repository: repo, savedVersesRepository: _FakeSaved());
-    final results = <bool>[];
-    for (var i = 0; i < 3; i++) {
-      bloc.add(LogActivity(act('surah_1_20261114'), onResult: results.add));
-    }
-    await Future<void>.delayed(const Duration(milliseconds: 100));
-    expect(repo.stored.length, 1);
-    expect(results, [true, false, false]);
-    await bloc.close();
-  });
+  test(
+    'LogActivity with an existing id is a no-op, even when spammed',
+    () async {
+      final repo = _FakePulseRepo();
+      final bloc = PulseBloc(
+        repository: repo,
+        savedVersesRepository: _FakeSaved(),
+      );
+      final results = <bool>[];
+      for (var i = 0; i < 3; i++) {
+        bloc.add(LogActivity(act('surah_1_20261114'), onResult: results.add));
+      }
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+      expect(repo.stored.length, 1);
+      expect(results, [true, false, false]);
+      await bloc.close();
+    },
+  );
 
-  test('reload does not emit PulseLoading once loaded; errors keep data',
-      () async {
-    final repo = _FakePulseRepo();
-    final bloc = PulseBloc(repository: repo, savedVersesRepository: _FakeSaved());
-    final states = <PulseState>[];
-    final sub = bloc.stream.listen(states.add);
-    bloc.add(LoadPulseData());
-    await Future<void>.delayed(const Duration(milliseconds: 20));
-    expect(bloc.state, isA<PulseLoaded>());
-    states.clear();
+  test(
+    'reload does not emit PulseLoading once loaded; errors keep data',
+    () async {
+      final repo = _FakePulseRepo();
+      final bloc = PulseBloc(
+        repository: repo,
+        savedVersesRepository: _FakeSaved(),
+      );
+      final states = <PulseState>[];
+      final sub = bloc.stream.listen(states.add);
+      bloc.add(LoadPulseData());
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+      expect(bloc.state, isA<PulseLoaded>());
+      states.clear();
 
-    bloc.add(LogActivity(act('a')));
-    await Future<void>.delayed(const Duration(milliseconds: 50));
-    expect(states.whereType<PulseLoading>(), isEmpty);
+      bloc.add(LogActivity(act('a')));
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      expect(states.whereType<PulseLoading>(), isEmpty);
 
-    repo.failReads = true;
-    bloc.add(LoadPulseData());
-    await Future<void>.delayed(const Duration(milliseconds: 20));
-    final s = bloc.state;
-    expect(s, isA<PulseLoaded>());
-    expect((s as PulseLoaded).error, isNotNull);
-    expect(s.pulse.recentActivities.length, 1);
-    await sub.cancel();
-    await bloc.close();
-  });
+      repo.failReads = true;
+      bloc.add(LoadPulseData());
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+      final s = bloc.state;
+      expect(s, isA<PulseLoaded>());
+      expect((s as PulseLoaded).error, isNotNull);
+      expect(s.pulse.recentActivities.length, 1);
+      await sub.cancel();
+      await bloc.close();
+    },
+  );
 }

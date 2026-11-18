@@ -13,9 +13,16 @@ class _FakeLocation implements LocationService {
     calls++;
     if (error != null) throw error!;
     return Position(
-      latitude: 21.42, longitude: 39.82, timestamp: DateTime.now(),
-      accuracy: 1, altitude: 0, altitudeAccuracy: 0, heading: 0,
-      headingAccuracy: 0, speed: 0, speedAccuracy: 0,
+      latitude: 21.42,
+      longitude: 39.82,
+      timestamp: DateTime.now(),
+      accuracy: 1,
+      altitude: 0,
+      altitudeAccuracy: 0,
+      heading: 0,
+      headingAccuracy: 0,
+      speed: 0,
+      speedAccuracy: 0,
     );
   }
 
@@ -25,8 +32,11 @@ class _FakeLocation implements LocationService {
 
 void main() {
   const manual = PrayerConfig(
-    method: 'MWL', madhab: 'shafi', useAutoLocation: false,
-    manualLatitude: 51.5, manualLongitude: -0.12,
+    method: 'MWL',
+    madhab: 'shafi',
+    useAutoLocation: false,
+    manualLatitude: 51.5,
+    manualLongitude: -0.12,
   );
 
   test('manual mode uses manual coords and never requests GPS', () async {
@@ -41,16 +51,26 @@ void main() {
   });
 
   test('auto mode surfaces typed location failures', () async {
-    final loc = _FakeLocation()
-      ..error = const LocationException(LocationFailure.deniedForever, 'x');
+    final loc =
+        _FakeLocation()
+          ..error = const LocationException(LocationFailure.deniedForever, 'x');
     final bloc = PrayerBloc(PrayerRepositoryImpl(AdhanService()), loc);
-    bloc.add(LoadPrayerTimes(const PrayerConfig(
-      method: 'MWL', madhab: 'shafi', useAutoLocation: true,
-      manualLatitude: 0, manualLongitude: 0,
-    )));
+    bloc.add(
+      LoadPrayerTimes(
+        const PrayerConfig(
+          method: 'MWL',
+          madhab: 'shafi',
+          useAutoLocation: true,
+          manualLatitude: 0,
+          manualLongitude: 0,
+        ),
+      ),
+    );
     await Future<void>.delayed(const Duration(milliseconds: 20));
-    expect((bloc.state as PrayerError).locationFailure,
-        LocationFailure.deniedForever);
+    expect(
+      (bloc.state as PrayerError).locationFailure,
+      LocationFailure.deniedForever,
+    );
     await bloc.close();
   });
 }

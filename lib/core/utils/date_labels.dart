@@ -23,3 +23,7 @@ List<String> lastDaysWeekdayLabels(
     }
   });
 }
+
+/// Wraps a formatted time (e.g. "12:05 PM") in a left-to-right isolate so
+/// it isn't reordered to "PM 12:05" inside Urdu/Arabic/Farsi text.
+String ltrTime(String time) => '\u2066$time\u2069';

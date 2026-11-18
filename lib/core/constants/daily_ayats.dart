@@ -38,27 +38,33 @@ const List<DailyAyat> dailyAyats = [
   ),
   DailyAyat(
     arabic: 'نَبِّئْ عِبَادِي أَنِّي أَنَا الْغَفُورُ الرَّحِيمُ',
-    translation: 'Inform My servants that it is I who am the Forgiving, the Merciful.',
+    translation:
+        'Inform My servants that it is I who am the Forgiving, the Merciful.',
     surah: 'Surah Al-Hijr [15:49]',
   ),
   DailyAyat(
     arabic: 'وَإِذَا سَأَلَكَ عِبَادِي عَنِّي فَإِنِّي قَرِيبٌ',
-    translation: 'And when My servants ask you concerning Me - indeed I am near.',
+    translation:
+        'And when My servants ask you concerning Me - indeed I am near.',
     surah: 'Surah Al-Baqarah [2:186]',
   ),
   DailyAyat(
     arabic: 'الَّذِينَ آمَنُوا وَتَطْمَئِنُّ قُلُوبُهُم بِذِكْرِ اللَّهِ',
-    translation: 'Those who have believed and whose hearts are assured by the remembrance of Allah.',
+    translation:
+        'Those who have believed and whose hearts are assured by the remembrance of Allah.',
     surah: 'Surah Ar-Ra’d [13:28]',
   ),
   DailyAyat(
-    arabic: 'قُلْ يَا عِبَادِيَ الَّذِينَ أَسْرَفُوا عَلَىٰ أَنفُسِهِمْ لَا تَقْنَطُوا مِن رَّحْمَةِ اللَّهِ',
-    translation: 'Say, "O My servants who have transgressed against themselves, do not despair of the mercy of Allah."',
+    arabic:
+        'قُلْ يَا عِبَادِيَ الَّذِينَ أَسْرَفُوا عَلَىٰ أَنفُسِهِمْ لَا تَقْنَطُوا مِن رَّحْمَةِ اللَّهِ',
+    translation:
+        'Say, "O My servants who have transgressed against themselves, do not despair of the mercy of Allah."',
     surah: 'Surah Az-Zumar [39:53]',
   ),
   DailyAyat(
     arabic: 'رَبَّنَا تَقَبَّلْ مِنَّا ۖ إِنَّكَ أَنتَ السَّمِيعُ الْعَلِيمُ',
-    translation: 'Our Lord, accept [this] from us. Indeed You are the Hearing, the Knowing.',
+    translation:
+        'Our Lord, accept [this] from us. Indeed You are the Hearing, the Knowing.',
     surah: 'Surah Al-Baqarah [2:127]',
   ),
 ];

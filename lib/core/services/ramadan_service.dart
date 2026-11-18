@@ -1,3 +1,4 @@
+import '../utils/date_labels.dart';
 import 'dart:convert';
 
 import 'package:flutter/widgets.dart';
@@ -130,9 +131,11 @@ class RamadanService {
       isRamadan: false,
       day: 0,
       daysUntil:
-          DateTime.utc(start.year, start.month, start.day)
-              .difference(DateTime.utc(today.year, today.month, today.day))
-              .inDays,
+          DateTime.utc(
+            start.year,
+            start.month,
+            start.day,
+          ).difference(DateTime.utc(today.year, today.month, today.day)).inDays,
       length: cal.getDaysInMonth(year, 9),
       start: start,
     );
@@ -196,9 +199,9 @@ class RamadanService {
     final code = l10n.locale.languageCode;
     String time(DateTime t) {
       try {
-        return DateFormat.jm(code).format(t);
+        return ltrTime(DateFormat.jm(code).format(t));
       } catch (_) {
-        return DateFormat.jm().format(t);
+        return ltrTime(DateFormat.jm().format(t));
       }
     }
 

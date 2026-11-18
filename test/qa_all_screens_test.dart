@@ -91,6 +91,7 @@ class _FakePrayerRepo implements PrayerRepository {
     double longitude, {
     String method = 'Karachi',
     String? madhab,
+    Map<String, int> offsets = const {},
   }) async {
     final now = DateTime.now();
     DailyPrayerTimes day(int offset) {
@@ -536,7 +537,23 @@ final _screens = <_Screen>[
     },
   ),
   _Screen('HajjGuide', () => const HajjGuidePage()),
-  _Screen('Settings', () => const SettingsPage()),
+  _Screen(
+    'Settings',
+    () => const SettingsPage(),
+    interact: (tester, ctx, l10n) async {
+      ctx.step = 'open adjust-times sheet';
+      await _tap(tester, find.text(l10n.adjust_times).first);
+      final plus = find.byIcon(Icons.add_rounded);
+      for (var i = 0; i < 3; i++) {
+        await _tap(tester, plus.first);
+      }
+      await _tap(tester, find.byIcon(Icons.remove_rounded).last);
+      await _scrollAll(tester, ctx, 'adjust-times sheet');
+      expect(find.text(l10n.minutesShort(3)), findsOneWidget);
+      await _tap(tester, find.text(l10n.reset).last);
+      await _tap(tester, find.text(l10n.close).last);
+    },
+  ),
   _Screen('About', () => const AboutPage()),
   _Screen(
     'Onboarding',

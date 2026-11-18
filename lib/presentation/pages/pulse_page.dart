@@ -405,7 +405,7 @@ class _TodayPrayersCard extends StatelessWidget {
               logged ? Icons.check_rounded : Icons.remove,
               size: 18.sp,
               color:
-                  logged ? AppColors.ivoryOnTeal : AppColors.glassStrokeStrong,
+                  logged ? AppColors.onAccentFill : AppColors.glassStrokeStrong,
             ),
           ),
           SizedBox(height: AppSpacing.vXs),
@@ -415,7 +415,8 @@ class _TodayPrayersCard extends StatelessWidget {
               name,
               maxLines: 1,
               style: textTheme.labelSmall?.copyWith(
-                color: logged ? AppColors.secondaryGold : AppColors.textSecondary,
+                color:
+                    logged ? AppColors.secondaryGold : AppColors.textSecondary,
                 fontWeight: logged ? FontWeight.w700 : FontWeight.w500,
               ),
             ),
@@ -750,8 +751,7 @@ class _BadgesSection extends StatelessWidget {
       child: Tooltip(
         message: l10n.translate(badgeDescriptionL10nKey(id)),
         child: Semantics(
-          label:
-              isEarned ? name : '$name, ${l10n.translate('badge_locked')}',
+          label: isEarned ? name : '$name, ${l10n.translate('badge_locked')}',
           excludeSemantics: true,
           child: Column(
             children: [
@@ -766,7 +766,7 @@ class _BadgesSection extends StatelessWidget {
                       size: 20.sp,
                       color:
                           isEarned
-                              ? AppColors.ivoryOnTeal
+                              ? AppColors.onAccentFill
                               : AppColors.textTertiary,
                     ),
                   ),

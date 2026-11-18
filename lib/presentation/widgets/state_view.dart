@@ -92,16 +92,17 @@ class StateView extends StatelessWidget {
     final l10n = context.l10n;
     final textTheme = Theme.of(context).textTheme;
 
-    final messageText = message == null
-        ? null
-        : Text(
-            message!,
-            textAlign: TextAlign.center,
-            style: textTheme.bodyLarge?.copyWith(
-              color: AppColors.textSecondary,
-              fontSize: 15.sp,
-            ),
-          );
+    final messageText =
+        message == null
+            ? null
+            : Text(
+              message!,
+              textAlign: TextAlign.center,
+              style: textTheme.bodyLarge?.copyWith(
+                color: AppColors.textSecondary,
+                fontSize: 15.sp,
+              ),
+            );
 
     switch (_kind) {
       case _StateKind.loading:

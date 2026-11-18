@@ -110,7 +110,7 @@ class _QuranPageState extends State<QuranPage> {
                     ),
                     for (final e in _translationLanguages.entries)
                       RadioListTile<String>(value: e.key, title: Text(e.value)),
-                    const SizedBox(height: 8),
+                    SizedBox(height: 8.h),
                   ],
                 ),
               ),
@@ -356,7 +356,7 @@ class _ContinueReadingCard extends StatelessWidget {
     return AppCard(
       onTap: onTap,
       blur: true,
-      color: AppColors.emeraldDeep,
+      border: Border.all(color: AppColors.brass, width: 1.2),
       semanticLabel:
           '${l10n.continue_reading}: ${surah.englishName}, ${l10n.ayah} $ayah',
       child: Row(

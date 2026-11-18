@@ -47,7 +47,10 @@ class SectionHeader extends StatelessWidget {
             ),
           ),
           if (actionLabel != null && onAction != null)
-            Flexible(
+            // Only as wide as its label (capped so a long translation can't
+            // push the title out); stays at the end of the row.
+            ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: 150.w),
               child: TextButton(
                 onPressed: onAction,
                 child: Text(

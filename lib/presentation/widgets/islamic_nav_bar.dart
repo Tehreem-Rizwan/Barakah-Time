@@ -37,9 +37,7 @@ class IslamicNavBar extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: AppColors.cardDark,
-        border: const Border(
-          top: BorderSide(color: AppColors.brass, width: 1),
-        ),
+        border: const Border(top: BorderSide(color: AppColors.brass, width: 1)),
         boxShadow: [
           BoxShadow(
             color: AppColors.textMain.withValues(alpha: 0.06),
@@ -93,9 +91,11 @@ class _NavTab extends StatelessWidget {
         onTap: onTap,
         radius: 36.r,
         highlightShape: BoxShape.rectangle,
-        child: SizedBox(
-          height: 60.h,
+        child: ConstrainedBox(
+          // Grows with large text instead of overflowing.
+          constraints: BoxConstraints(minHeight: 60.h),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               AnimatedContainer(
@@ -104,7 +104,8 @@ class _NavTab extends StatelessWidget {
                 width: selected ? 46.r : 40.r,
                 height: 32.r,
                 decoration: BoxDecoration(
-                  color: selected ? AppColors.secondaryGold : Colors.transparent,
+                  color:
+                      selected ? AppColors.secondaryGold : Colors.transparent,
                   // Mihrab: tall rounded top, small rounded base.
                   borderRadius: BorderRadius.vertical(
                     top: Radius.circular(23.r),
@@ -119,7 +120,9 @@ class _NavTab extends StatelessWidget {
                   selected ? item.selectedIcon : item.icon,
                   size: 21.sp,
                   color:
-                      selected ? AppColors.ivoryOnTeal : AppColors.textSecondary,
+                      selected
+                          ? AppColors.onAccentFill
+                          : AppColors.textSecondary,
                 ),
               ),
               SizedBox(height: 4.h),
@@ -129,7 +132,9 @@ class _NavTab extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: textTheme.labelSmall?.copyWith(
                   color:
-                      selected ? AppColors.secondaryGold : AppColors.textSecondary,
+                      selected
+                          ? AppColors.secondaryGold
+                          : AppColors.textSecondary,
                   fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
                 ),
               ),

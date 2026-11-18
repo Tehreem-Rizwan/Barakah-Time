@@ -37,10 +37,11 @@ class MemorialRepository {
   // No 0/O/1/I to avoid misreading.
   static const _alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 
-  String newCode() => List.generate(
-    codeLength,
-    (_) => _alphabet[_random.nextInt(_alphabet.length)],
-  ).join();
+  String newCode() =>
+      List.generate(
+        codeLength,
+        (_) => _alphabet[_random.nextInt(_alphabet.length)],
+      ).join();
 
   /// Uppercases and strips spaces/dashes; null if it can't be a code.
   static String? normalizeCode(String input) {
@@ -57,18 +58,15 @@ class MemorialRepository {
       .snapshots()
       .map((s) => s.exists ? Memorial.fromMap(s.id, s.data()!) : null);
 
-  Stream<List<MemorialEntry>> watchEntries(String id, {int limit = 40}) =>
-      _col
-          .doc(id)
-          .collection('entries')
-          .orderBy('createdAt', descending: true)
-          .limit(limit)
-          .snapshots()
-          .map(
-            (q) => [
-              for (final d in q.docs) MemorialEntry.fromMap(d.id, d.data()),
-            ],
-          );
+  Stream<List<MemorialEntry>> watchEntries(String id, {int limit = 40}) => _col
+      .doc(id)
+      .collection('entries')
+      .orderBy('createdAt', descending: true)
+      .limit(limit)
+      .snapshots()
+      .map(
+        (q) => [for (final d in q.docs) MemorialEntry.fromMap(d.id, d.data())],
+      );
 
   Stream<List<MemorialLink>> watchMine(String uid) => _index(uid)
       .orderBy('joinedAt', descending: true)
@@ -105,7 +103,12 @@ class MemorialRepository {
               deathDate == null
                   ? null
                   : Timestamp.fromDate(
-                    DateTime.utc(deathDate.year, deathDate.month, deathDate.day, 12),
+                    DateTime.utc(
+                      deathDate.year,
+                      deathDate.month,
+                      deathDate.day,
+                      12,
+                    ),
                   ),
           'showDates': showDates,
           'goals': goals,
@@ -239,7 +242,8 @@ class MemorialRepository {
         tx.set(entries.doc(), _entry(me, 'khatam', '${m.khatams + 1}'));
       } else {
         tx.update(ref, {
-          'paras.$para': ParaClaim(uid: c.uid, name: c.name, done: true).toMap(),
+          'paras.$para':
+              ParaClaim(uid: c.uid, name: c.name, done: true).toMap(),
           'updatedAt': FieldValue.serverTimestamp(),
         });
       }

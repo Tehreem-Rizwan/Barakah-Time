@@ -73,7 +73,10 @@ void main() {
       final s = QazaState.empty.addDays(3).madeUp('isha');
       expect(QazaState.fromJson(s.toJson()), s);
       expect(
-        QazaState.fromJson({'remaining': 'x', 'done': {'fajr': 'y'}}),
+        QazaState.fromJson({
+          'remaining': 'x',
+          'done': {'fajr': 'y'},
+        }),
         QazaState.empty,
       );
       expect(QazaState.fromJson(null).isEmpty, isTrue);

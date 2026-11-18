@@ -32,12 +32,12 @@ String _body(List<Map<String, dynamic>> ayahs) => json.encode({
 void main() {
   test('translation edition per language', () {
     const f = QuranRepository.translationEditionFor;
-    expect(f('en'), 'en.asad');
+    expect(f('en'), 'en.sahih');
     expect(f('ur'), 'ur.jalandhry');
-    expect(f('tr'), 'tr.diyanet');
-    expect(f('fa'), 'fa.makarem');
+    expect(f('tr'), 'tr.vakfi');
+    expect(f('fa'), 'fa.fooladvand');
     expect(f('ar'), 'ar.muyassar');
-    expect(f('xx'), 'en.asad');
+    expect(f('xx'), 'en.sahih');
   });
 
   group('caching', () {

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dark mode: window behind the Flutter UI matches the dark background
+         (avoids a light flash on resume or keyboard resize). -->
+    <color name="app_background">#0C1B1D</color>
+</resources>

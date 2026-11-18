@@ -347,7 +347,7 @@ class _MosqueFinderPageState extends State<MosqueFinderPage> {
           ),
           IconButton(
             tooltip: l10n.directions,
-            icon: const Icon(
+            icon: Icon(
               Icons.directions_rounded,
               color: AppColors.secondaryGold,
             ),

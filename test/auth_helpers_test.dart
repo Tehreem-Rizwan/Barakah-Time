@@ -31,25 +31,34 @@ void main() {
 
   group('auth messages', () {
     test('known codes map to localized text', () {
-      expect(localizedAuthMessage(l10n, 'invalid-credential', 'x'),
-          l10n.err_wrong_credentials);
-      expect(localizedAuthMessage(l10n, 'wrong-password', 'x'),
-          l10n.err_wrong_credentials);
-      expect(localizedAuthMessage(l10n, 'network-request-failed', 'x'),
-          l10n.err_network);
-      expect(localizedAuthMessage(l10n, 'requires-recent-login', 'x'),
-          l10n.err_recent_login);
+      expect(
+        localizedAuthMessage(l10n, 'invalid-credential', 'x'),
+        l10n.err_wrong_credentials,
+      );
+      expect(
+        localizedAuthMessage(l10n, 'wrong-password', 'x'),
+        l10n.err_wrong_credentials,
+      );
+      expect(
+        localizedAuthMessage(l10n, 'network-request-failed', 'x'),
+        l10n.err_network,
+      );
+      expect(
+        localizedAuthMessage(l10n, 'requires-recent-login', 'x'),
+        l10n.err_recent_login,
+      );
     });
 
     test('unknown codes fall back to the message', () {
-      expect(localizedAuthMessage(l10n, 'something-else', 'Fallback'),
-          'Fallback');
+      expect(
+        localizedAuthMessage(l10n, 'something-else', 'Fallback'),
+        'Fallback',
+      );
     });
 
     test('cleanErrorMessage strips Exception prefixes', () {
       expect(cleanErrorMessage(Exception('Boom')), 'Boom');
-      expect(cleanErrorMessage(const AuthFailure('x', 'Friendly')),
-          'Friendly');
+      expect(cleanErrorMessage(const AuthFailure('x', 'Friendly')), 'Friendly');
     });
   });
 

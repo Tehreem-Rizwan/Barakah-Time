@@ -58,18 +58,19 @@ class _AudioControlBarState extends State<AudioControlBar> {
       initialData: _audioService.status,
       builder: (context, snapshot) {
         final status = snapshot.data ?? AudioStatus.idle;
+        // Keeps content clear of the system navigation bar on pages where
+        // this bar is the Scaffold's bottom bar (0 inside the main tabs).
+        final inset = MediaQuery.paddingOf(context).bottom;
         if (!status.isActive) {
-          return const SizedBox.shrink();
+          return SizedBox(height: inset);
         }
         final playing = status.isPlaying;
 
         return Container(
-          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+          padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 12.h + inset),
           decoration: BoxDecoration(
             color: AppColors.cardDark,
-            border: Border(
-              top: BorderSide(color: AppColors.glassStroke),
-            ),
+            border: Border(top: BorderSide(color: AppColors.glassStroke)),
             boxShadow: [
               BoxShadow(
                 color: AppColors.textMain.withValues(alpha: 0.08),

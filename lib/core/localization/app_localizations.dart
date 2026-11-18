@@ -10,56 +10,72 @@ class AppLocalizations {
       'pulse_today': 'Today',
       'pulse_today_prayers': 'Today\'s prayers',
       'badge_locked': 'Locked',
-      'audio_error_voice_missing': "This phone has no voice for this language. Install it in phone Settings → Text-to-speech.",
+      'audio_error_voice_missing':
+          "This phone has no voice for this language. Install it in phone Settings → Text-to-speech.",
       'quran_translation_language': 'Translation language',
       'quran_translation_same_as_app': 'Same as app language',
-      'quran_translation_audio_note': 'Urdu, English, Farsi and Turkish translations are read aloud by a person.',
+      'quran_translation_audio_note':
+          'Urdu, English, Farsi and Turkish translations are read aloud by a person.',
       'audio_error_play': 'Could not play audio. Check your connection.',
       'audio_error_speech': 'Speech playback failed',
       'name_too_long': 'Name must be 100 characters or fewer',
-      'reminders_need_notifications': 'Turn on prayer notifications in Settings first.',
+      'reminders_need_notifications':
+          'Turn on prayer notifications in Settings first.',
       'ramadan_title': 'Ramadan',
       'ramadan_day_of': 'Day {day} of {len}',
       'ramadan_starts_in': 'Starts in {n} days',
-      'ramadan_qadr_tonight': 'Tonight may be Laylatul Qadr. Spend it in worship and dua.',
+      'ramadan_qadr_tonight':
+          'Tonight may be Laylatul Qadr. Spend it in worship and dua.',
       'ramadan_moon_adjust': 'Moon sighting adjustment (days)',
-      'ramadan_need_location': 'Load prayer times to see sehri and iftar times.',
+      'ramadan_need_location':
+          'Load prayer times to see sehri and iftar times.',
       'ramadan_sehri_ends_in': 'Sehri ends in',
       'ramadan_iftar_in': 'Iftar in',
       'ramadan_sehri_ends': 'Sehri ends',
       'ramadan_iftar': 'Iftar',
       'ramadan_reminders': 'Sehri & iftar reminders',
-      'ramadan_reminders_desc': '30 minutes before sehri ends, and at iftar time',
+      'ramadan_reminders_desc':
+          '30 minutes before sehri ends, and at iftar time',
       'ramadan_duas': 'Ramadan duas',
       'ramadan_sehri_niyyah': 'Intention for fasting (sehri)',
-      'ramadan_sehri_niyyah_meaning': 'I intend to keep tomorrow\'s fast of the month of Ramadan.',
+      'ramadan_sehri_niyyah_meaning':
+          'I intend to keep tomorrow\'s fast of the month of Ramadan.',
       'ramadan_iftar_dua': 'Dua for iftar',
-      'ramadan_iftar_dua_meaning': 'O Allah, I fasted for You, I believe in You, I put my trust in You, and I break my fast with Your provision.',
+      'ramadan_iftar_dua_meaning':
+          'O Allah, I fasted for You, I believe in You, I put my trust in You, and I break my fast with Your provision.',
       'ramadan_iftar_dua2': 'After breaking the fast',
-      'ramadan_iftar_dua2_meaning': 'The thirst is gone, the veins are moistened, and the reward is certain, if Allah wills. (Abu Dawud)',
+      'ramadan_iftar_dua2_meaning':
+          'The thirst is gone, the veins are moistened, and the reward is certain, if Allah wills. (Abu Dawud)',
       'ramadan_qadr_dua': 'Dua for Laylatul Qadr',
-      'ramadan_qadr_dua_meaning': 'O Allah, You are Most Forgiving and You love forgiveness, so forgive me. (Tirmidhi)',
+      'ramadan_qadr_dua_meaning':
+          'O Allah, You are Most Forgiving and You love forgiveness, so forgive me. (Tirmidhi)',
       'ramadan_log': 'Fasting log',
       'ramadan_fasted': 'Fasted',
       'ramadan_missed': 'Missed',
       'ramadan_taraweeh': 'Taraweeh',
-      'ramadan_log_hint': 'Tap a day to mark your fast and Taraweeh. Stars mark the odd nights of the last ten.',
+      'ramadan_log_hint':
+          'Tap a day to mark your fast and Taraweeh. Stars mark the odd nights of the last ten.',
       'ramadan_qaza_fasts': '{n} fasts to make up (qaza)',
       'ramadan_day': 'Day',
       'ramadan_not_set': 'Clear',
       'ramadan_prayed_taraweeh': 'Prayed Taraweeh',
       'ramadan_prepare': 'Get ready: plan your Quran, duas and charity.',
       'ramadan_sehri_reminder_title': 'Sehri ends in 30 minutes',
-      'ramadan_sehri_reminder_body': 'Sehri ends at {time}. Don\'t forget your intention.',
+      'ramadan_sehri_reminder_body':
+          'Sehri ends at {time}. Don\'t forget your intention.',
       'ramadan_iftar_reminder_title': 'It\'s iftar time',
-      'ramadan_iftar_reminder_body': 'Break your fast and make dua. Duas at iftar are accepted.',
+      'ramadan_iftar_reminder_body':
+          'Break your fast and make dua. Duas at iftar are accepted.',
       'memorial_title': 'Esaal-e-Sawab',
       'memorial_tool_subtitle': 'For the departed',
-      'memorial_sign_in': 'Sign in to create or join an Esaal-e-Sawab page for a loved one.',
-      'memorial_intro': 'Create a page for a loved one who passed away and share it on WhatsApp. Family and friends can take paras to complete a khatam, recite dhikr toward shared goals, and add good deeds for them.',
+      'memorial_sign_in':
+          'Sign in to create or join an Esaal-e-Sawab page for a loved one.',
+      'memorial_intro':
+          'Create a page for a loved one who passed away and share it on WhatsApp. Family and friends can take paras to complete a khatam, recite dhikr toward shared goals, and add good deeds for them.',
       'memorial_create': 'Create a page',
       'memorial_join': 'Join with a code',
-      'memorial_none': 'No pages yet. Create one, or join with a code someone shared.',
+      'memorial_none':
+          'No pages yet. Create one, or join with a code someone shared.',
       'memorial_you_created': 'Created by you',
       'memorial_joined': 'Joined',
       'memorial_code_invalid': 'Enter the 8-character code',
@@ -72,31 +88,39 @@ class AppLocalizations {
       'memorial_death_date': 'Date of passing',
       'memorial_optional': 'Optional',
       'memorial_show_dates': 'Show remembrance days',
-      'memorial_show_dates_desc': '3rd day, 10th day, 40th day and yearly anniversary',
+      'memorial_show_dates_desc':
+          '3rd day, 10th day, 40th day and yearly anniversary',
       'memorial_goals': 'Dhikr goals',
       'memorial_goal': 'Goal',
       'memorial_error_not_found': 'No page found with this code.',
-      'memorial_error_para_taken': 'Someone just took this para. Please pick another.',
-      'memorial_error_generic': 'Something went wrong. Check your internet and try again.',
+      'memorial_error_para_taken':
+          'Someone just took this para. Please pick another.',
+      'memorial_error_generic':
+          'Something went wrong. Check your internet and try again.',
       'memorial_deleted': 'This page has been deleted.',
       'memorial_remove_from_list': 'Remove from my list',
-      'memorial_created_hint': 'Page created. Share it with family and friends.',
+      'memorial_created_hint':
+          'Page created. Share it with family and friends.',
       'memorial_share': 'Share',
-      'memorial_share_text': 'Please join the Esaal-e-Sawab for {name}. Read a para of the Quran or recite dhikr for them in the Barakah Time app.\n\nCode: {code}\n\nGet the app: {link}',
+      'memorial_share_text':
+          'Please join the Esaal-e-Sawab for {name}. Read a para of the Quran or recite dhikr for them in the Barakah Time app.\n\nCode: {code}\n\nGet the app: {link}',
       'memorial_para': 'Para {n}',
-      'memorial_take_para_confirm': 'You will read this para for the deceased. Others will see that you took it.',
+      'memorial_take_para_confirm':
+          'You will read this para for the deceased. Others will see that you took it.',
       'memorial_take_para': 'Take this para',
       'memorial_para_read_by': 'Para {n} was read by {name}',
       'memorial_para_taken_by': 'Para {n} is being read by {name}',
       'memorial_para_yours': 'You are reading this para',
       'memorial_mark_read': 'I have read it',
       'memorial_release_para': 'Give it back',
-      'memorial_khatam_done': 'Khatam completed. Alhamdulillah! A new khatam has started.',
+      'memorial_khatam_done':
+          'Khatam completed. Alhamdulillah! A new khatam has started.',
       'memorial_para_done': 'JazakAllah khair. May Allah accept it.',
       'memorial_how_many': 'How many times?',
       'memorial_added': 'Added. JazakAllah khair.',
       'memorial_delete': 'Delete page',
-      'memorial_delete_confirm': 'This deletes the page for everyone, including all progress. It cannot be undone.',
+      'memorial_delete_confirm':
+          'This deletes the page for everyone, including all progress. It cannot be undone.',
       'memorial_add_deed': 'Add a good deed or dua',
       'memorial_deed_hint': 'e.g. Gave food to 10 people, or a dua for them',
       'memorial_dates': 'Remembrance days',
@@ -121,7 +145,8 @@ class AppLocalizations {
       'memorial_day40': '40th day (Chehlum)',
       'memorial_barsi': 'Yearly anniversary (Barsi)',
       'memorial_reminder_title': '{day} of {name}',
-      'memorial_reminder_body': 'Remember {name} today with Quran, dua or charity.',
+      'memorial_reminder_body':
+          'Remember {name} today with Quran, dua or charity.',
       'dhikr_kareema': 'Ayat-e-Kareema',
       'dhikr_darood': 'Darood Shareef',
       'dhikr_kalma': 'Kalma Tayyiba',
@@ -133,13 +158,16 @@ class AppLocalizations {
       'promise_no_ads': 'No ads, ever',
       'promise_no_sell': 'We never sell or share your data',
       'promise_no_tracking': 'No trackers or analytics',
-      'promise_location': 'Your location is used only for prayer times, Qibla and nearby mosques',
+      'promise_location':
+          'Your location is used only for prayer times, Qibla and nearby mosques',
       'onboarding_privacy_title': 'No ads. Your data stays yours.',
-      'onboarding_privacy_desc': 'Barakah Time has no ads and no trackers, and we never sell your data. Your worship stays between you and Allah.',
+      'onboarding_privacy_desc':
+          'Barakah Time has no ads and no trackers, and we never sell your data. Your worship stays between you and Allah.',
       'qaza_tracker': 'Qaza Tracker',
       'witr': 'Witr',
       'qaza_intro_title': 'Make up missed prayers',
-      'qaza_intro_body': 'Estimate how many prayers you owe, then count them down one by one. Your progress is saved and synced to your account.',
+      'qaza_intro_body':
+          'Estimate how many prayers you owe, then count them down one by one. Your progress is saved and synced to your account.',
       'qaza_calculate': 'Estimate missed prayers',
       'qaza_enter_manually': 'Enter counts manually',
       'qaza_remaining': 'Remaining',
@@ -153,22 +181,28 @@ class AppLocalizations {
       'qaza_months': 'Months',
       'qaza_days': 'Days',
       'qaza_include_witr': 'Include Witr (Hanafi)',
-      'qaza_calc_desc': 'How long did you miss prayers? For example, from puberty until you started praying regularly.',
+      'qaza_calc_desc':
+          'How long did you miss prayers? For example, from puberty until you started praying regularly.',
       'qaza_calc_result': 'Adds {n} of each prayer',
-      'qaza_estimate_note': 'A year is counted as 365 days to stay on the safe side. Ask a scholar if you are unsure.',
+      'qaza_estimate_note':
+          'A year is counted as 365 days to stay on the safe side. Ask a scholar if you are unsure.',
       'qaza_add': 'Add to tracker',
       'qaza_reset': 'Reset tracker',
-      'qaza_reset_confirm': 'This clears all counts and progress. It cannot be undone.',
+      'qaza_reset_confirm':
+          'This clears all counts and progress. It cannot be undone.',
       'qaza_all_done': 'All qaza prayers made up. Alhamdulillah!',
       'qaza_tool_subtitle': 'Missed prayers',
       // Auth / onboarding / profile / settings / about pages
       'app_tagline': 'Bring barakah to your time',
       'onboarding_pulse_title': 'Spiritual Pulse',
-      'onboarding_pulse_desc': 'Track your spiritual consistency and build lasting habits. Stay connected, stay consistent.',
+      'onboarding_pulse_desc':
+          'Track your spiritual consistency and build lasting habits. Stay connected, stay consistent.',
       'onboarding_prayer_title': 'Never Miss a Prayer',
-      'onboarding_prayer_desc': 'Accurate prayer times, live countdowns and reminders tailored to your location.',
+      'onboarding_prayer_desc':
+          'Accurate prayer times, live countdowns and reminders tailored to your location.',
       'onboarding_inspiration_title': 'Daily Inspiration',
-      'onboarding_inspiration_desc': 'Find peace with daily ayat, the 99 Names of Allah, duas and more for your soul.',
+      'onboarding_inspiration_desc':
+          'Find peace with daily ayat, the 99 Names of Allah, duas and more for your soul.',
       'onboarding_next': 'Next',
       'onboarding_get_started': 'Get Started',
       'auth_welcome_back': 'Welcome Back',
@@ -184,12 +218,14 @@ class AppLocalizations {
       'auth_full_name': 'Full Name',
       'auth_register': 'Register',
       'auth_have_account': 'Already have an account?',
-      'auth_account_created_verify': 'Account created! We sent a verification link to {email}.',
+      'auth_account_created_verify':
+          'Account created! We sent a verification link to {email}.',
       'profile_saved_verses': 'Saved verses',
       'profile_saved_count': '{n} saved',
       'profile_activity_history': 'Activity history',
       'profile_last_activity': 'Last: {activity}',
-      'profile_no_saved_verses': 'No saved verses yet. Tap the bookmark on any ayah to save it here.',
+      'profile_no_saved_verses':
+          'No saved verses yet. Tap the bookmark on any ayah to save it here.',
       'profile_remove_verse': 'Remove from saved',
       'profile_undo': 'Undo',
       'profile_change_photo': 'Change photo',
@@ -202,11 +238,13 @@ class AppLocalizations {
       'settings_support_us': 'Support our work',
       'settings_version': 'Version {v}',
       'about_title': 'About Barakah Time',
-      'about_description': 'An Islamic companion for prayer times, Quran, dhikr and daily spiritual growth — designed to bring barakah to your time.',
+      'about_description':
+          'An Islamic companion for prayer times, Quran, dhikr and daily spiritual growth — designed to bring barakah to your time.',
       'about_credits': 'Credits & data sources',
       'about_quran_data': 'Quran text, translations & audio',
       'about_map_data': 'Map & place data',
-      'about_map_license': '© OpenStreetMap contributors, available under the Open Database License (ODbL)',
+      'about_map_license':
+          '© OpenStreetMap contributors, available under the Open Database License (ODbL)',
       'about_prayer_calc': 'Prayer time calculation',
       'about_prayer_calc_source': 'adhan library (open source)',
       'about_privacy': 'Privacy Policy',
@@ -280,8 +318,10 @@ class AppLocalizations {
       'all_tools': 'All Tools',
       'ayah': 'Ayah',
       'ayahs': 'Ayahs',
-      'calibrate_compass': 'If the direction seems wrong, move your phone in a figure-8 to calibrate the compass.',
-      'compass_unavailable': 'Compass not available on this device — face North, then turn to the angle shown.',
+      'calibrate_compass':
+          'If the direction seems wrong, move your phone in a figure-8 to calibrate the compass.',
+      'compass_unavailable':
+          'Compass not available on this device — face North, then turn to the angle shown.',
       'could_not_open_maps': 'Could not open maps',
       'degrees_from_north': '{deg}° from North',
       'detecting_location': 'Detecting location...',
@@ -290,9 +330,11 @@ class AppLocalizations {
       'finding_mosques': 'Finding nearby mosques...',
       'in_days': 'in {n} days',
       'listen_translation': 'Listen to translation',
-      'location_error_message': 'Couldn\'t get your location. Enable location services and permission, then try again.',
+      'location_error_message':
+          'Couldn\'t get your location. Enable location services and permission, then try again.',
       'mark_as_read': 'Mark as Read',
-      'mosques_load_error': 'Couldn\'t load nearby mosques. Check your internet connection.',
+      'mosques_load_error':
+          'Couldn\'t load nearby mosques. Check your internet connection.',
       'no_mosques_match': 'No mosques match your search',
       'no_mosques_nearby': 'No mosques found within 5 km',
       'now_playing': 'Now playing',
@@ -300,13 +342,16 @@ class AppLocalizations {
       'pause': 'Pause',
       'play': 'Play',
       'play_surah': 'Play Surah',
-      'quran_load_error': 'Couldn\'t load the Quran. Check your internet connection and try again.',
-      'reset_counter_message': 'The counter will go back to 0. Your dhikr so far will be saved to Spiritual Pulse.',
+      'quran_load_error':
+          'Couldn\'t load the Quran. Check your internet connection and try again.',
+      'reset_counter_message':
+          'The counter will go back to 0. Your dhikr so far will be saved to Spiritual Pulse.',
       'reset_counter_title': 'Reset counter?',
       'share': 'Share',
       'stop': 'Stop',
       'surah_already_logged_today': 'Already logged today ✓',
-      'surah_load_error': 'Couldn\'t load this surah. Check your internet connection and try again.',
+      'surah_load_error':
+          'Couldn\'t load this surah. Check your internet connection and try again.',
       'surah_logged': 'Surah {name} logged! ✨',
       'today': 'Today',
       'tomorrow': 'Tomorrow',
@@ -341,21 +386,26 @@ class AppLocalizations {
       'err_email_in_use': 'An account with this email already exists.',
       'err_network': 'Network error. Check your connection.',
       'err_too_many_requests': 'Too many attempts. Try again later.',
-      'err_recent_login': 'For security, please sign out and sign in again before changing your email.',
+      'err_recent_login':
+          'For security, please sign out and sign in again before changing your email.',
       'err_upload_failed': 'Failed to upload photo. Please try again.',
-      'err_profile_update_failed': 'Failed to update profile. Please try again.',
+      'err_profile_update_failed':
+          'Failed to update profile. Please try again.',
       'err_google_failed': 'Google Sign-In failed. Please try again.',
       'profile_updated': 'Profile updated.',
       'photo_updated': 'Profile photo updated.',
-      'verification_email_sent': 'A verification link was sent to your new email. Your email will update once you confirm it.',
+      'verification_email_sent':
+          'A verification link was sent to your new email. Your email will update once you confirm it.',
       'forgot_password': 'Forgot Password?',
       'reset_password': 'Reset Password',
-      'reset_password_hint': 'Enter your email and we\'ll send you a link to reset your password.',
+      'reset_password_hint':
+          'Enter your email and we\'ll send you a link to reset your password.',
       'send_link': 'Send Link',
       'reset_email_sent': 'Password reset email sent. Check your inbox.',
       'email': 'Email',
       'name': 'Name',
-      'photo_permission_denied': 'Photo access denied. Please allow access in your device settings.',
+      'photo_permission_denied':
+          'Photo access denied. Please allow access in your device settings.',
       'photo_pick_failed': 'Could not open your photos. Please try again.',
       'member_since': 'Member since',
       'my_profile': 'My Profile',
@@ -370,8 +420,10 @@ class AppLocalizations {
       'location_required': 'Please enter a city.',
       'rate_now': 'Rate Now',
       'later': 'Later',
-      'rate_us_message': 'If you enjoy Barakah Time, please take a moment to rate us! ✨',
-      'app_store_coming_soon': 'Barakah Time is coming soon to the App Store. Thank you for your support!',
+      'rate_us_message':
+          'If you enjoy Barakah Time, please take a moment to rate us! ✨',
+      'app_store_coming_soon':
+          'Barakah Time is coming soon to the App Store. Thank you for your support!',
       'store_open_failed': 'Couldn\'t open the store. Please try again later.',
       'close': 'Close',
       'skip': 'Skip',
@@ -487,10 +539,13 @@ class AppLocalizations {
       'note': 'Note',
       'sunrise': 'Sunrise',
       'tomorrow_fajr': 'Tomorrow\'s Fajr',
-      'location_not_found': 'Couldn\'t find "{city}". Try a different spelling or add the country.',
+      'location_not_found':
+          'Couldn\'t find "{city}". Try a different spelling or add the country.',
       'location_services_disabled': 'Location services are turned off',
-      'location_permission_denied': 'Location permission is needed to show prayer times for where you are.',
-      'location_permission_denied_forever': 'Location permission is blocked. Enable it in app settings, or set a city manually.',
+      'location_permission_denied':
+          'Location permission is needed to show prayer times for where you are.',
+      'location_permission_denied_forever':
+          'Location permission is blocked. Enable it in app settings, or set a city manually.',
       'location_timeout': 'Couldn\'t get your location in time.',
       'location_access_required': 'Location Access Required',
       'open_settings': 'Open Settings',
@@ -522,11 +577,14 @@ class AppLocalizations {
       'badge_points_1000_desc': 'Earned 1,000 lifetime points',
       'no_badges_yet': 'Keep using the app to earn badges!',
       'badges_earned': '{n} badges earned',
-      'motivation_achieved': 'MashaAllah! You\'ve achieved your spiritual goals for today. ✨',
-      'motivation_almost': 'Great progress! Just a little more to hit your target. 🚀',
+      'motivation_achieved':
+          'MashaAllah! You\'ve achieved your spiritual goals for today. ✨',
+      'motivation_almost':
+          'Great progress! Just a little more to hit your target. 🚀',
       'motivation_halfway': 'You\'re halfway through! Keep up the momentum. 💪',
       'motivation_started': 'Good start! Keep moving towards your goals. ⚡',
-      'motivation_start': 'Start your spiritual journey for today. Every step counts! 🌱',
+      'motivation_start':
+          'Start your spiritual journey for today. Every step counts! 🌱',
       'method_mwl': 'Muslim World League',
       'method_karachi': 'University of Islamic Sciences, Karachi',
       'method_isna': 'Islamic Society of North America (ISNA)',
@@ -543,33 +601,54 @@ class AppLocalizations {
       'default_user_name': 'Barakah User',
       'sign_in_with_apple': 'Sign in with Apple',
       'continue_as_guest': 'Continue as guest',
-      'guest_mode_notice': 'You are using Barakah Time as a guest. Sign in to back up your progress and use it on other devices.',
+      'guest_mode_notice':
+          'You are using Barakah Time as a guest. Sign in to back up your progress and use it on other devices.',
       'sign_in_to_sync': 'Sign in to sync',
-      'auth_unavailable_notice': 'Sign-in is unavailable right now. You can keep using the app; your data stays on this device.',
-      'err_auth_unavailable': 'Sign-in is unavailable right now. Check your connection and restart the app.',
+      'auth_unavailable_notice':
+          'Sign-in is unavailable right now. You can keep using the app; your data stays on this device.',
+      'err_auth_unavailable':
+          'Sign-in is unavailable right now. Check your connection and restart the app.',
       'err_apple_failed': 'Sign in with Apple failed. Please try again.',
       'err_user_disabled': 'This account has been disabled.',
-      'err_account_exists_different_provider': 'An account already exists with this email using a different sign-in method.',
-      'err_user_mismatch': 'Please sign in with the same account you are deleting.',
+      'err_account_exists_different_provider':
+          'An account already exists with this email using a different sign-in method.',
+      'err_user_mismatch':
+          'Please sign in with the same account you are deleting.',
       'session_expired': 'You have been signed out. Please sign in again.',
-      'email_not_verified': 'Your email is not verified yet. Check your inbox for the verification link.',
+      'email_not_verified':
+          'Your email is not verified yet. Check your inbox for the verification link.',
       'resend_verification': 'Resend verification email',
       'verification_link_resent': 'Verification email sent. Check your inbox.',
       'delete_account': 'Delete account',
       'delete_confirm_word': 'DELETE',
       'delete_account_confirm_title': 'Delete your account?',
-      'delete_account_confirm_message': 'This permanently deletes your account, progress, badges, saved verses and profile photo. This cannot be undone.',
-      'reauth_required_delete': 'For security, please confirm your sign-in to delete your account.',
+      'delete_account_confirm_message':
+          'This permanently deletes your account, progress, badges, saved verses and profile photo. This cannot be undone.',
+      'reauth_required_delete':
+          'For security, please confirm your sign-in to delete your account.',
       'confirm_with_password': 'Enter your password to continue',
       'confirm_with_provider': 'Confirm with {provider}',
       'account_deleted': 'Your account has been deleted.',
-      'err_delete_account_failed': 'Could not delete your account. Please try again.',
+      'err_delete_account_failed':
+          'Could not delete your account. Please try again.',
       'lifetime_points': 'Lifetime points',
       'longest_streak': 'Longest streak',
       'adhan_sound': 'Adhan sound',
       'adhan_sound_desc': 'Play the adhan for prayer reminders',
-      'exact_alarms_hint': 'Allow "Alarms & reminders" so prayer reminders arrive exactly on time.',
-      'notifications_permission_revoked': 'Notification permission was turned off in system settings, so prayer reminders were disabled.',
+      'adjust_times': 'Adjust prayer times',
+      'app_theme': 'Theme',
+      'theme_system': 'System default',
+      'theme_light': 'Light',
+      'theme_dark': 'Dark',
+      'adjust_times_desc': 'Shift each prayer to match your mosque',
+      'adjust_times_none': 'No changes',
+      'minutes_short': '{n} min',
+      'adjust_times_note':
+          'Times are shifted from the calculated time. Use this only if your local mosque differs.',
+      'exact_alarms_hint':
+          'Allow "Alarms & reminders" so prayer reminders arrive exactly on time.',
+      'notifications_permission_revoked':
+          'Notification permission was turned off in system settings, so prayer reminders were disabled.',
       'good_morning': 'Good morning',
       'good_afternoon': 'Good afternoon',
       'good_evening': 'Good evening',
@@ -592,13 +671,15 @@ class AppLocalizations {
       'more': 'More',
       'read_full_ayah': 'Read full ayah',
       'shared_from_app': 'Shared from Barakah Time',
-      'pulse_share_text': 'My Barakah Time progress: {streak}-day streak and {points} points this week.',
+      'pulse_share_text':
+          'My Barakah Time progress: {streak}-day streak and {points} points this week.',
       'points_this_week': 'Points this week',
       'current_streak': 'Current streak',
       'day_streak_count': '{n}-day streak',
       'weekday_points': '{day}: {n} points',
       'recent_activity': 'Recent activity',
-      'no_recent_activity': 'No activity yet. Log a prayer, read the Quran or do dhikr to get started.',
+      'no_recent_activity':
+          'No activity yet. Log a prayer, read the Quran or do dhikr to get started.',
       'activity_prayer': '{prayer} prayer',
       'activity_quran': 'Quran reading',
       'activity_dhikr': 'Dhikr',
@@ -621,10 +702,12 @@ class AppLocalizations {
       'pulse_today': 'اليوم',
       'pulse_today_prayers': 'صلوات اليوم',
       'badge_locked': 'مقفل',
-      'audio_error_voice_missing': "لا يوجد صوت لهذه اللغة على الهاتف. ثبّته من الإعدادات ← تحويل النص إلى كلام.",
+      'audio_error_voice_missing':
+          "لا يوجد صوت لهذه اللغة على الهاتف. ثبّته من الإعدادات ← تحويل النص إلى كلام.",
       'quran_translation_language': 'لغة الترجمة',
       'quran_translation_same_as_app': 'نفس لغة التطبيق',
-      'quran_translation_audio_note': 'تُقرأ الترجمات الأردية والإنجليزية والفارسية والتركية بصوت قارئ بشري.',
+      'quran_translation_audio_note':
+          'تُقرأ الترجمات الأردية والإنجليزية والفارسية والتركية بصوت قارئ بشري.',
       'audio_error_play': 'تعذّر تشغيل الصوت. تحقق من الاتصال.',
       'audio_error_speech': 'تعذّر تشغيل القراءة الصوتية',
       'name_too_long': 'يجب ألا يتجاوز الاسم 100 حرف',
@@ -632,7 +715,8 @@ class AppLocalizations {
       'ramadan_title': 'رمضان',
       'ramadan_day_of': 'اليوم {day} من {len}',
       'ramadan_starts_in': 'يبدأ بعد {n} يومًا',
-      'ramadan_qadr_tonight': 'قد تكون الليلة ليلة القدر. اغتنمها بالعبادة والدعاء.',
+      'ramadan_qadr_tonight':
+          'قد تكون الليلة ليلة القدر. اغتنمها بالعبادة والدعاء.',
       'ramadan_moon_adjust': 'تعديل رؤية الهلال (أيام)',
       'ramadan_need_location': 'حمّل مواقيت الصلاة لرؤية وقتي السحور والإفطار.',
       'ramadan_sehri_ends_in': 'ينتهي السحور بعد',
@@ -645,29 +729,36 @@ class AppLocalizations {
       'ramadan_sehri_niyyah': 'نية الصيام (السحور)',
       'ramadan_sehri_niyyah_meaning': 'نويت صيام غدٍ من شهر رمضان.',
       'ramadan_iftar_dua': 'دعاء الإفطار',
-      'ramadan_iftar_dua_meaning': 'اللهم لك صمت، وبك آمنت، وعليك توكلت، وعلى رزقك أفطرت.',
+      'ramadan_iftar_dua_meaning':
+          'اللهم لك صمت، وبك آمنت، وعليك توكلت، وعلى رزقك أفطرت.',
       'ramadan_iftar_dua2': 'بعد الإفطار',
-      'ramadan_iftar_dua2_meaning': 'ذهب الظمأ وابتلت العروق وثبت الأجر إن شاء الله. (أبو داود)',
+      'ramadan_iftar_dua2_meaning':
+          'ذهب الظمأ وابتلت العروق وثبت الأجر إن شاء الله. (أبو داود)',
       'ramadan_qadr_dua': 'دعاء ليلة القدر',
       'ramadan_qadr_dua_meaning': 'اللهم إنك عفو تحب العفو فاعف عني. (الترمذي)',
       'ramadan_log': 'سجل الصيام',
       'ramadan_fasted': 'صمت',
       'ramadan_missed': 'فاتني',
       'ramadan_taraweeh': 'التراويح',
-      'ramadan_log_hint': 'اضغط على اليوم لتسجيل الصيام والتراويح. النجوم تشير إلى الليالي الوتر من العشر الأواخر.',
+      'ramadan_log_hint':
+          'اضغط على اليوم لتسجيل الصيام والتراويح. النجوم تشير إلى الليالي الوتر من العشر الأواخر.',
       'ramadan_qaza_fasts': '{n} أيام للقضاء',
       'ramadan_day': 'اليوم',
       'ramadan_not_set': 'مسح',
       'ramadan_prayed_taraweeh': 'صليت التراويح',
       'ramadan_prepare': 'استعد: خطط لقراءة القرآن والدعاء والصدقة.',
       'ramadan_sehri_reminder_title': 'ينتهي السحور بعد 30 دقيقة',
-      'ramadan_sehri_reminder_body': 'ينتهي السحور الساعة {time}. لا تنسَ النية.',
+      'ramadan_sehri_reminder_body':
+          'ينتهي السحور الساعة {time}. لا تنسَ النية.',
       'ramadan_iftar_reminder_title': 'حان وقت الإفطار',
-      'ramadan_iftar_reminder_body': 'أفطر وادعُ، فللصائم عند فطره دعوة لا ترد.',
+      'ramadan_iftar_reminder_body':
+          'أفطر وادعُ، فللصائم عند فطره دعوة لا ترد.',
       'memorial_title': 'إيصال الثواب',
       'memorial_tool_subtitle': 'للأموات',
-      'memorial_sign_in': 'سجّل الدخول لإنشاء صفحة إيصال ثواب لعزيز أو الانضمام إليها.',
-      'memorial_intro': 'أنشئ صفحة لعزيز توفي وشاركها عبر واتساب. يمكن للأهل والأصدقاء أخذ أجزاء لإتمام ختمة، وقراءة الأذكار نحو أهداف مشتركة، وإضافة أعمال صالحة له.',
+      'memorial_sign_in':
+          'سجّل الدخول لإنشاء صفحة إيصال ثواب لعزيز أو الانضمام إليها.',
+      'memorial_intro':
+          'أنشئ صفحة لعزيز توفي وشاركها عبر واتساب. يمكن للأهل والأصدقاء أخذ أجزاء لإتمام ختمة، وقراءة الأذكار نحو أهداف مشتركة، وإضافة أعمال صالحة له.',
       'memorial_create': 'إنشاء صفحة',
       'memorial_join': 'الانضمام برمز',
       'memorial_none': 'لا توجد صفحات بعد. أنشئ صفحة أو انضم برمز أرسله أحدهم.',
@@ -683,7 +774,8 @@ class AppLocalizations {
       'memorial_death_date': 'تاريخ الوفاة',
       'memorial_optional': 'اختياري',
       'memorial_show_dates': 'عرض أيام الذكرى',
-      'memorial_show_dates_desc': 'اليوم الثالث والعاشر والأربعون والذكرى السنوية',
+      'memorial_show_dates_desc':
+          'اليوم الثالث والعاشر والأربعون والذكرى السنوية',
       'memorial_goals': 'أهداف الذكر',
       'memorial_goal': 'الهدف',
       'memorial_error_not_found': 'لا توجد صفحة بهذا الرمز.',
@@ -693,9 +785,11 @@ class AppLocalizations {
       'memorial_remove_from_list': 'إزالة من قائمتي',
       'memorial_created_hint': 'تم إنشاء الصفحة. شاركها مع الأهل والأصدقاء.',
       'memorial_share': 'مشاركة',
-      'memorial_share_text': 'شارك في إيصال الثواب إلى {name}. اقرأ جزءًا من القرآن أو اذكر الله له في تطبيق Barakah Time.\n\nالرمز: {code}\n\nحمّل التطبيق: {link}',
+      'memorial_share_text':
+          'شارك في إيصال الثواب إلى {name}. اقرأ جزءًا من القرآن أو اذكر الله له في تطبيق Barakah Time.\n\nالرمز: {code}\n\nحمّل التطبيق: {link}',
       'memorial_para': 'الجزء {n}',
-      'memorial_take_para_confirm': 'ستقرأ هذا الجزء للمتوفى، وسيرى الآخرون أنك أخذته.',
+      'memorial_take_para_confirm':
+          'ستقرأ هذا الجزء للمتوفى، وسيرى الآخرون أنك أخذته.',
       'memorial_take_para': 'خذ هذا الجزء',
       'memorial_para_read_by': 'قرأ {name} الجزء {n}',
       'memorial_para_taken_by': 'يقرأ {name} الجزء {n}',
@@ -707,7 +801,8 @@ class AppLocalizations {
       'memorial_how_many': 'كم مرة؟',
       'memorial_added': 'تمت الإضافة. جزاك الله خيرًا.',
       'memorial_delete': 'حذف الصفحة',
-      'memorial_delete_confirm': 'سيتم حذف الصفحة للجميع مع كل التقدم. لا يمكن التراجع.',
+      'memorial_delete_confirm':
+          'سيتم حذف الصفحة للجميع مع كل التقدم. لا يمكن التراجع.',
       'memorial_add_deed': 'أضف عملًا صالحًا أو دعاء',
       'memorial_deed_hint': 'مثلًا: أطعمت 10 أشخاص، أو دعاء له',
       'memorial_dates': 'أيام الذكرى',
@@ -732,7 +827,8 @@ class AppLocalizations {
       'memorial_day40': 'اليوم الأربعون',
       'memorial_barsi': 'الذكرى السنوية',
       'memorial_reminder_title': '{day} لـ {name}',
-      'memorial_reminder_body': 'اذكر {name} اليوم بالقرآن أو الدعاء أو الصدقة.',
+      'memorial_reminder_body':
+          'اذكر {name} اليوم بالقرآن أو الدعاء أو الصدقة.',
       'dhikr_kareema': 'الآية الكريمة',
       'dhikr_darood': 'الصلاة على النبي ﷺ',
       'dhikr_kalma': 'كلمة التوحيد',
@@ -744,13 +840,16 @@ class AppLocalizations {
       'promise_no_ads': 'بلا إعلانات أبدًا',
       'promise_no_sell': 'لا نبيع بياناتك ولا نشاركها أبدًا',
       'promise_no_tracking': 'بلا أدوات تتبع أو تحليلات',
-      'promise_location': 'يُستخدم موقعك فقط لمواقيت الصلاة والقبلة والمساجد القريبة',
+      'promise_location':
+          'يُستخدم موقعك فقط لمواقيت الصلاة والقبلة والمساجد القريبة',
       'onboarding_privacy_title': 'بلا إعلانات. بياناتك ملكك.',
-      'onboarding_privacy_desc': 'لا يحتوي Barakah Time على إعلانات أو أدوات تتبع، ولا نبيع بياناتك أبدًا. عبادتك بينك وبين الله.',
+      'onboarding_privacy_desc':
+          'لا يحتوي Barakah Time على إعلانات أو أدوات تتبع، ولا نبيع بياناتك أبدًا. عبادتك بينك وبين الله.',
       'qaza_tracker': 'متتبع القضاء',
       'witr': 'الوتر',
       'qaza_intro_title': 'اقضِ الصلوات الفائتة',
-      'qaza_intro_body': 'قدّر عدد الصلوات التي فاتتك، ثم اقضها واحدة تلو الأخرى. يُحفظ تقدمك ويُزامن مع حسابك.',
+      'qaza_intro_body':
+          'قدّر عدد الصلوات التي فاتتك، ثم اقضها واحدة تلو الأخرى. يُحفظ تقدمك ويُزامن مع حسابك.',
       'qaza_calculate': 'تقدير الصلوات الفائتة',
       'qaza_enter_manually': 'إدخال الأعداد يدويًا',
       'qaza_remaining': 'المتبقي',
@@ -764,22 +863,28 @@ class AppLocalizations {
       'qaza_months': 'أشهر',
       'qaza_days': 'أيام',
       'qaza_include_witr': 'تضمين الوتر (الحنفي)',
-      'qaza_calc_desc': 'كم من الوقت فاتتك الصلوات؟ مثلًا من البلوغ حتى بدأت المحافظة على الصلاة.',
+      'qaza_calc_desc':
+          'كم من الوقت فاتتك الصلوات؟ مثلًا من البلوغ حتى بدأت المحافظة على الصلاة.',
       'qaza_calc_result': 'يضيف {n} من كل صلاة',
-      'qaza_estimate_note': 'تُحسب السنة 365 يومًا احتياطًا. اسأل عالمًا إن لم تكن متأكدًا.',
+      'qaza_estimate_note':
+          'تُحسب السنة 365 يومًا احتياطًا. اسأل عالمًا إن لم تكن متأكدًا.',
       'qaza_add': 'إضافة إلى المتتبع',
       'qaza_reset': 'إعادة تعيين المتتبع',
-      'qaza_reset_confirm': 'سيؤدي هذا إلى مسح جميع الأعداد والتقدم. لا يمكن التراجع.',
+      'qaza_reset_confirm':
+          'سيؤدي هذا إلى مسح جميع الأعداد والتقدم. لا يمكن التراجع.',
       'qaza_all_done': 'تم قضاء جميع الصلوات. الحمد لله!',
       'qaza_tool_subtitle': 'الصلوات الفائتة',
       // Auth / onboarding / profile / settings / about pages
       'app_tagline': 'اجعل البركة في وقتك',
       'onboarding_pulse_title': 'النبض الروحي',
-      'onboarding_pulse_desc': 'تابع استمرارك الروحي وابنِ عادات دائمة. ابقَ متصلاً وثابتاً.',
+      'onboarding_pulse_desc':
+          'تابع استمرارك الروحي وابنِ عادات دائمة. ابقَ متصلاً وثابتاً.',
       'onboarding_prayer_title': 'لا تفوّت أي صلاة',
-      'onboarding_prayer_desc': 'مواقيت صلاة دقيقة وعدّ تنازلي مباشر وتذكيرات مخصّصة لموقعك.',
+      'onboarding_prayer_desc':
+          'مواقيت صلاة دقيقة وعدّ تنازلي مباشر وتذكيرات مخصّصة لموقعك.',
       'onboarding_inspiration_title': 'إلهام يومي',
-      'onboarding_inspiration_desc': 'اعثر على السكينة مع آيات يومية وأسماء الله الحسنى والأدعية والمزيد لروحك.',
+      'onboarding_inspiration_desc':
+          'اعثر على السكينة مع آيات يومية وأسماء الله الحسنى والأدعية والمزيد لروحك.',
       'onboarding_next': 'التالي',
       'onboarding_get_started': 'ابدأ الآن',
       'auth_welcome_back': 'مرحباً بعودتك',
@@ -795,12 +900,14 @@ class AppLocalizations {
       'auth_full_name': 'الاسم الكامل',
       'auth_register': 'تسجيل',
       'auth_have_account': 'لديك حساب بالفعل؟',
-      'auth_account_created_verify': 'تم إنشاء الحساب! أرسلنا رابط التحقق إلى {email}.',
+      'auth_account_created_verify':
+          'تم إنشاء الحساب! أرسلنا رابط التحقق إلى {email}.',
       'profile_saved_verses': 'الآيات المحفوظة',
       'profile_saved_count': '{n} محفوظة',
       'profile_activity_history': 'سجل النشاط',
       'profile_last_activity': 'آخر نشاط: {activity}',
-      'profile_no_saved_verses': 'لا توجد آيات محفوظة بعد. اضغط على علامة الحفظ بجانب أي آية لحفظها هنا.',
+      'profile_no_saved_verses':
+          'لا توجد آيات محفوظة بعد. اضغط على علامة الحفظ بجانب أي آية لحفظها هنا.',
       'profile_remove_verse': 'إزالة من المحفوظات',
       'profile_undo': 'تراجع',
       'profile_change_photo': 'تغيير الصورة',
@@ -813,11 +920,13 @@ class AppLocalizations {
       'settings_support_us': 'ادعم عملنا',
       'settings_version': 'الإصدار {v}',
       'about_title': 'حول وقت البركة',
-      'about_description': 'رفيق إسلامي لمواقيت الصلاة والقرآن والذكر والنمو الروحي اليومي، صُمّم ليجلب البركة إلى وقتك.',
+      'about_description':
+          'رفيق إسلامي لمواقيت الصلاة والقرآن والذكر والنمو الروحي اليومي، صُمّم ليجلب البركة إلى وقتك.',
       'about_credits': 'الشكر ومصادر البيانات',
       'about_quran_data': 'نص القرآن والترجمات والتلاوات',
       'about_map_data': 'بيانات الخرائط والأماكن',
-      'about_map_license': '© المساهمون في OpenStreetMap، متاحة بموجب رخصة قاعدة البيانات المفتوحة (ODbL)',
+      'about_map_license':
+          '© المساهمون في OpenStreetMap، متاحة بموجب رخصة قاعدة البيانات المفتوحة (ODbL)',
       'about_prayer_calc': 'حساب مواقيت الصلاة',
       'about_prayer_calc_source': 'مكتبة adhan (مفتوحة المصدر)',
       'about_privacy': 'سياسة الخصوصية',
@@ -891,8 +1000,10 @@ class AppLocalizations {
       'all_tools': 'جميع الأدوات',
       'ayah': 'آية',
       'ayahs': 'آيات',
-      'calibrate_compass': 'إذا بدا الاتجاه خاطئًا، حرّك هاتفك على شكل الرقم 8 لمعايرة البوصلة.',
-      'compass_unavailable': 'البوصلة غير متوفرة على هذا الجهاز — اتجه إلى الشمال ثم استدر بالزاوية الموضحة.',
+      'calibrate_compass':
+          'إذا بدا الاتجاه خاطئًا، حرّك هاتفك على شكل الرقم 8 لمعايرة البوصلة.',
+      'compass_unavailable':
+          'البوصلة غير متوفرة على هذا الجهاز — اتجه إلى الشمال ثم استدر بالزاوية الموضحة.',
       'could_not_open_maps': 'تعذّر فتح الخرائط',
       'degrees_from_north': '{deg}° من الشمال',
       'detecting_location': 'جارٍ تحديد الموقع...',
@@ -901,9 +1012,11 @@ class AppLocalizations {
       'finding_mosques': 'جارٍ البحث عن المساجد القريبة...',
       'in_days': 'بعد {n} يوم',
       'listen_translation': 'استمع إلى الترجمة',
-      'location_error_message': 'تعذّر تحديد موقعك. فعّل خدمات الموقع والإذن ثم حاول مرة أخرى.',
+      'location_error_message':
+          'تعذّر تحديد موقعك. فعّل خدمات الموقع والإذن ثم حاول مرة أخرى.',
       'mark_as_read': 'تحديد كمقروءة',
-      'mosques_load_error': 'تعذّر تحميل المساجد القريبة. تحقق من اتصالك بالإنترنت.',
+      'mosques_load_error':
+          'تعذّر تحميل المساجد القريبة. تحقق من اتصالك بالإنترنت.',
       'no_mosques_match': 'لا توجد مساجد مطابقة لبحثك',
       'no_mosques_nearby': 'لم يتم العثور على مساجد ضمن 5 كم',
       'now_playing': 'قيد التشغيل',
@@ -911,13 +1024,16 @@ class AppLocalizations {
       'pause': 'إيقاف مؤقت',
       'play': 'تشغيل',
       'play_surah': 'تشغيل السورة',
-      'quran_load_error': 'تعذّر تحميل القرآن. تحقق من اتصالك بالإنترنت وحاول مرة أخرى.',
-      'reset_counter_message': 'سيعود العداد إلى 0. سيتم حفظ ذكرك حتى الآن في النبض الروحي.',
+      'quran_load_error':
+          'تعذّر تحميل القرآن. تحقق من اتصالك بالإنترنت وحاول مرة أخرى.',
+      'reset_counter_message':
+          'سيعود العداد إلى 0. سيتم حفظ ذكرك حتى الآن في النبض الروحي.',
       'reset_counter_title': 'إعادة ضبط العداد؟',
       'share': 'مشاركة',
       'stop': 'إيقاف',
       'surah_already_logged_today': 'تم التسجيل اليوم بالفعل ✓',
-      'surah_load_error': 'تعذّر تحميل هذه السورة. تحقق من اتصالك بالإنترنت وحاول مرة أخرى.',
+      'surah_load_error':
+          'تعذّر تحميل هذه السورة. تحقق من اتصالك بالإنترنت وحاول مرة أخرى.',
       'surah_logged': 'تم تسجيل سورة {name}! ✨',
       'today': 'اليوم',
       'tomorrow': 'غدًا',
@@ -952,21 +1068,26 @@ class AppLocalizations {
       'err_email_in_use': 'يوجد حساب بهذا البريد الإلكتروني بالفعل.',
       'err_network': 'خطأ في الشبكة. تحقق من اتصالك.',
       'err_too_many_requests': 'محاولات كثيرة جداً. حاول لاحقاً.',
-      'err_recent_login': 'لأسباب أمنية، يرجى تسجيل الخروج ثم الدخول مجدداً قبل تغيير بريدك الإلكتروني.',
+      'err_recent_login':
+          'لأسباب أمنية، يرجى تسجيل الخروج ثم الدخول مجدداً قبل تغيير بريدك الإلكتروني.',
       'err_upload_failed': 'فشل رفع الصورة. حاول مرة أخرى.',
       'err_profile_update_failed': 'فشل تحديث الملف الشخصي. حاول مرة أخرى.',
       'err_google_failed': 'فشل تسجيل الدخول عبر Google. حاول مرة أخرى.',
       'profile_updated': 'تم تحديث الملف الشخصي.',
       'photo_updated': 'تم تحديث صورة الملف الشخصي.',
-      'verification_email_sent': 'تم إرسال رابط تحقق إلى بريدك الجديد. سيتم تحديث بريدك بعد التأكيد.',
+      'verification_email_sent':
+          'تم إرسال رابط تحقق إلى بريدك الجديد. سيتم تحديث بريدك بعد التأكيد.',
       'forgot_password': 'نسيت كلمة المرور؟',
       'reset_password': 'إعادة تعيين كلمة المرور',
-      'reset_password_hint': 'أدخل بريدك الإلكتروني وسنرسل لك رابطاً لإعادة تعيين كلمة المرور.',
+      'reset_password_hint':
+          'أدخل بريدك الإلكتروني وسنرسل لك رابطاً لإعادة تعيين كلمة المرور.',
       'send_link': 'إرسال الرابط',
-      'reset_email_sent': 'تم إرسال رسالة إعادة تعيين كلمة المرور. تحقق من بريدك.',
+      'reset_email_sent':
+          'تم إرسال رسالة إعادة تعيين كلمة المرور. تحقق من بريدك.',
       'email': 'البريد الإلكتروني',
       'name': 'الاسم',
-      'photo_permission_denied': 'تم رفض الوصول إلى الصور. يرجى السماح بالوصول من إعدادات الجهاز.',
+      'photo_permission_denied':
+          'تم رفض الوصول إلى الصور. يرجى السماح بالوصول من إعدادات الجهاز.',
       'photo_pick_failed': 'تعذر فتح الصور. حاول مرة أخرى.',
       'member_since': 'عضو منذ',
       'my_profile': 'ملفي الشخصي',
@@ -982,7 +1103,8 @@ class AppLocalizations {
       'rate_now': 'قيّم الآن',
       'later': 'لاحقاً',
       'rate_us_message': 'إذا أعجبك تطبيق بركة تايم، يرجى تقييمنا! ✨',
-      'app_store_coming_soon': 'بركة تايم سيتوفر قريباً على App Store. شكراً لدعمك!',
+      'app_store_coming_soon':
+          'بركة تايم سيتوفر قريباً على App Store. شكراً لدعمك!',
       'store_open_failed': 'تعذر فتح المتجر. حاول لاحقاً.',
       'close': 'إغلاق',
       'skip': 'تخطي',
@@ -1097,10 +1219,13 @@ class AppLocalizations {
       'note': 'ملاحظة',
       'sunrise': 'الشروق',
       'tomorrow_fajr': 'فجر الغد',
-      'location_not_found': 'تعذر العثور على "{city}". جرّب تهجئة أخرى أو أضف اسم الدولة.',
+      'location_not_found':
+          'تعذر العثور على "{city}". جرّب تهجئة أخرى أو أضف اسم الدولة.',
       'location_services_disabled': 'خدمات الموقع متوقفة',
-      'location_permission_denied': 'نحتاج إذن الموقع لعرض أوقات الصلاة في مكانك.',
-      'location_permission_denied_forever': 'إذن الموقع محظور. فعّله من إعدادات التطبيق أو حدّد المدينة يدويًا.',
+      'location_permission_denied':
+          'نحتاج إذن الموقع لعرض أوقات الصلاة في مكانك.',
+      'location_permission_denied_forever':
+          'إذن الموقع محظور. فعّله من إعدادات التطبيق أو حدّد المدينة يدويًا.',
       'location_timeout': 'تعذر تحديد موقعك في الوقت المناسب.',
       'location_access_required': 'مطلوب الوصول إلى الموقع',
       'open_settings': 'فتح الإعدادات',
@@ -1132,7 +1257,8 @@ class AppLocalizations {
       'badge_points_1000_desc': 'جمعت ١٠٠٠ نقطة إجمالًا',
       'no_badges_yet': 'استمر في استخدام التطبيق لتحصل على الأوسمة!',
       'badges_earned': '{n} أوسمة مكتسبة',
-      'motivation_achieved': 'ما شاء الله! لقد حققت أهدافك الروحية لهذا اليوم. ✨',
+      'motivation_achieved':
+          'ما شاء الله! لقد حققت أهدافك الروحية لهذا اليوم. ✨',
       'motivation_almost': 'تقدّم رائع! بقي القليل لتبلغ هدفك. 🚀',
       'motivation_halfway': 'أنت في منتصف الطريق! حافظ على همّتك. 💪',
       'motivation_started': 'بداية طيبة! واصل التقدّم نحو أهدافك. ⚡',
@@ -1153,23 +1279,30 @@ class AppLocalizations {
       'default_user_name': 'مستخدم بركة',
       'sign_in_with_apple': 'تسجيل الدخول باستخدام Apple',
       'continue_as_guest': 'المتابعة كضيف',
-      'guest_mode_notice': 'أنت تستخدم التطبيق كضيف. سجّل الدخول لحفظ تقدّمك واستخدامه على أجهزة أخرى.',
+      'guest_mode_notice':
+          'أنت تستخدم التطبيق كضيف. سجّل الدخول لحفظ تقدّمك واستخدامه على أجهزة أخرى.',
       'sign_in_to_sync': 'سجّل الدخول للمزامنة',
-      'auth_unavailable_notice': 'تسجيل الدخول غير متاح حاليًا. يمكنك متابعة استخدام التطبيق وستبقى بياناتك على هذا الجهاز.',
-      'err_auth_unavailable': 'تسجيل الدخول غير متاح حاليًا. تحقّق من اتصالك وأعد تشغيل التطبيق.',
+      'auth_unavailable_notice':
+          'تسجيل الدخول غير متاح حاليًا. يمكنك متابعة استخدام التطبيق وستبقى بياناتك على هذا الجهاز.',
+      'err_auth_unavailable':
+          'تسجيل الدخول غير متاح حاليًا. تحقّق من اتصالك وأعد تشغيل التطبيق.',
       'err_apple_failed': 'فشل تسجيل الدخول باستخدام Apple. حاول مرة أخرى.',
       'err_user_disabled': 'تم تعطيل هذا الحساب.',
-      'err_account_exists_different_provider': 'يوجد حساب بهذا البريد بطريقة تسجيل دخول مختلفة.',
+      'err_account_exists_different_provider':
+          'يوجد حساب بهذا البريد بطريقة تسجيل دخول مختلفة.',
       'err_user_mismatch': 'يرجى تسجيل الدخول بالحساب نفسه الذي تريد حذفه.',
       'session_expired': 'تم تسجيل خروجك. يرجى تسجيل الدخول مرة أخرى.',
-      'email_not_verified': 'لم يتم التحقق من بريدك بعد. تحقّق من صندوق الوارد لرابط التحقق.',
+      'email_not_verified':
+          'لم يتم التحقق من بريدك بعد. تحقّق من صندوق الوارد لرابط التحقق.',
       'resend_verification': 'إعادة إرسال رسالة التحقق',
       'verification_link_resent': 'تم إرسال رسالة التحقق. تحقّق من بريدك.',
       'delete_account': 'حذف الحساب',
       'delete_confirm_word': 'حذف',
       'delete_account_confirm_title': 'حذف حسابك؟',
-      'delete_account_confirm_message': 'سيؤدي هذا إلى حذف حسابك وتقدّمك وأوسمتك والآيات المحفوظة وصورتك نهائيًا. لا يمكن التراجع عن ذلك.',
-      'reauth_required_delete': 'لأسباب أمنية، يرجى تأكيد تسجيل دخولك لحذف حسابك.',
+      'delete_account_confirm_message':
+          'سيؤدي هذا إلى حذف حسابك وتقدّمك وأوسمتك والآيات المحفوظة وصورتك نهائيًا. لا يمكن التراجع عن ذلك.',
+      'reauth_required_delete':
+          'لأسباب أمنية، يرجى تأكيد تسجيل دخولك لحذف حسابك.',
       'confirm_with_password': 'أدخل كلمة المرور للمتابعة',
       'confirm_with_provider': 'التأكيد عبر {provider}',
       'account_deleted': 'تم حذف حسابك.',
@@ -1178,8 +1311,20 @@ class AppLocalizations {
       'longest_streak': 'أطول سلسلة',
       'adhan_sound': 'صوت الأذان',
       'adhan_sound_desc': 'تشغيل الأذان مع تذكيرات الصلاة',
-      'exact_alarms_hint': 'اسمح بـ"المنبّهات والتذكيرات" لتصل تذكيرات الصلاة في وقتها تمامًا.',
-      'notifications_permission_revoked': 'تم إيقاف إذن الإشعارات من إعدادات النظام، لذا عُطّلت تذكيرات الصلاة.',
+      'adjust_times': 'ضبط أوقات الصلاة',
+      'app_theme': 'المظهر',
+      'theme_system': 'حسب النظام',
+      'theme_light': 'فاتح',
+      'theme_dark': 'داكن',
+      'adjust_times_desc': 'قدّم أو أخّر كل صلاة لتطابق مسجدك',
+      'adjust_times_none': 'بدون تغيير',
+      'minutes_short': '{n} د',
+      'adjust_times_note':
+          'تُزاح الأوقات عن الوقت المحسوب. استخدم هذا فقط إذا كان مسجدك المحلي مختلفاً.',
+      'exact_alarms_hint':
+          'اسمح بـ"المنبّهات والتذكيرات" لتصل تذكيرات الصلاة في وقتها تمامًا.',
+      'notifications_permission_revoked':
+          'تم إيقاف إذن الإشعارات من إعدادات النظام، لذا عُطّلت تذكيرات الصلاة.',
       'good_morning': 'صباح الخير',
       'good_afternoon': 'طاب يومك',
       'good_evening': 'مساء الخير',
@@ -1202,13 +1347,15 @@ class AppLocalizations {
       'more': 'المزيد',
       'read_full_ayah': 'اقرأ الآية كاملة',
       'shared_from_app': 'تمت المشاركة من تطبيق بركة تايم',
-      'pulse_share_text': 'تقدّمي في بركة تايم: سلسلة {streak} يوم و{points} نقطة هذا الأسبوع.',
+      'pulse_share_text':
+          'تقدّمي في بركة تايم: سلسلة {streak} يوم و{points} نقطة هذا الأسبوع.',
       'points_this_week': 'نقاط هذا الأسبوع',
       'current_streak': 'السلسلة الحالية',
       'day_streak_count': 'سلسلة {n} يوم',
       'weekday_points': '{day}: {n} نقطة',
       'recent_activity': 'النشاط الأخير',
-      'no_recent_activity': 'لا يوجد نشاط بعد. سجّل صلاة أو اقرأ القرآن أو اذكر الله لتبدأ.',
+      'no_recent_activity':
+          'لا يوجد نشاط بعد. سجّل صلاة أو اقرأ القرآن أو اذكر الله لتبدأ.',
       'activity_prayer': 'صلاة {prayer}',
       'activity_quran': 'قراءة القرآن',
       'activity_dhikr': 'ذكر',
@@ -1231,20 +1378,25 @@ class AppLocalizations {
       'pulse_today': 'امروز',
       'pulse_today_prayers': 'نمازهای امروز',
       'badge_locked': 'قفل',
-      'audio_error_voice_missing': "گوشی صدای این زبان را ندارد. آن را از تنظیمات ← تبدیل متن به گفتار نصب کنید.",
+      'audio_error_voice_missing':
+          "گوشی صدای این زبان را ندارد. آن را از تنظیمات ← تبدیل متن به گفتار نصب کنید.",
       'quran_translation_language': 'زبان ترجمه',
       'quran_translation_same_as_app': 'همان زبان برنامه',
-      'quran_translation_audio_note': 'ترجمه‌های اردو، انگلیسی، فارسی و ترکی با صدای یک قاری خوانده می‌شود.',
+      'quran_translation_audio_note':
+          'ترجمه‌های اردو، انگلیسی، فارسی و ترکی با صدای یک قاری خوانده می‌شود.',
       'audio_error_play': 'پخش صدا ممکن نشد. اتصال خود را بررسی کنید.',
       'audio_error_speech': 'پخش گفتار ناموفق بود',
       'name_too_long': 'نام باید حداکثر ۱۰۰ نویسه باشد',
-      'reminders_need_notifications': 'ابتدا اعلان‌های نماز را در تنظیمات روشن کنید.',
+      'reminders_need_notifications':
+          'ابتدا اعلان‌های نماز را در تنظیمات روشن کنید.',
       'ramadan_title': 'رمضان',
       'ramadan_day_of': 'روز {day} از {len}',
       'ramadan_starts_in': '{n} روز تا شروع',
-      'ramadan_qadr_tonight': 'امشب ممکن است شب قدر باشد. آن را با عبادت و دعا بگذرانید.',
+      'ramadan_qadr_tonight':
+          'امشب ممکن است شب قدر باشد. آن را با عبادت و دعا بگذرانید.',
       'ramadan_moon_adjust': 'تنظیم رؤیت هلال (روز)',
-      'ramadan_need_location': 'برای دیدن زمان سحر و افطار، اوقات نماز را بارگیری کنید.',
+      'ramadan_need_location':
+          'برای دیدن زمان سحر و افطار، اوقات نماز را بارگیری کنید.',
       'ramadan_sehri_ends_in': 'پایان سحر تا',
       'ramadan_iftar_in': 'افطار تا',
       'ramadan_sehri_ends': 'پایان سحر',
@@ -1253,34 +1405,44 @@ class AppLocalizations {
       'ramadan_reminders_desc': '۳۰ دقیقه پیش از پایان سحر، و هنگام افطار',
       'ramadan_duas': 'دعاهای رمضان',
       'ramadan_sehri_niyyah': 'نیت روزه (سحر)',
-      'ramadan_sehri_niyyah_meaning': 'نیت می‌کنم روزه فردا از ماه رمضان را بگیرم.',
+      'ramadan_sehri_niyyah_meaning':
+          'نیت می‌کنم روزه فردا از ماه رمضان را بگیرم.',
       'ramadan_iftar_dua': 'دعای افطار',
-      'ramadan_iftar_dua_meaning': 'خدایا برای تو روزه گرفتم، به تو ایمان آوردم، بر تو توکل کردم و با روزی تو افطار کردم.',
+      'ramadan_iftar_dua_meaning':
+          'خدایا برای تو روزه گرفتم، به تو ایمان آوردم، بر تو توکل کردم و با روزی تو افطار کردم.',
       'ramadan_iftar_dua2': 'پس از افطار',
-      'ramadan_iftar_dua2_meaning': 'تشنگی رفت، رگ‌ها تر شد و پاداش ثابت شد، اگر خدا بخواهد. (ابوداود)',
+      'ramadan_iftar_dua2_meaning':
+          'تشنگی رفت، رگ‌ها تر شد و پاداش ثابت شد، اگر خدا بخواهد. (ابوداود)',
       'ramadan_qadr_dua': 'دعای شب قدر',
-      'ramadan_qadr_dua_meaning': 'خدایا تو بخشنده‌ای و بخشش را دوست داری، پس مرا ببخش. (ترمذی)',
+      'ramadan_qadr_dua_meaning':
+          'خدایا تو بخشنده‌ای و بخشش را دوست داری، پس مرا ببخش. (ترمذی)',
       'ramadan_log': 'ثبت روزه‌ها',
       'ramadan_fasted': 'روزه گرفتم',
       'ramadan_missed': 'قضا',
       'ramadan_taraweeh': 'تراویح',
-      'ramadan_log_hint': 'برای ثبت روزه و تراویح روی روز بزنید. ستاره‌ها شب‌های فرد دهه آخر هستند.',
+      'ramadan_log_hint':
+          'برای ثبت روزه و تراویح روی روز بزنید. ستاره‌ها شب‌های فرد دهه آخر هستند.',
       'ramadan_qaza_fasts': '{n} روزه قضا',
       'ramadan_day': 'روز',
       'ramadan_not_set': 'پاک کردن',
       'ramadan_prayed_taraweeh': 'تراویح خواندم',
       'ramadan_prepare': 'آماده شوید: برای قرآن، دعا و صدقه برنامه بریزید.',
       'ramadan_sehri_reminder_title': 'سحر ۳۰ دقیقه دیگر تمام می‌شود',
-      'ramadan_sehri_reminder_body': 'سحر ساعت {time} تمام می‌شود. نیت را فراموش نکنید.',
+      'ramadan_sehri_reminder_body':
+          'سحر ساعت {time} تمام می‌شود. نیت را فراموش نکنید.',
       'ramadan_iftar_reminder_title': 'وقت افطار است',
-      'ramadan_iftar_reminder_body': 'روزه را باز کنید و دعا کنید؛ دعای روزه‌دار هنگام افطار رد نمی‌شود.',
+      'ramadan_iftar_reminder_body':
+          'روزه را باز کنید و دعا کنید؛ دعای روزه‌دار هنگام افطار رد نمی‌شود.',
       'memorial_title': 'ایصال ثواب',
       'memorial_tool_subtitle': 'برای درگذشتگان',
-      'memorial_sign_in': 'برای ساختن یا پیوستن به صفحه ایصال ثواب یک عزیز وارد شوید.',
-      'memorial_intro': 'برای عزیزی که درگذشته صفحه‌ای بسازید و در واتس‌اپ به اشتراک بگذارید. خانواده و دوستان می‌توانند جزء بگیرند تا ختم قرآن کامل شود، برای اهداف مشترک ذکر بگویند و کارهای نیک برایش ثبت کنند.',
+      'memorial_sign_in':
+          'برای ساختن یا پیوستن به صفحه ایصال ثواب یک عزیز وارد شوید.',
+      'memorial_intro':
+          'برای عزیزی که درگذشته صفحه‌ای بسازید و در واتس‌اپ به اشتراک بگذارید. خانواده و دوستان می‌توانند جزء بگیرند تا ختم قرآن کامل شود، برای اهداف مشترک ذکر بگویند و کارهای نیک برایش ثبت کنند.',
       'memorial_create': 'ساختن صفحه',
       'memorial_join': 'پیوستن با کد',
-      'memorial_none': 'هنوز صفحه‌ای نیست. یکی بسازید یا با کدی که برایتان فرستاده‌اند بپیوندید.',
+      'memorial_none':
+          'هنوز صفحه‌ای نیست. یکی بسازید یا با کدی که برایتان فرستاده‌اند بپیوندید.',
       'memorial_you_created': 'ساخته شما',
       'memorial_joined': 'عضو',
       'memorial_code_invalid': 'کد ۸ حرفی را وارد کنید',
@@ -1297,15 +1459,20 @@ class AppLocalizations {
       'memorial_goals': 'اهداف ذکر',
       'memorial_goal': 'هدف',
       'memorial_error_not_found': 'صفحه‌ای با این کد پیدا نشد.',
-      'memorial_error_para_taken': 'کسی همین الان این جزء را گرفت. جزء دیگری انتخاب کنید.',
-      'memorial_error_generic': 'مشکلی پیش آمد. اینترنت را بررسی کنید و دوباره تلاش کنید.',
+      'memorial_error_para_taken':
+          'کسی همین الان این جزء را گرفت. جزء دیگری انتخاب کنید.',
+      'memorial_error_generic':
+          'مشکلی پیش آمد. اینترنت را بررسی کنید و دوباره تلاش کنید.',
       'memorial_deleted': 'این صفحه حذف شده است.',
       'memorial_remove_from_list': 'حذف از فهرست من',
-      'memorial_created_hint': 'صفحه ساخته شد. آن را با خانواده و دوستان به اشتراک بگذارید.',
+      'memorial_created_hint':
+          'صفحه ساخته شد. آن را با خانواده و دوستان به اشتراک بگذارید.',
       'memorial_share': 'اشتراک',
-      'memorial_share_text': 'در ایصال ثواب برای {name} شرکت کنید. در برنامه Barakah Time یک جزء قرآن بخوانید یا برایش ذکر بگویید.\n\nکد: {code}\n\nدریافت برنامه: {link}',
+      'memorial_share_text':
+          'در ایصال ثواب برای {name} شرکت کنید. در برنامه Barakah Time یک جزء قرآن بخوانید یا برایش ذکر بگویید.\n\nکد: {code}\n\nدریافت برنامه: {link}',
       'memorial_para': 'جزء {n}',
-      'memorial_take_para_confirm': 'این جزء را برای درگذشته می‌خوانید. دیگران می‌بینند که شما آن را گرفته‌اید.',
+      'memorial_take_para_confirm':
+          'این جزء را برای درگذشته می‌خوانید. دیگران می‌بینند که شما آن را گرفته‌اید.',
       'memorial_take_para': 'گرفتن این جزء',
       'memorial_para_read_by': 'جزء {n} را {name} خواند',
       'memorial_para_taken_by': 'جزء {n} را {name} می‌خواند',
@@ -1317,7 +1484,8 @@ class AppLocalizations {
       'memorial_how_many': 'چند بار؟',
       'memorial_added': 'افزوده شد. جزاک الله خیر.',
       'memorial_delete': 'حذف صفحه',
-      'memorial_delete_confirm': 'این صفحه برای همه با تمام پیشرفت حذف می‌شود. قابل بازگشت نیست.',
+      'memorial_delete_confirm':
+          'این صفحه برای همه با تمام پیشرفت حذف می‌شود. قابل بازگشت نیست.',
       'memorial_add_deed': 'افزودن کار نیک یا دعا',
       'memorial_deed_hint': 'مثلاً به ۱۰ نفر غذا دادم، یا دعایی برایش',
       'memorial_dates': 'روزهای یادبود',
@@ -1326,7 +1494,8 @@ class AppLocalizations {
       'memorial_invite': 'دعوت',
       'memorial_khatam_n': 'ختم {n}',
       'memorial_khatams_completed': '{n} ختم کامل شد',
-      'memorial_khatam_hint': 'روی یک جزء آزاد بزنید تا آن را برای درگذشته بخوانید.',
+      'memorial_khatam_hint':
+          'روی یک جزء آزاد بزنید تا آن را برای درگذشته بخوانید.',
       'memorial_free': 'آزاد',
       'memorial_yours': 'مال شما',
       'memorial_taken': 'گرفته‌شده',
@@ -1342,7 +1511,8 @@ class AppLocalizations {
       'memorial_day40': 'چهلم',
       'memorial_barsi': 'سالگرد',
       'memorial_reminder_title': '{day} {name}',
-      'memorial_reminder_body': 'امروز {name} را با قرآن، دعا یا صدقه یاد کنید.',
+      'memorial_reminder_body':
+          'امروز {name} را با قرآن، دعا یا صدقه یاد کنید.',
       'dhikr_kareema': 'آیه کریمه',
       'dhikr_darood': 'صلوات',
       'dhikr_kalma': 'کلمه طیبه',
@@ -1352,15 +1522,19 @@ class AppLocalizations {
       'widget_empty': 'برای بارگیری اوقات نماز Barakah Time را باز کنید',
       'promise_title': 'تعهد ما',
       'promise_no_ads': 'هرگز تبلیغ نداریم',
-      'promise_no_sell': 'هرگز داده‌های شما را نمی‌فروشیم یا به اشتراک نمی‌گذاریم',
+      'promise_no_sell':
+          'هرگز داده‌های شما را نمی‌فروشیم یا به اشتراک نمی‌گذاریم',
       'promise_no_tracking': 'بدون ردیاب و تحلیل‌گر',
-      'promise_location': 'موقعیت شما فقط برای اوقات نماز، قبله و مساجد نزدیک استفاده می‌شود',
+      'promise_location':
+          'موقعیت شما فقط برای اوقات نماز، قبله و مساجد نزدیک استفاده می‌شود',
       'onboarding_privacy_title': 'بدون تبلیغ. داده‌های شما مال شماست.',
-      'onboarding_privacy_desc': 'Barakah Time تبلیغ و ردیاب ندارد و ما هرگز داده‌های شما را نمی‌فروشیم. عبادت شما میان شما و خداست.',
+      'onboarding_privacy_desc':
+          'Barakah Time تبلیغ و ردیاب ندارد و ما هرگز داده‌های شما را نمی‌فروشیم. عبادت شما میان شما و خداست.',
       'qaza_tracker': 'ردیاب نماز قضا',
       'witr': 'وتر',
       'qaza_intro_title': 'نمازهای قضا را جبران کنید',
-      'qaza_intro_body': 'تعداد نمازهای قضای خود را تخمین بزنید و یکی‌یکی آن‌ها را بخوانید. پیشرفت شما ذخیره و با حسابتان همگام می‌شود.',
+      'qaza_intro_body':
+          'تعداد نمازهای قضای خود را تخمین بزنید و یکی‌یکی آن‌ها را بخوانید. پیشرفت شما ذخیره و با حسابتان همگام می‌شود.',
       'qaza_calculate': 'تخمین نمازهای قضا',
       'qaza_enter_manually': 'وارد کردن دستی تعداد',
       'qaza_remaining': 'باقی‌مانده',
@@ -1374,22 +1548,28 @@ class AppLocalizations {
       'qaza_months': 'ماه',
       'qaza_days': 'روز',
       'qaza_include_witr': 'شامل وتر (حنفی)',
-      'qaza_calc_desc': 'چه مدت نماز نخوانده‌اید؟ مثلاً از بلوغ تا زمانی که نماز را مرتب شروع کردید.',
+      'qaza_calc_desc':
+          'چه مدت نماز نخوانده‌اید؟ مثلاً از بلوغ تا زمانی که نماز را مرتب شروع کردید.',
       'qaza_calc_result': '{n} از هر نماز اضافه می‌شود',
-      'qaza_estimate_note': 'برای احتیاط هر سال ۳۶۵ روز حساب می‌شود. اگر مطمئن نیستید از عالم دین بپرسید.',
+      'qaza_estimate_note':
+          'برای احتیاط هر سال ۳۶۵ روز حساب می‌شود. اگر مطمئن نیستید از عالم دین بپرسید.',
       'qaza_add': 'افزودن به ردیاب',
       'qaza_reset': 'بازنشانی ردیاب',
-      'qaza_reset_confirm': 'همه تعدادها و پیشرفت پاک می‌شود. قابل بازگشت نیست.',
+      'qaza_reset_confirm':
+          'همه تعدادها و پیشرفت پاک می‌شود. قابل بازگشت نیست.',
       'qaza_all_done': 'همه نمازهای قضا خوانده شد. الحمدلله!',
       'qaza_tool_subtitle': 'نمازهای قضا',
       // Auth / onboarding / profile / settings / about pages
       'app_tagline': 'برکت را به وقت خود بیاورید',
       'onboarding_pulse_title': 'نبض معنوی',
-      'onboarding_pulse_desc': 'پیوستگی معنوی خود را دنبال کنید و عادت‌های ماندگار بسازید. در ارتباط و پایدار بمانید.',
+      'onboarding_pulse_desc':
+          'پیوستگی معنوی خود را دنبال کنید و عادت‌های ماندگار بسازید. در ارتباط و پایدار بمانید.',
       'onboarding_prayer_title': 'هیچ نمازی را از دست ندهید',
-      'onboarding_prayer_desc': 'اوقات شرعی دقیق، شمارش معکوس زنده و یادآورهای متناسب با موقعیت شما.',
+      'onboarding_prayer_desc':
+          'اوقات شرعی دقیق، شمارش معکوس زنده و یادآورهای متناسب با موقعیت شما.',
       'onboarding_inspiration_title': 'الهام روزانه',
-      'onboarding_inspiration_desc': 'با آیات روزانه، اسماء الحسنی، دعاها و موارد بیشتر برای روحتان آرامش بیابید.',
+      'onboarding_inspiration_desc':
+          'با آیات روزانه، اسماء الحسنی، دعاها و موارد بیشتر برای روحتان آرامش بیابید.',
       'onboarding_next': 'بعدی',
       'onboarding_get_started': 'شروع کنید',
       'auth_welcome_back': 'خوش آمدید',
@@ -1405,12 +1585,14 @@ class AppLocalizations {
       'auth_full_name': 'نام کامل',
       'auth_register': 'ثبت‌نام',
       'auth_have_account': 'قبلاً حساب ساخته‌اید؟',
-      'auth_account_created_verify': 'حساب ایجاد شد! لینک تأیید به {email} ارسال شد.',
+      'auth_account_created_verify':
+          'حساب ایجاد شد! لینک تأیید به {email} ارسال شد.',
       'profile_saved_verses': 'آیات ذخیره‌شده',
       'profile_saved_count': '{n} ذخیره‌شده',
       'profile_activity_history': 'تاریخچه فعالیت',
       'profile_last_activity': 'آخرین: {activity}',
-      'profile_no_saved_verses': 'هنوز آیه‌ای ذخیره نشده. روی نشانک هر آیه بزنید تا اینجا ذخیره شود.',
+      'profile_no_saved_verses':
+          'هنوز آیه‌ای ذخیره نشده. روی نشانک هر آیه بزنید تا اینجا ذخیره شود.',
       'profile_remove_verse': 'حذف از ذخیره‌ها',
       'profile_undo': 'واگرد',
       'profile_change_photo': 'تغییر عکس',
@@ -1423,11 +1605,13 @@ class AppLocalizations {
       'settings_support_us': 'از کار ما حمایت کنید',
       'settings_version': 'نسخه {v}',
       'about_title': 'درباره وقت برکت',
-      'about_description': 'همراهی اسلامی برای اوقات نماز، قرآن، ذکر و رشد معنوی روزانه؛ طراحی‌شده تا به وقت شما برکت بدهد.',
+      'about_description':
+          'همراهی اسلامی برای اوقات نماز، قرآن، ذکر و رشد معنوی روزانه؛ طراحی‌شده تا به وقت شما برکت بدهد.',
       'about_credits': 'قدردانی و منابع داده',
       'about_quran_data': 'متن قرآن، ترجمه‌ها و صوت',
       'about_map_data': 'داده‌های نقشه و مکان',
-      'about_map_license': '© مشارکت‌کنندگان OpenStreetMap، تحت مجوز پایگاه داده باز (ODbL)',
+      'about_map_license':
+          '© مشارکت‌کنندگان OpenStreetMap، تحت مجوز پایگاه داده باز (ODbL)',
       'about_prayer_calc': 'محاسبه اوقات نماز',
       'about_prayer_calc_source': 'کتابخانه adhan (متن‌باز)',
       'about_privacy': 'سیاست حفظ حریم خصوصی',
@@ -1501,8 +1685,10 @@ class AppLocalizations {
       'all_tools': 'همه ابزارها',
       'ayah': 'آیه',
       'ayahs': 'آیه',
-      'calibrate_compass': 'اگر جهت اشتباه به نظر می‌رسد، گوشی را به شکل عدد ۸ حرکت دهید تا قطب‌نما کالیبره شود.',
-      'compass_unavailable': 'قطب‌نما در این دستگاه در دسترس نیست — رو به شمال بایستید و سپس به اندازه زاویه نشان‌داده‌شده بچرخید.',
+      'calibrate_compass':
+          'اگر جهت اشتباه به نظر می‌رسد، گوشی را به شکل عدد ۸ حرکت دهید تا قطب‌نما کالیبره شود.',
+      'compass_unavailable':
+          'قطب‌نما در این دستگاه در دسترس نیست — رو به شمال بایستید و سپس به اندازه زاویه نشان‌داده‌شده بچرخید.',
       'could_not_open_maps': 'باز کردن نقشه ممکن نشد',
       'degrees_from_north': '{deg}° از شمال',
       'detecting_location': 'در حال تشخیص موقعیت...',
@@ -1511,9 +1697,11 @@ class AppLocalizations {
       'finding_mosques': 'در حال یافتن مساجد نزدیک...',
       'in_days': '{n} روز دیگر',
       'listen_translation': 'گوش دادن به ترجمه',
-      'location_error_message': 'موقعیت شما دریافت نشد. سرویس موقعیت و مجوز را فعال کرده و دوباره تلاش کنید.',
+      'location_error_message':
+          'موقعیت شما دریافت نشد. سرویس موقعیت و مجوز را فعال کرده و دوباره تلاش کنید.',
       'mark_as_read': 'علامت‌گذاری به‌عنوان خوانده‌شده',
-      'mosques_load_error': 'بارگیری مساجد نزدیک ممکن نشد. اتصال اینترنت را بررسی کنید.',
+      'mosques_load_error':
+          'بارگیری مساجد نزدیک ممکن نشد. اتصال اینترنت را بررسی کنید.',
       'no_mosques_match': 'مسجدی مطابق جستجوی شما نیست',
       'no_mosques_nearby': 'مسجدی در شعاع ۵ کیلومتری یافت نشد',
       'now_playing': 'در حال پخش',
@@ -1521,13 +1709,16 @@ class AppLocalizations {
       'pause': 'توقف',
       'play': 'پخش',
       'play_surah': 'پخش سوره',
-      'quran_load_error': 'بارگیری قرآن ممکن نشد. اتصال اینترنت را بررسی و دوباره تلاش کنید.',
-      'reset_counter_message': 'شمارنده به ۰ برمی‌گردد. ذکرهای شما تا این لحظه در نبض معنوی ذخیره می‌شود.',
+      'quran_load_error':
+          'بارگیری قرآن ممکن نشد. اتصال اینترنت را بررسی و دوباره تلاش کنید.',
+      'reset_counter_message':
+          'شمارنده به ۰ برمی‌گردد. ذکرهای شما تا این لحظه در نبض معنوی ذخیره می‌شود.',
       'reset_counter_title': 'شمارنده بازنشانی شود؟',
       'share': 'اشتراک‌گذاری',
       'stop': 'توقف کامل',
       'surah_already_logged_today': 'امروز قبلاً ثبت شده است ✓',
-      'surah_load_error': 'بارگیری این سوره ممکن نشد. اتصال اینترنت را بررسی و دوباره تلاش کنید.',
+      'surah_load_error':
+          'بارگیری این سوره ممکن نشد. اتصال اینترنت را بررسی و دوباره تلاش کنید.',
       'surah_logged': 'سوره {name} ثبت شد! ✨',
       'today': 'امروز',
       'tomorrow': 'فردا',
@@ -1542,7 +1733,8 @@ class AppLocalizations {
       'zakat_net_wealth': 'خالص دارایی مشمول زکات',
       'zakat_nisab_standard': 'معیار نصاب',
       'zakat_nisab_unknown': 'برای بررسی نصاب، قیمت فلز را در زیر وارد کنید',
-      'zakat_no_wealth': 'پس از کسر بدهی‌ها دارایی مشمول زکات ندارید — زکات واجب نیست',
+      'zakat_no_wealth':
+          'پس از کسر بدهی‌ها دارایی مشمول زکات ندارید — زکات واجب نیست',
       'zakat_silver_nisab': 'نقره (۶۱۲٫۳۶ گرم)',
       'zakat_silver_price': 'قیمت فعلی هر گرم نقره',
       'mawlid': 'میلاد پیامبر',
@@ -1562,21 +1754,27 @@ class AppLocalizations {
       'err_email_in_use': 'حسابی با این ایمیل از قبل وجود دارد.',
       'err_network': 'خطای شبکه. اتصال خود را بررسی کنید.',
       'err_too_many_requests': 'تلاش‌های بیش از حد. بعداً دوباره امتحان کنید.',
-      'err_recent_login': 'برای امنیت، لطفاً پیش از تغییر ایمیل، خارج شده و دوباره وارد شوید.',
+      'err_recent_login':
+          'برای امنیت، لطفاً پیش از تغییر ایمیل، خارج شده و دوباره وارد شوید.',
       'err_upload_failed': 'بارگذاری عکس ناموفق بود. دوباره امتحان کنید.',
-      'err_profile_update_failed': 'به‌روزرسانی نمایه ناموفق بود. دوباره امتحان کنید.',
+      'err_profile_update_failed':
+          'به‌روزرسانی نمایه ناموفق بود. دوباره امتحان کنید.',
       'err_google_failed': 'ورود با Google ناموفق بود. دوباره امتحان کنید.',
       'profile_updated': 'نمایه به‌روزرسانی شد.',
       'photo_updated': 'عکس نمایه به‌روزرسانی شد.',
-      'verification_email_sent': 'لینک تأیید به ایمیل جدید شما ارسال شد. پس از تأیید، ایمیل شما به‌روز می‌شود.',
+      'verification_email_sent':
+          'لینک تأیید به ایمیل جدید شما ارسال شد. پس از تأیید، ایمیل شما به‌روز می‌شود.',
       'forgot_password': 'رمز عبور را فراموش کرده‌اید؟',
       'reset_password': 'بازنشانی رمز عبور',
-      'reset_password_hint': 'ایمیل خود را وارد کنید تا لینک بازنشانی رمز عبور را برایتان بفرستیم.',
+      'reset_password_hint':
+          'ایمیل خود را وارد کنید تا لینک بازنشانی رمز عبور را برایتان بفرستیم.',
       'send_link': 'ارسال لینک',
-      'reset_email_sent': 'ایمیل بازنشانی رمز عبور ارسال شد. صندوق ورودی خود را بررسی کنید.',
+      'reset_email_sent':
+          'ایمیل بازنشانی رمز عبور ارسال شد. صندوق ورودی خود را بررسی کنید.',
       'email': 'ایمیل',
       'name': 'نام',
-      'photo_permission_denied': 'دسترسی به عکس‌ها رد شد. لطفاً از تنظیمات دستگاه اجازه دهید.',
+      'photo_permission_denied':
+          'دسترسی به عکس‌ها رد شد. لطفاً از تنظیمات دستگاه اجازه دهید.',
       'photo_pick_failed': 'باز کردن عکس‌ها ممکن نشد. دوباره امتحان کنید.',
       'member_since': 'عضو از',
       'my_profile': 'نمایه من',
@@ -1591,8 +1789,10 @@ class AppLocalizations {
       'location_required': 'لطفاً یک شهر وارد کنید.',
       'rate_now': 'اکنون امتیاز دهید',
       'later': 'بعداً',
-      'rate_us_message': 'اگر از Barakah Time لذت می‌برید، لطفاً به ما امتیاز دهید! ✨',
-      'app_store_coming_soon': 'Barakah Time به‌زودی در App Store عرضه می‌شود. از حمایت شما سپاسگزاریم!',
+      'rate_us_message':
+          'اگر از Barakah Time لذت می‌برید، لطفاً به ما امتیاز دهید! ✨',
+      'app_store_coming_soon':
+          'Barakah Time به‌زودی در App Store عرضه می‌شود. از حمایت شما سپاسگزاریم!',
       'store_open_failed': 'باز کردن فروشگاه ممکن نشد. بعداً امتحان کنید.',
       'close': 'بستن',
       'skip': 'رد شدن',
@@ -1706,10 +1906,13 @@ class AppLocalizations {
       'note': 'توجه',
       'sunrise': 'طلوع آفتاب',
       'tomorrow_fajr': 'فجر فردا',
-      'location_not_found': '"{city}" پیدا نشد. املای دیگری امتحان کنید یا نام کشور را اضافه کنید.',
+      'location_not_found':
+          '"{city}" پیدا نشد. املای دیگری امتحان کنید یا نام کشور را اضافه کنید.',
       'location_services_disabled': 'خدمات مکان‌یابی خاموش است',
-      'location_permission_denied': 'برای نمایش اوقات نماز در محل شما به اجازه مکان نیاز است.',
-      'location_permission_denied_forever': 'اجازه مکان مسدود است. آن را در تنظیمات برنامه فعال کنید یا شهر را دستی وارد کنید.',
+      'location_permission_denied':
+          'برای نمایش اوقات نماز در محل شما به اجازه مکان نیاز است.',
+      'location_permission_denied_forever':
+          'اجازه مکان مسدود است. آن را در تنظیمات برنامه فعال کنید یا شهر را دستی وارد کنید.',
       'location_timeout': 'مکان شما به‌موقع پیدا نشد.',
       'location_access_required': 'دسترسی به مکان لازم است',
       'open_settings': 'باز کردن تنظیمات',
@@ -1745,7 +1948,8 @@ class AppLocalizations {
       'motivation_almost': 'پیشرفت عالی! کمی دیگر تا هدفتان مانده است. 🚀',
       'motivation_halfway': 'نیمی از راه را رفته‌اید! ادامه دهید. 💪',
       'motivation_started': 'شروع خوبی است! به سوی اهدافتان ادامه دهید. ⚡',
-      'motivation_start': 'سفر معنوی امروزتان را آغاز کنید. هر قدم ارزشمند است! 🌱',
+      'motivation_start':
+          'سفر معنوی امروزتان را آغاز کنید. هر قدم ارزشمند است! 🌱',
       'method_mwl': 'رابطهٔ جهان اسلام',
       'method_karachi': 'دانشگاه علوم اسلامی کراچی',
       'method_isna': 'انجمن اسلامی آمریکای شمالی (ISNA)',
@@ -1762,23 +1966,31 @@ class AppLocalizations {
       'default_user_name': 'کاربر برکت',
       'sign_in_with_apple': 'ورود با Apple',
       'continue_as_guest': 'ادامه به‌عنوان مهمان',
-      'guest_mode_notice': 'شما به‌عنوان مهمان از برنامه استفاده می‌کنید. برای پشتیبان‌گیری از پیشرفت و استفاده در دستگاه‌های دیگر وارد شوید.',
+      'guest_mode_notice':
+          'شما به‌عنوان مهمان از برنامه استفاده می‌کنید. برای پشتیبان‌گیری از پیشرفت و استفاده در دستگاه‌های دیگر وارد شوید.',
       'sign_in_to_sync': 'برای همگام‌سازی وارد شوید',
-      'auth_unavailable_notice': 'ورود در حال حاضر در دسترس نیست. می‌توانید به استفاده ادامه دهید؛ داده‌ها روی همین دستگاه می‌مانند.',
-      'err_auth_unavailable': 'ورود در حال حاضر ممکن نیست. اتصال را بررسی کرده و برنامه را دوباره باز کنید.',
+      'auth_unavailable_notice':
+          'ورود در حال حاضر در دسترس نیست. می‌توانید به استفاده ادامه دهید؛ داده‌ها روی همین دستگاه می‌مانند.',
+      'err_auth_unavailable':
+          'ورود در حال حاضر ممکن نیست. اتصال را بررسی کرده و برنامه را دوباره باز کنید.',
       'err_apple_failed': 'ورود با Apple ناموفق بود. دوباره تلاش کنید.',
       'err_user_disabled': 'این حساب غیرفعال شده است.',
-      'err_account_exists_different_provider': 'حسابی با این ایمیل و روش ورود دیگری وجود دارد.',
+      'err_account_exists_different_provider':
+          'حسابی با این ایمیل و روش ورود دیگری وجود دارد.',
       'err_user_mismatch': 'لطفاً با همان حسابی که حذف می‌کنید وارد شوید.',
       'session_expired': 'از حساب خارج شدید. لطفاً دوباره وارد شوید.',
-      'email_not_verified': 'ایمیل شما هنوز تأیید نشده است. صندوق ورودی را برای پیوند تأیید بررسی کنید.',
+      'email_not_verified':
+          'ایمیل شما هنوز تأیید نشده است. صندوق ورودی را برای پیوند تأیید بررسی کنید.',
       'resend_verification': 'ارسال دوبارهٔ ایمیل تأیید',
-      'verification_link_resent': 'ایمیل تأیید ارسال شد. صندوق ورودی را بررسی کنید.',
+      'verification_link_resent':
+          'ایمیل تأیید ارسال شد. صندوق ورودی را بررسی کنید.',
       'delete_account': 'حذف حساب',
       'delete_confirm_word': 'حذف',
       'delete_account_confirm_title': 'حساب خود را حذف می‌کنید؟',
-      'delete_account_confirm_message': 'این کار حساب، پیشرفت، نشان‌ها، آیات ذخیره‌شده و عکس پروفایل شما را برای همیشه حذف می‌کند و قابل بازگشت نیست.',
-      'reauth_required_delete': 'برای امنیت، لطفاً برای حذف حساب ورود خود را تأیید کنید.',
+      'delete_account_confirm_message':
+          'این کار حساب، پیشرفت، نشان‌ها، آیات ذخیره‌شده و عکس پروفایل شما را برای همیشه حذف می‌کند و قابل بازگشت نیست.',
+      'reauth_required_delete':
+          'برای امنیت، لطفاً برای حذف حساب ورود خود را تأیید کنید.',
       'confirm_with_password': 'برای ادامه رمز عبور را وارد کنید',
       'confirm_with_provider': 'تأیید با {provider}',
       'account_deleted': 'حساب شما حذف شد.',
@@ -1787,8 +1999,20 @@ class AppLocalizations {
       'longest_streak': 'طولانی‌ترین پیاپی',
       'adhan_sound': 'صدای اذان',
       'adhan_sound_desc': 'پخش اذان برای یادآوری نماز',
-      'exact_alarms_hint': 'اجازهٔ «زنگ‌ها و یادآورها» را بدهید تا یادآوری نماز دقیقاً سر وقت برسد.',
-      'notifications_permission_revoked': 'اجازهٔ اعلان در تنظیمات سیستم خاموش شد، بنابراین یادآوری نماز غیرفعال شد.',
+      'adjust_times': 'تنظیم اوقات نماز',
+      'app_theme': 'پوسته',
+      'theme_system': 'پیش‌فرض سیستم',
+      'theme_light': 'روشن',
+      'theme_dark': 'تیره',
+      'adjust_times_desc': 'هر نماز را با مسجد محل هماهنگ کنید',
+      'adjust_times_none': 'بدون تغییر',
+      'minutes_short': '{n} دقیقه',
+      'adjust_times_note':
+          'اوقات نسبت به زمان محاسبه‌شده جابه‌جا می‌شوند. فقط اگر مسجد محل شما متفاوت است از این استفاده کنید.',
+      'exact_alarms_hint':
+          'اجازهٔ «زنگ‌ها و یادآورها» را بدهید تا یادآوری نماز دقیقاً سر وقت برسد.',
+      'notifications_permission_revoked':
+          'اجازهٔ اعلان در تنظیمات سیستم خاموش شد، بنابراین یادآوری نماز غیرفعال شد.',
       'good_morning': 'صبح بخیر',
       'good_afternoon': 'ظهر بخیر',
       'good_evening': 'عصر بخیر',
@@ -1811,13 +2035,15 @@ class AppLocalizations {
       'more': 'بیشتر',
       'read_full_ayah': 'خواندن کامل آیه',
       'shared_from_app': 'به اشتراک گذاشته شده از Barakah Time',
-      'pulse_share_text': 'پیشرفت من در Barakah Time: {streak} روز پیاپی و {points} امتیاز در این هفته.',
+      'pulse_share_text':
+          'پیشرفت من در Barakah Time: {streak} روز پیاپی و {points} امتیاز در این هفته.',
       'points_this_week': 'امتیاز این هفته',
       'current_streak': 'پیاپی فعلی',
       'day_streak_count': '{n} روز پیاپی',
       'weekday_points': '{day}: {n} امتیاز',
       'recent_activity': 'فعالیت‌های اخیر',
-      'no_recent_activity': 'هنوز فعالیتی ثبت نشده. برای شروع یک نماز ثبت کنید، قرآن بخوانید یا ذکر بگویید.',
+      'no_recent_activity':
+          'هنوز فعالیتی ثبت نشده. برای شروع یک نماز ثبت کنید، قرآن بخوانید یا ذکر بگویید.',
       'activity_prayer': 'نماز {prayer}',
       'activity_quran': 'تلاوت قرآن',
       'activity_dhikr': 'ذکر',
@@ -1840,56 +2066,71 @@ class AppLocalizations {
       'pulse_today': 'آج',
       'pulse_today_prayers': 'آج کی نمازیں',
       'badge_locked': 'مقفل',
-      'audio_error_voice_missing': "فون میں اس زبان کی آواز نہیں ہے۔ فون کی سیٹنگز ← ٹیکسٹ ٹو اسپیچ سے انسٹال کریں۔",
+      'audio_error_voice_missing':
+          "فون میں اس زبان کی آواز نہیں ہے۔ فون کی سیٹنگز ← ٹیکسٹ ٹو اسپیچ سے انسٹال کریں۔",
       'quran_translation_language': 'ترجمے کی زبان',
       'quran_translation_same_as_app': 'ایپ والی زبان',
-      'quran_translation_audio_note': 'اردو، انگریزی، فارسی اور ترکی ترجمہ انسانی آواز میں سنایا جاتا ہے۔',
+      'quran_translation_audio_note':
+          'اردو، انگریزی، فارسی اور ترکی ترجمہ انسانی آواز میں سنایا جاتا ہے۔',
       'audio_error_play': 'آڈیو نہیں چل سکی۔ انٹرنیٹ چیک کریں۔',
       'audio_error_speech': 'آواز میں پڑھائی نہیں چل سکی',
       'name_too_long': 'نام 100 حروف سے زیادہ نہیں ہو سکتا',
-      'reminders_need_notifications': 'پہلے سیٹنگز میں نماز کی نوٹیفکیشنز آن کریں۔',
+      'reminders_need_notifications':
+          'پہلے سیٹنگز میں نماز کی نوٹیفکیشنز آن کریں۔',
       'ramadan_title': 'رمضان',
       'ramadan_day_of': '{len} میں سے {day}واں روزہ',
       'ramadan_starts_in': '{n} دن میں شروع',
-      'ramadan_qadr_tonight': 'آج کی رات لیلۃ القدر ہو سکتی ہے۔ اسے عبادت اور دعا میں گزاریں۔',
+      'ramadan_qadr_tonight':
+          'آج کی رات لیلۃ القدر ہو سکتی ہے۔ اسے عبادت اور دعا میں گزاریں۔',
       'ramadan_moon_adjust': 'چاند کے حساب سے تبدیلی (دن)',
-      'ramadan_need_location': 'سحری اور افطار کے اوقات دیکھنے کے لیے نماز کے اوقات لوڈ کریں۔',
+      'ramadan_need_location':
+          'سحری اور افطار کے اوقات دیکھنے کے لیے نماز کے اوقات لوڈ کریں۔',
       'ramadan_sehri_ends_in': 'سحری ختم ہونے میں',
       'ramadan_iftar_in': 'افطار میں',
       'ramadan_sehri_ends': 'سحری ختم',
       'ramadan_iftar': 'افطار',
       'ramadan_reminders': 'سحری اور افطار کی یاد دہانی',
-      'ramadan_reminders_desc': 'سحری ختم ہونے سے 30 منٹ پہلے، اور افطار کے وقت',
+      'ramadan_reminders_desc':
+          'سحری ختم ہونے سے 30 منٹ پہلے، اور افطار کے وقت',
       'ramadan_duas': 'رمضان کی دعائیں',
       'ramadan_sehri_niyyah': 'روزے کی نیت (سحری)',
       'ramadan_sehri_niyyah_meaning': 'میں نے کل کے رمضان کے روزے کی نیت کی۔',
       'ramadan_iftar_dua': 'افطار کی دعا',
-      'ramadan_iftar_dua_meaning': 'اے اللہ! میں نے تیرے لیے روزہ رکھا، تجھ پر ایمان لایا، تجھ پر بھروسہ کیا، اور تیرے رزق سے افطار کیا۔',
+      'ramadan_iftar_dua_meaning':
+          'اے اللہ! میں نے تیرے لیے روزہ رکھا، تجھ پر ایمان لایا، تجھ پر بھروسہ کیا، اور تیرے رزق سے افطار کیا۔',
       'ramadan_iftar_dua2': 'روزہ کھولنے کے بعد',
-      'ramadan_iftar_dua2_meaning': 'پیاس بجھ گئی، رگیں تر ہو گئیں، اور اگر اللہ نے چاہا تو اجر ثابت ہو گیا۔ (ابو داؤد)',
+      'ramadan_iftar_dua2_meaning':
+          'پیاس بجھ گئی، رگیں تر ہو گئیں، اور اگر اللہ نے چاہا تو اجر ثابت ہو گیا۔ (ابو داؤد)',
       'ramadan_qadr_dua': 'لیلۃ القدر کی دعا',
-      'ramadan_qadr_dua_meaning': 'اے اللہ! تو معاف کرنے والا ہے، معافی کو پسند کرتا ہے، پس مجھے معاف فرما دے۔ (ترمذی)',
+      'ramadan_qadr_dua_meaning':
+          'اے اللہ! تو معاف کرنے والا ہے، معافی کو پسند کرتا ہے، پس مجھے معاف فرما دے۔ (ترمذی)',
       'ramadan_log': 'روزوں کا ریکارڈ',
       'ramadan_fasted': 'روزہ رکھا',
       'ramadan_missed': 'قضا',
       'ramadan_taraweeh': 'تراویح',
-      'ramadan_log_hint': 'روزہ اور تراویح درج کرنے کے لیے دن پر ٹیپ کریں۔ ستارے آخری عشرے کی طاق راتیں ہیں۔',
+      'ramadan_log_hint':
+          'روزہ اور تراویح درج کرنے کے لیے دن پر ٹیپ کریں۔ ستارے آخری عشرے کی طاق راتیں ہیں۔',
       'ramadan_qaza_fasts': '{n} روزوں کی قضا باقی ہے',
       'ramadan_day': 'دن',
       'ramadan_not_set': 'صاف کریں',
       'ramadan_prayed_taraweeh': 'تراویح پڑھی',
       'ramadan_prepare': 'تیاری کریں: قرآن، دعاؤں اور صدقے کا منصوبہ بنائیں۔',
       'ramadan_sehri_reminder_title': 'سحری 30 منٹ میں ختم',
-      'ramadan_sehri_reminder_body': 'سحری {time} پر ختم ہوگی۔ نیت کرنا نہ بھولیں۔',
+      'ramadan_sehri_reminder_body':
+          'سحری {time} پر ختم ہوگی۔ نیت کرنا نہ بھولیں۔',
       'ramadan_iftar_reminder_title': 'افطار کا وقت ہو گیا',
-      'ramadan_iftar_reminder_body': 'روزہ افطار کریں اور دعا مانگیں۔ افطار کے وقت دعا قبول ہوتی ہے۔',
+      'ramadan_iftar_reminder_body':
+          'روزہ افطار کریں اور دعا مانگیں۔ افطار کے وقت دعا قبول ہوتی ہے۔',
       'memorial_title': 'ایصالِ ثواب',
       'memorial_tool_subtitle': 'مرحومین کے لیے',
-      'memorial_sign_in': 'کسی عزیز کے لیے ایصالِ ثواب کا صفحہ بنانے یا اس میں شامل ہونے کے لیے سائن ان کریں۔',
-      'memorial_intro': 'کسی مرحوم عزیز کا صفحہ بنائیں اور واٹس ایپ پر شیئر کریں۔ گھر والے اور دوست پارے لے کر ختمِ قرآن مکمل کر سکتے ہیں، مل کر ذکر کا ہدف پورا کر سکتے ہیں، اور ان کے لیے نیک اعمال لکھ سکتے ہیں۔',
+      'memorial_sign_in':
+          'کسی عزیز کے لیے ایصالِ ثواب کا صفحہ بنانے یا اس میں شامل ہونے کے لیے سائن ان کریں۔',
+      'memorial_intro':
+          'کسی مرحوم عزیز کا صفحہ بنائیں اور واٹس ایپ پر شیئر کریں۔ گھر والے اور دوست پارے لے کر ختمِ قرآن مکمل کر سکتے ہیں، مل کر ذکر کا ہدف پورا کر سکتے ہیں، اور ان کے لیے نیک اعمال لکھ سکتے ہیں۔',
       'memorial_create': 'صفحہ بنائیں',
       'memorial_join': 'کوڈ سے شامل ہوں',
-      'memorial_none': 'ابھی کوئی صفحہ نہیں۔ نیا بنائیں یا کسی کے بھیجے ہوئے کوڈ سے شامل ہوں۔',
+      'memorial_none':
+          'ابھی کوئی صفحہ نہیں۔ نیا بنائیں یا کسی کے بھیجے ہوئے کوڈ سے شامل ہوں۔',
       'memorial_you_created': 'آپ نے بنایا',
       'memorial_joined': 'شامل',
       'memorial_code_invalid': '8 حروف والا کوڈ درج کریں',
@@ -1906,27 +2147,34 @@ class AppLocalizations {
       'memorial_goals': 'ذکر کے ہدف',
       'memorial_goal': 'ہدف',
       'memorial_error_not_found': 'اس کوڈ کا کوئی صفحہ نہیں ملا۔',
-      'memorial_error_para_taken': 'یہ پارہ ابھی کسی نے لے لیا۔ براہ کرم کوئی اور چنیں۔',
-      'memorial_error_generic': 'کچھ غلط ہو گیا۔ انٹرنیٹ چیک کر کے دوبارہ کوشش کریں۔',
+      'memorial_error_para_taken':
+          'یہ پارہ ابھی کسی نے لے لیا۔ براہ کرم کوئی اور چنیں۔',
+      'memorial_error_generic':
+          'کچھ غلط ہو گیا۔ انٹرنیٹ چیک کر کے دوبارہ کوشش کریں۔',
       'memorial_deleted': 'یہ صفحہ حذف ہو چکا ہے۔',
       'memorial_remove_from_list': 'میری فہرست سے ہٹائیں',
-      'memorial_created_hint': 'صفحہ بن گیا۔ اسے گھر والوں اور دوستوں سے شیئر کریں۔',
+      'memorial_created_hint':
+          'صفحہ بن گیا۔ اسے گھر والوں اور دوستوں سے شیئر کریں۔',
       'memorial_share': 'شیئر',
-      'memorial_share_text': '{name} کے ایصالِ ثواب میں شامل ہوں۔ Barakah Time ایپ میں ان کے لیے قرآن کا ایک پارہ پڑھیں یا ذکر کریں۔\n\nکوڈ: {code}\n\nایپ حاصل کریں: {link}',
+      'memorial_share_text':
+          '{name} کے ایصالِ ثواب میں شامل ہوں۔ Barakah Time ایپ میں ان کے لیے قرآن کا ایک پارہ پڑھیں یا ذکر کریں۔\n\nکوڈ: {code}\n\nایپ حاصل کریں: {link}',
       'memorial_para': 'پارہ {n}',
-      'memorial_take_para_confirm': 'آپ یہ پارہ مرحوم کے لیے پڑھیں گے۔ باقی لوگ دیکھ سکیں گے کہ یہ آپ نے لیا ہے۔',
+      'memorial_take_para_confirm':
+          'آپ یہ پارہ مرحوم کے لیے پڑھیں گے۔ باقی لوگ دیکھ سکیں گے کہ یہ آپ نے لیا ہے۔',
       'memorial_take_para': 'یہ پارہ لیں',
       'memorial_para_read_by': 'پارہ {n} {name} نے پڑھا',
       'memorial_para_taken_by': 'پارہ {n} {name} پڑھ رہے ہیں',
       'memorial_para_yours': 'یہ پارہ آپ پڑھ رہے ہیں',
       'memorial_mark_read': 'میں نے پڑھ لیا',
       'memorial_release_para': 'واپس کریں',
-      'memorial_khatam_done': 'ختم مکمل ہو گیا۔ الحمدللہ! نیا ختم شروع ہو گیا ہے۔',
+      'memorial_khatam_done':
+          'ختم مکمل ہو گیا۔ الحمدللہ! نیا ختم شروع ہو گیا ہے۔',
       'memorial_para_done': 'جزاک اللہ خیر۔ اللہ قبول فرمائے۔',
       'memorial_how_many': 'کتنی بار؟',
       'memorial_added': 'شامل ہو گیا۔ جزاک اللہ خیر۔',
       'memorial_delete': 'صفحہ حذف کریں',
-      'memorial_delete_confirm': 'یہ صفحہ سب کے لیے حذف ہو جائے گا، ساری پیش رفت سمیت۔ یہ واپس نہیں ہو سکتا۔',
+      'memorial_delete_confirm':
+          'یہ صفحہ سب کے لیے حذف ہو جائے گا، ساری پیش رفت سمیت۔ یہ واپس نہیں ہو سکتا۔',
       'memorial_add_deed': 'نیک عمل یا دعا لکھیں',
       'memorial_deed_hint': 'مثلاً 10 لوگوں کو کھانا کھلایا، یا ان کے لیے دعا',
       'memorial_dates': 'یاد کے دن',
@@ -1935,7 +2183,8 @@ class AppLocalizations {
       'memorial_invite': 'دعوت دیں',
       'memorial_khatam_n': 'ختم {n}',
       'memorial_khatams_completed': '{n} ختم مکمل',
-      'memorial_khatam_hint': 'مرحوم کے لیے پڑھنے کو کسی خالی پارے پر ٹیپ کریں۔',
+      'memorial_khatam_hint':
+          'مرحوم کے لیے پڑھنے کو کسی خالی پارے پر ٹیپ کریں۔',
       'memorial_free': 'خالی',
       'memorial_yours': 'آپ کا',
       'memorial_taken': 'لیا ہوا',
@@ -1951,7 +2200,8 @@ class AppLocalizations {
       'memorial_day40': 'چہلم (چالیسواں)',
       'memorial_barsi': 'برسی',
       'memorial_reminder_title': '{name} کا {day}',
-      'memorial_reminder_body': 'آج {name} کو قرآن، دعا یا صدقے کے ساتھ یاد کریں۔',
+      'memorial_reminder_body':
+          'آج {name} کو قرآن، دعا یا صدقے کے ساتھ یاد کریں۔',
       'dhikr_kareema': 'آیتِ کریمہ',
       'dhikr_darood': 'درود شریف',
       'dhikr_kalma': 'کلمہ طیبہ',
@@ -1963,13 +2213,16 @@ class AppLocalizations {
       'promise_no_ads': 'کبھی کوئی اشتہار نہیں',
       'promise_no_sell': 'ہم آپ کا ڈیٹا کبھی نہ بیچتے ہیں نہ کسی کو دیتے ہیں',
       'promise_no_tracking': 'کوئی ٹریکر یا اینالیٹکس نہیں',
-      'promise_location': 'آپ کی لوکیشن صرف نماز کے اوقات، قبلہ اور قریبی مساجد کے لیے استعمال ہوتی ہے',
+      'promise_location':
+          'آپ کی لوکیشن صرف نماز کے اوقات، قبلہ اور قریبی مساجد کے لیے استعمال ہوتی ہے',
       'onboarding_privacy_title': 'کوئی اشتہار نہیں۔ آپ کا ڈیٹا آپ کا ہے۔',
-      'onboarding_privacy_desc': 'Barakah Time میں نہ اشتہار ہیں نہ ٹریکر، اور ہم آپ کا ڈیٹا کبھی نہیں بیچتے۔ آپ کی عبادت آپ اور اللہ کے درمیان ہے۔',
+      'onboarding_privacy_desc':
+          'Barakah Time میں نہ اشتہار ہیں نہ ٹریکر، اور ہم آپ کا ڈیٹا کبھی نہیں بیچتے۔ آپ کی عبادت آپ اور اللہ کے درمیان ہے۔',
       'qaza_tracker': 'قضا نماز ٹریکر',
       'witr': 'وتر',
       'qaza_intro_title': 'قضا نمازیں ادا کریں',
-      'qaza_intro_body': 'اندازہ لگائیں کہ آپ کی کتنی نمازیں قضا ہیں، پھر انہیں ایک ایک کر کے ادا کریں۔ آپ کی پیش رفت محفوظ ہو کر آپ کے اکاؤنٹ سے سنک ہوتی ہے۔',
+      'qaza_intro_body':
+          'اندازہ لگائیں کہ آپ کی کتنی نمازیں قضا ہیں، پھر انہیں ایک ایک کر کے ادا کریں۔ آپ کی پیش رفت محفوظ ہو کر آپ کے اکاؤنٹ سے سنک ہوتی ہے۔',
       'qaza_calculate': 'قضا نمازوں کا اندازہ',
       'qaza_enter_manually': 'تعداد خود درج کریں',
       'qaza_remaining': 'باقی',
@@ -1983,22 +2236,28 @@ class AppLocalizations {
       'qaza_months': 'مہینے',
       'qaza_days': 'دن',
       'qaza_include_witr': 'وتر شامل کریں (حنفی)',
-      'qaza_calc_desc': 'آپ کی نمازیں کتنے عرصے قضا ہوئیں؟ مثلاً بالغ ہونے سے لے کر باقاعدہ نماز شروع کرنے تک۔',
+      'qaza_calc_desc':
+          'آپ کی نمازیں کتنے عرصے قضا ہوئیں؟ مثلاً بالغ ہونے سے لے کر باقاعدہ نماز شروع کرنے تک۔',
       'qaza_calc_result': 'ہر نماز کی {n} قضا شامل ہوں گی',
-      'qaza_estimate_note': 'احتیاطاً ایک سال 365 دن کا شمار کیا جاتا ہے۔ شک ہو تو کسی عالم سے پوچھ لیں۔',
+      'qaza_estimate_note':
+          'احتیاطاً ایک سال 365 دن کا شمار کیا جاتا ہے۔ شک ہو تو کسی عالم سے پوچھ لیں۔',
       'qaza_add': 'ٹریکر میں شامل کریں',
       'qaza_reset': 'ٹریکر ری سیٹ کریں',
-      'qaza_reset_confirm': 'تمام تعداد اور پیش رفت مٹ جائے گی۔ یہ واپس نہیں ہو سکتا۔',
+      'qaza_reset_confirm':
+          'تمام تعداد اور پیش رفت مٹ جائے گی۔ یہ واپس نہیں ہو سکتا۔',
       'qaza_all_done': 'تمام قضا نمازیں ادا ہو گئیں۔ الحمدللہ!',
       'qaza_tool_subtitle': 'قضا نمازیں',
       // Auth / onboarding / profile / settings / about pages
       'app_tagline': 'اپنے وقت میں برکت لائیں',
       'onboarding_pulse_title': 'روحانی نبض',
-      'onboarding_pulse_desc': 'اپنی روحانی مستقل مزاجی کو ٹریک کریں اور دیرپا عادتیں بنائیں۔ جڑے رہیں، ثابت قدم رہیں۔',
+      'onboarding_pulse_desc':
+          'اپنی روحانی مستقل مزاجی کو ٹریک کریں اور دیرپا عادتیں بنائیں۔ جڑے رہیں، ثابت قدم رہیں۔',
       'onboarding_prayer_title': 'کوئی نماز نہ چھوٹے',
-      'onboarding_prayer_desc': 'آپ کے مقام کے مطابق درست اوقاتِ نماز، لائیو کاؤنٹ ڈاؤن اور یاد دہانیاں۔',
+      'onboarding_prayer_desc':
+          'آپ کے مقام کے مطابق درست اوقاتِ نماز، لائیو کاؤنٹ ڈاؤن اور یاد دہانیاں۔',
       'onboarding_inspiration_title': 'روزانہ کی تحریک',
-      'onboarding_inspiration_desc': 'روزانہ آیات، اللہ کے 99 نام، دعاؤں اور بہت کچھ کے ساتھ سکون پائیں۔',
+      'onboarding_inspiration_desc':
+          'روزانہ آیات، اللہ کے 99 نام، دعاؤں اور بہت کچھ کے ساتھ سکون پائیں۔',
       'onboarding_next': 'اگلا',
       'onboarding_get_started': 'شروع کریں',
       'auth_welcome_back': 'خوش آمدید',
@@ -2014,12 +2273,14 @@ class AppLocalizations {
       'auth_full_name': 'پورا نام',
       'auth_register': 'رجسٹر کریں',
       'auth_have_account': 'پہلے سے اکاؤنٹ ہے؟',
-      'auth_account_created_verify': 'اکاؤنٹ بن گیا! ہم نے {email} پر تصدیقی لنک بھیج دیا ہے۔',
+      'auth_account_created_verify':
+          'اکاؤنٹ بن گیا! ہم نے {email} پر تصدیقی لنک بھیج دیا ہے۔',
       'profile_saved_verses': 'محفوظ آیات',
       'profile_saved_count': '{n} محفوظ',
       'profile_activity_history': 'سرگرمیوں کی تاریخ',
       'profile_last_activity': 'آخری: {activity}',
-      'profile_no_saved_verses': 'ابھی کوئی آیت محفوظ نہیں۔ کسی بھی آیت پر بُک مارک دبا کر اسے یہاں محفوظ کریں۔',
+      'profile_no_saved_verses':
+          'ابھی کوئی آیت محفوظ نہیں۔ کسی بھی آیت پر بُک مارک دبا کر اسے یہاں محفوظ کریں۔',
       'profile_remove_verse': 'محفوظ سے ہٹائیں',
       'profile_undo': 'واپس کریں',
       'profile_change_photo': 'تصویر تبدیل کریں',
@@ -2032,11 +2293,13 @@ class AppLocalizations {
       'settings_support_us': 'ہمارے کام کی حمایت کریں',
       'settings_version': 'ورژن {v}',
       'about_title': 'برکت ٹائم کے بارے میں',
-      'about_description': 'نماز کے اوقات، قرآن، ذکر اور روزانہ روحانی ترقی کے لیے ایک اسلامی ساتھی، جو آپ کے وقت میں برکت لانے کے لیے بنایا گیا ہے۔',
+      'about_description':
+          'نماز کے اوقات، قرآن، ذکر اور روزانہ روحانی ترقی کے لیے ایک اسلامی ساتھی، جو آپ کے وقت میں برکت لانے کے لیے بنایا گیا ہے۔',
       'about_credits': 'کریڈٹس اور ڈیٹا کے ذرائع',
       'about_quran_data': 'قرآن کا متن، تراجم اور آڈیو',
       'about_map_data': 'نقشہ اور مقامات کا ڈیٹا',
-      'about_map_license': '© OpenStreetMap کے معاونین، اوپن ڈیٹابیس لائسنس (ODbL) کے تحت دستیاب',
+      'about_map_license':
+          '© OpenStreetMap کے معاونین، اوپن ڈیٹابیس لائسنس (ODbL) کے تحت دستیاب',
       'about_prayer_calc': 'اوقاتِ نماز کا حساب',
       'about_prayer_calc_source': 'adhan لائبریری (اوپن سورس)',
       'about_privacy': 'رازداری کی پالیسی',
@@ -2110,8 +2373,10 @@ class AppLocalizations {
       'all_tools': 'تمام ٹولز',
       'ayah': 'آیت',
       'ayahs': 'آیات',
-      'calibrate_compass': 'اگر سمت غلط لگے تو کمپاس کیلیبریٹ کرنے کے لیے فون کو 8 کی شکل میں گھمائیں۔',
-      'compass_unavailable': 'اس ڈیوائس پر کمپاس دستیاب نہیں — شمال کی طرف رخ کریں، پھر دکھائے گئے زاویے پر مڑیں۔',
+      'calibrate_compass':
+          'اگر سمت غلط لگے تو کمپاس کیلیبریٹ کرنے کے لیے فون کو 8 کی شکل میں گھمائیں۔',
+      'compass_unavailable':
+          'اس ڈیوائس پر کمپاس دستیاب نہیں — شمال کی طرف رخ کریں، پھر دکھائے گئے زاویے پر مڑیں۔',
       'could_not_open_maps': 'نقشہ نہیں کھل سکا',
       'degrees_from_north': 'شمال سے {deg}°',
       'detecting_location': 'مقام معلوم کیا جا رہا ہے...',
@@ -2120,9 +2385,11 @@ class AppLocalizations {
       'finding_mosques': 'قریبی مساجد تلاش کی جا رہی ہیں...',
       'in_days': '{n} دن میں',
       'listen_translation': 'ترجمہ سنیں',
-      'location_error_message': 'آپ کا مقام معلوم نہیں ہو سکا۔ لوکیشن سروس اور اجازت فعال کریں، پھر دوبارہ کوشش کریں۔',
+      'location_error_message':
+          'آپ کا مقام معلوم نہیں ہو سکا۔ لوکیشن سروس اور اجازت فعال کریں، پھر دوبارہ کوشش کریں۔',
       'mark_as_read': 'پڑھا ہوا نشان زد کریں',
-      'mosques_load_error': 'قریبی مساجد لوڈ نہیں ہو سکیں۔ انٹرنیٹ کنکشن چیک کریں۔',
+      'mosques_load_error':
+          'قریبی مساجد لوڈ نہیں ہو سکیں۔ انٹرنیٹ کنکشن چیک کریں۔',
       'no_mosques_match': 'آپ کی تلاش سے کوئی مسجد نہیں ملی',
       'no_mosques_nearby': '5 کلومیٹر کے اندر کوئی مسجد نہیں ملی',
       'now_playing': 'چل رہا ہے',
@@ -2130,13 +2397,16 @@ class AppLocalizations {
       'pause': 'روکیں',
       'play': 'چلائیں',
       'play_surah': 'سورہ چلائیں',
-      'quran_load_error': 'قرآن لوڈ نہیں ہو سکا۔ انٹرنیٹ کنکشن چیک کریں اور دوبارہ کوشش کریں۔',
-      'reset_counter_message': 'کاؤنٹر 0 پر واپس چلا جائے گا۔ اب تک کا ذکر روحانی پلس میں محفوظ ہو جائے گا۔',
+      'quran_load_error':
+          'قرآن لوڈ نہیں ہو سکا۔ انٹرنیٹ کنکشن چیک کریں اور دوبارہ کوشش کریں۔',
+      'reset_counter_message':
+          'کاؤنٹر 0 پر واپس چلا جائے گا۔ اب تک کا ذکر روحانی پلس میں محفوظ ہو جائے گا۔',
       'reset_counter_title': 'کاؤنٹر ری سیٹ کریں؟',
       'share': 'شیئر کریں',
       'stop': 'بند کریں',
       'surah_already_logged_today': 'آج پہلے ہی درج ہو چکی ہے ✓',
-      'surah_load_error': 'یہ سورہ لوڈ نہیں ہو سکی۔ انٹرنیٹ کنکشن چیک کریں اور دوبارہ کوشش کریں۔',
+      'surah_load_error':
+          'یہ سورہ لوڈ نہیں ہو سکی۔ انٹرنیٹ کنکشن چیک کریں اور دوبارہ کوشش کریں۔',
       'surah_logged': 'سورہ {name} درج ہو گئی! ✨',
       'today': 'آج',
       'tomorrow': 'کل',
@@ -2171,21 +2441,27 @@ class AppLocalizations {
       'err_email_in_use': 'اس ای میل سے پہلے ہی ایک اکاؤنٹ موجود ہے۔',
       'err_network': 'نیٹ ورک کی خرابی۔ اپنا کنکشن چیک کریں۔',
       'err_too_many_requests': 'بہت زیادہ کوششیں۔ بعد میں دوبارہ کوشش کریں۔',
-      'err_recent_login': 'حفاظت کے لیے، ای میل تبدیل کرنے سے پہلے سائن آؤٹ کر کے دوبارہ سائن ان کریں۔',
+      'err_recent_login':
+          'حفاظت کے لیے، ای میل تبدیل کرنے سے پہلے سائن آؤٹ کر کے دوبارہ سائن ان کریں۔',
       'err_upload_failed': 'تصویر اپ لوڈ نہیں ہو سکی۔ دوبارہ کوشش کریں۔',
-      'err_profile_update_failed': 'پروفائل اپ ڈیٹ نہیں ہو سکی۔ دوبارہ کوشش کریں۔',
+      'err_profile_update_failed':
+          'پروفائل اپ ڈیٹ نہیں ہو سکی۔ دوبارہ کوشش کریں۔',
       'err_google_failed': 'Google سائن ان ناکام رہا۔ دوبارہ کوشش کریں۔',
       'profile_updated': 'پروفائل اپ ڈیٹ ہو گئی۔',
       'photo_updated': 'پروفائل تصویر اپ ڈیٹ ہو گئی۔',
-      'verification_email_sent': 'آپ کے نئے ای میل پر تصدیقی لنک بھیج دیا گیا ہے۔ تصدیق کے بعد ای میل اپ ڈیٹ ہو جائے گا۔',
+      'verification_email_sent':
+          'آپ کے نئے ای میل پر تصدیقی لنک بھیج دیا گیا ہے۔ تصدیق کے بعد ای میل اپ ڈیٹ ہو جائے گا۔',
       'forgot_password': 'پاس ورڈ بھول گئے؟',
       'reset_password': 'پاس ورڈ ری سیٹ کریں',
-      'reset_password_hint': 'اپنا ای میل درج کریں، ہم آپ کو پاس ورڈ ری سیٹ کرنے کا لنک بھیجیں گے۔',
+      'reset_password_hint':
+          'اپنا ای میل درج کریں، ہم آپ کو پاس ورڈ ری سیٹ کرنے کا لنک بھیجیں گے۔',
       'send_link': 'لنک بھیجیں',
-      'reset_email_sent': 'پاس ورڈ ری سیٹ ای میل بھیج دی گئی۔ اپنا ان باکس چیک کریں۔',
+      'reset_email_sent':
+          'پاس ورڈ ری سیٹ ای میل بھیج دی گئی۔ اپنا ان باکس چیک کریں۔',
       'email': 'ای میل',
       'name': 'نام',
-      'photo_permission_denied': 'تصاویر تک رسائی مسترد کر دی گئی۔ براہ کرم ڈیوائس کی ترتیبات میں اجازت دیں۔',
+      'photo_permission_denied':
+          'تصاویر تک رسائی مسترد کر دی گئی۔ براہ کرم ڈیوائس کی ترتیبات میں اجازت دیں۔',
       'photo_pick_failed': 'تصاویر نہیں کھل سکیں۔ دوبارہ کوشش کریں۔',
       'member_since': 'رکن از',
       'my_profile': 'میری پروفائل',
@@ -2200,8 +2476,10 @@ class AppLocalizations {
       'location_required': 'براہ کرم شہر درج کریں۔',
       'rate_now': 'ابھی ریٹ کریں',
       'later': 'بعد میں',
-      'rate_us_message': 'اگر آپ کو برکت ٹائم پسند ہے تو براہ کرم ہمیں ریٹ کریں! ✨',
-      'app_store_coming_soon': 'برکت ٹائم جلد App Store پر دستیاب ہوگا۔ آپ کے تعاون کا شکریہ!',
+      'rate_us_message':
+          'اگر آپ کو برکت ٹائم پسند ہے تو براہ کرم ہمیں ریٹ کریں! ✨',
+      'app_store_coming_soon':
+          'برکت ٹائم جلد App Store پر دستیاب ہوگا۔ آپ کے تعاون کا شکریہ!',
       'store_open_failed': 'اسٹور نہیں کھل سکا۔ بعد میں کوشش کریں۔',
       'close': 'بند کریں',
       'skip': 'چھوڑیں',
@@ -2315,10 +2593,13 @@ class AppLocalizations {
       'note': 'نوٹ',
       'sunrise': 'طلوعِ آفتاب',
       'tomorrow_fajr': 'کل کی فجر',
-      'location_not_found': '"{city}" نہیں ملا۔ مختلف ہجے آزمائیں یا ملک کا نام شامل کریں۔',
+      'location_not_found':
+          '"{city}" نہیں ملا۔ مختلف ہجے آزمائیں یا ملک کا نام شامل کریں۔',
       'location_services_disabled': 'لوکیشن سروسز بند ہیں',
-      'location_permission_denied': 'آپ کے مقام کے اوقاتِ نماز دکھانے کے لیے لوکیشن کی اجازت درکار ہے۔',
-      'location_permission_denied_forever': 'لوکیشن کی اجازت بلاک ہے۔ ایپ سیٹنگز میں فعال کریں یا شہر دستی طور پر منتخب کریں۔',
+      'location_permission_denied':
+          'آپ کے مقام کے اوقاتِ نماز دکھانے کے لیے لوکیشن کی اجازت درکار ہے۔',
+      'location_permission_denied_forever':
+          'لوکیشن کی اجازت بلاک ہے۔ ایپ سیٹنگز میں فعال کریں یا شہر دستی طور پر منتخب کریں۔',
       'location_timeout': 'آپ کا مقام بروقت معلوم نہیں ہو سکا۔',
       'location_access_required': 'لوکیشن تک رسائی درکار ہے',
       'open_settings': 'سیٹنگز کھولیں',
@@ -2350,8 +2631,10 @@ class AppLocalizations {
       'badge_points_1000_desc': 'مجموعی طور پر 1,000 پوائنٹس حاصل کیے',
       'no_badges_yet': 'بیجز حاصل کرنے کے لیے ایپ استعمال کرتے رہیں!',
       'badges_earned': '{n} بیجز حاصل کیے',
-      'motivation_achieved': 'ماشاءاللہ! آپ نے آج کے روحانی اہداف حاصل کر لیے۔ ✨',
-      'motivation_almost': 'زبردست پیش رفت! ہدف تک پہنچنے میں تھوڑا سا باقی ہے۔ 🚀',
+      'motivation_achieved':
+          'ماشاءاللہ! آپ نے آج کے روحانی اہداف حاصل کر لیے۔ ✨',
+      'motivation_almost':
+          'زبردست پیش رفت! ہدف تک پہنچنے میں تھوڑا سا باقی ہے۔ 🚀',
       'motivation_halfway': 'آپ آدھا راستہ طے کر چکے ہیں! جاری رکھیں۔ 💪',
       'motivation_started': 'اچھی شروعات! اپنے اہداف کی طرف بڑھتے رہیں۔ ⚡',
       'motivation_start': 'آج کا روحانی سفر شروع کریں۔ ہر قدم اہم ہے! 🌱',
@@ -2371,23 +2654,32 @@ class AppLocalizations {
       'default_user_name': 'برکت صارف',
       'sign_in_with_apple': 'Apple کے ساتھ سائن ان کریں',
       'continue_as_guest': 'مہمان کے طور پر جاری رکھیں',
-      'guest_mode_notice': 'آپ مہمان کے طور پر ایپ استعمال کر رہے ہیں۔ اپنی پیش رفت محفوظ کرنے اور دوسرے آلات پر استعمال کے لیے سائن ان کریں۔',
+      'guest_mode_notice':
+          'آپ مہمان کے طور پر ایپ استعمال کر رہے ہیں۔ اپنی پیش رفت محفوظ کرنے اور دوسرے آلات پر استعمال کے لیے سائن ان کریں۔',
       'sign_in_to_sync': 'ہم آہنگی کے لیے سائن ان کریں',
-      'auth_unavailable_notice': 'سائن ان اس وقت دستیاب نہیں۔ آپ ایپ استعمال کرتے رہ سکتے ہیں؛ آپ کا ڈیٹا اسی آلے پر رہے گا۔',
-      'err_auth_unavailable': 'سائن ان اس وقت ممکن نہیں۔ اپنا کنکشن چیک کریں اور ایپ دوبارہ کھولیں۔',
+      'auth_unavailable_notice':
+          'سائن ان اس وقت دستیاب نہیں۔ آپ ایپ استعمال کرتے رہ سکتے ہیں؛ آپ کا ڈیٹا اسی آلے پر رہے گا۔',
+      'err_auth_unavailable':
+          'سائن ان اس وقت ممکن نہیں۔ اپنا کنکشن چیک کریں اور ایپ دوبارہ کھولیں۔',
       'err_apple_failed': 'Apple کے ساتھ سائن ان ناکام رہا۔ دوبارہ کوشش کریں۔',
       'err_user_disabled': 'یہ اکاؤنٹ غیر فعال کر دیا گیا ہے۔',
-      'err_account_exists_different_provider': 'اس ای میل کے ساتھ کسی اور طریقے سے اکاؤنٹ پہلے سے موجود ہے۔',
-      'err_user_mismatch': 'براہ کرم اسی اکاؤنٹ سے سائن ان کریں جسے آپ حذف کر رہے ہیں۔',
-      'session_expired': 'آپ سائن آؤٹ ہو گئے ہیں۔ براہ کرم دوبارہ سائن ان کریں۔',
-      'email_not_verified': 'آپ کی ای میل ابھی تصدیق شدہ نہیں۔ تصدیقی لنک کے لیے ان باکس دیکھیں۔',
+      'err_account_exists_different_provider':
+          'اس ای میل کے ساتھ کسی اور طریقے سے اکاؤنٹ پہلے سے موجود ہے۔',
+      'err_user_mismatch':
+          'براہ کرم اسی اکاؤنٹ سے سائن ان کریں جسے آپ حذف کر رہے ہیں۔',
+      'session_expired':
+          'آپ سائن آؤٹ ہو گئے ہیں۔ براہ کرم دوبارہ سائن ان کریں۔',
+      'email_not_verified':
+          'آپ کی ای میل ابھی تصدیق شدہ نہیں۔ تصدیقی لنک کے لیے ان باکس دیکھیں۔',
       'resend_verification': 'تصدیقی ای میل دوبارہ بھیجیں',
       'verification_link_resent': 'تصدیقی ای میل بھیج دی گئی۔ ان باکس دیکھیں۔',
       'delete_account': 'اکاؤنٹ حذف کریں',
       'delete_confirm_word': 'حذف',
       'delete_account_confirm_title': 'اپنا اکاؤنٹ حذف کریں؟',
-      'delete_account_confirm_message': 'اس سے آپ کا اکاؤنٹ، پیش رفت، بیجز، محفوظ آیات اور پروفائل تصویر ہمیشہ کے لیے حذف ہو جائیں گے۔ یہ واپس نہیں ہو سکتا۔',
-      'reauth_required_delete': 'حفاظت کے لیے، اکاؤنٹ حذف کرنے سے پہلے اپنا سائن ان تصدیق کریں۔',
+      'delete_account_confirm_message':
+          'اس سے آپ کا اکاؤنٹ، پیش رفت، بیجز، محفوظ آیات اور پروفائل تصویر ہمیشہ کے لیے حذف ہو جائیں گے۔ یہ واپس نہیں ہو سکتا۔',
+      'reauth_required_delete':
+          'حفاظت کے لیے، اکاؤنٹ حذف کرنے سے پہلے اپنا سائن ان تصدیق کریں۔',
       'confirm_with_password': 'جاری رکھنے کے لیے پاس ورڈ درج کریں',
       'confirm_with_provider': '{provider} کے ساتھ تصدیق کریں',
       'account_deleted': 'آپ کا اکاؤنٹ حذف کر دیا گیا۔',
@@ -2396,8 +2688,20 @@ class AppLocalizations {
       'longest_streak': 'سب سے طویل تسلسل',
       'adhan_sound': 'اذان کی آواز',
       'adhan_sound_desc': 'نماز کی یاد دہانی پر اذان چلائیں',
-      'exact_alarms_hint': '"الارمز اور یاد دہانیاں" کی اجازت دیں تاکہ نماز کی یاد دہانی بالکل وقت پر آئے۔',
-      'notifications_permission_revoked': 'سسٹم سیٹنگز میں اطلاعات کی اجازت بند کر دی گئی، اس لیے نماز کی یاد دہانیاں بند ہو گئیں۔',
+      'adjust_times': 'نماز کے اوقات میں ترمیم',
+      'app_theme': 'تھیم',
+      'theme_system': 'سسٹم کے مطابق',
+      'theme_light': 'لائٹ',
+      'theme_dark': 'ڈارک',
+      'adjust_times_desc': 'ہر نماز کو اپنی مسجد کے وقت کے مطابق کریں',
+      'adjust_times_none': 'کوئی تبدیلی نہیں',
+      'minutes_short': '{n} منٹ',
+      'adjust_times_note':
+          'اوقات حساب شدہ وقت سے آگے پیچھے کیے جاتے ہیں۔ یہ صرف تب استعمال کریں جب آپ کی مقامی مسجد کا وقت مختلف ہو۔',
+      'exact_alarms_hint':
+          '"الارمز اور یاد دہانیاں" کی اجازت دیں تاکہ نماز کی یاد دہانی بالکل وقت پر آئے۔',
+      'notifications_permission_revoked':
+          'سسٹم سیٹنگز میں اطلاعات کی اجازت بند کر دی گئی، اس لیے نماز کی یاد دہانیاں بند ہو گئیں۔',
       'good_morning': 'صبح بخیر',
       'good_afternoon': 'سہ پہر بخیر',
       'good_evening': 'شام بخیر',
@@ -2420,13 +2724,15 @@ class AppLocalizations {
       'more': 'مزید',
       'read_full_ayah': 'پوری آیت پڑھیں',
       'shared_from_app': 'Barakah Time سے شیئر کیا گیا',
-      'pulse_share_text': 'Barakah Time میں میری پیش رفت: {streak} دن کا تسلسل اور اس ہفتے {points} پوائنٹس۔',
+      'pulse_share_text':
+          'Barakah Time میں میری پیش رفت: {streak} دن کا تسلسل اور اس ہفتے {points} پوائنٹس۔',
       'points_this_week': 'اس ہفتے کے پوائنٹس',
       'current_streak': 'موجودہ تسلسل',
       'day_streak_count': '{n} دن کا تسلسل',
       'weekday_points': '{day}: {n} پوائنٹس',
       'recent_activity': 'حالیہ سرگرمی',
-      'no_recent_activity': 'ابھی کوئی سرگرمی نہیں۔ شروع کرنے کے لیے نماز درج کریں، قرآن پڑھیں یا ذکر کریں۔',
+      'no_recent_activity':
+          'ابھی کوئی سرگرمی نہیں۔ شروع کرنے کے لیے نماز درج کریں، قرآن پڑھیں یا ذکر کریں۔',
       'activity_prayer': 'نمازِ {prayer}',
       'activity_quran': 'تلاوتِ قرآن',
       'activity_dhikr': 'ذکر',
@@ -2449,56 +2755,72 @@ class AppLocalizations {
       'pulse_today': 'Bugün',
       'pulse_today_prayers': 'Bugünün namazları',
       'badge_locked': 'Kilitli',
-      'audio_error_voice_missing': "Telefonda bu dil için ses yok. Telefon Ayarları → Metin okuma bölümünden yükleyin.",
+      'audio_error_voice_missing':
+          "Telefonda bu dil için ses yok. Telefon Ayarları → Metin okuma bölümünden yükleyin.",
       'quran_translation_language': 'Meal dili',
       'quran_translation_same_as_app': 'Uygulama diliyle aynı',
-      'quran_translation_audio_note': 'Urduca, İngilizce, Farsça ve Türkçe mealler bir okuyucunun sesiyle dinlenir.',
+      'quran_translation_audio_note':
+          'Urduca, İngilizce, Farsça ve Türkçe mealler bir okuyucunun sesiyle dinlenir.',
       'audio_error_play': 'Ses çalınamadı. Bağlantınızı kontrol edin.',
       'audio_error_speech': 'Sesli okuma başarısız oldu',
       'name_too_long': 'Ad en fazla 100 karakter olabilir',
-      'reminders_need_notifications': 'Önce Ayarlar\'dan namaz bildirimlerini açın.',
+      'reminders_need_notifications':
+          'Önce Ayarlar\'dan namaz bildirimlerini açın.',
       'ramadan_title': 'Ramazan',
       'ramadan_day_of': '{len} günün {day}. günü',
       'ramadan_starts_in': '{n} gün sonra başlıyor',
-      'ramadan_qadr_tonight': 'Bu gece Kadir Gecesi olabilir. İbadet ve duayla geçirin.',
+      'ramadan_qadr_tonight':
+          'Bu gece Kadir Gecesi olabilir. İbadet ve duayla geçirin.',
       'ramadan_moon_adjust': 'Hilal gözlem ayarı (gün)',
-      'ramadan_need_location': 'Sahur ve iftar vakitlerini görmek için namaz vakitlerini yükleyin.',
+      'ramadan_need_location':
+          'Sahur ve iftar vakitlerini görmek için namaz vakitlerini yükleyin.',
       'ramadan_sehri_ends_in': 'Sahurun bitmesine',
       'ramadan_iftar_in': 'İftara',
       'ramadan_sehri_ends': 'Sahur bitişi',
       'ramadan_iftar': 'İftar',
       'ramadan_reminders': 'Sahur ve iftar hatırlatmaları',
-      'ramadan_reminders_desc': 'Sahur bitmeden 30 dakika önce ve iftar vaktinde',
+      'ramadan_reminders_desc':
+          'Sahur bitmeden 30 dakika önce ve iftar vaktinde',
       'ramadan_duas': 'Ramazan duaları',
       'ramadan_sehri_niyyah': 'Oruç niyeti (sahur)',
-      'ramadan_sehri_niyyah_meaning': 'Yarınki Ramazan orucunu tutmaya niyet ettim.',
+      'ramadan_sehri_niyyah_meaning':
+          'Yarınki Ramazan orucunu tutmaya niyet ettim.',
       'ramadan_iftar_dua': 'İftar duası',
-      'ramadan_iftar_dua_meaning': 'Allah\'ım, senin için oruç tuttum, sana inandım, sana güvendim ve senin rızkınla orucumu açtım.',
+      'ramadan_iftar_dua_meaning':
+          'Allah\'ım, senin için oruç tuttum, sana inandım, sana güvendim ve senin rızkınla orucumu açtım.',
       'ramadan_iftar_dua2': 'Orucu açtıktan sonra',
-      'ramadan_iftar_dua2_meaning': 'Susuzluk gitti, damarlar ıslandı ve inşallah ecir sabit oldu. (Ebû Dâvûd)',
+      'ramadan_iftar_dua2_meaning':
+          'Susuzluk gitti, damarlar ıslandı ve inşallah ecir sabit oldu. (Ebû Dâvûd)',
       'ramadan_qadr_dua': 'Kadir Gecesi duası',
-      'ramadan_qadr_dua_meaning': 'Allah\'ım, sen affedicisin, affetmeyi seversin, beni affet. (Tirmizî)',
+      'ramadan_qadr_dua_meaning':
+          'Allah\'ım, sen affedicisin, affetmeyi seversin, beni affet. (Tirmizî)',
       'ramadan_log': 'Oruç kaydı',
       'ramadan_fasted': 'Tuttum',
       'ramadan_missed': 'Kaçırdım',
       'ramadan_taraweeh': 'Teravih',
-      'ramadan_log_hint': 'Orucu ve teravihi işaretlemek için bir güne dokunun. Yıldızlar son on günün tek gecelerini gösterir.',
+      'ramadan_log_hint':
+          'Orucu ve teravihi işaretlemek için bir güne dokunun. Yıldızlar son on günün tek gecelerini gösterir.',
       'ramadan_qaza_fasts': 'Kaza edilecek {n} oruç',
       'ramadan_day': 'Gün',
       'ramadan_not_set': 'Temizle',
       'ramadan_prayed_taraweeh': 'Teravih kıldım',
       'ramadan_prepare': 'Hazırlanın: Kur\'an, dua ve sadaka planınızı yapın.',
       'ramadan_sehri_reminder_title': 'Sahur 30 dakika sonra bitiyor',
-      'ramadan_sehri_reminder_body': 'Sahur {time}\'da bitiyor. Niyet etmeyi unutmayın.',
+      'ramadan_sehri_reminder_body':
+          'Sahur {time}\'da bitiyor. Niyet etmeyi unutmayın.',
       'ramadan_iftar_reminder_title': 'İftar vakti',
-      'ramadan_iftar_reminder_body': 'Orucunuzu açın ve dua edin; iftar anındaki dua kabul olunur.',
+      'ramadan_iftar_reminder_body':
+          'Orucunuzu açın ve dua edin; iftar anındaki dua kabul olunur.',
       'memorial_title': 'İsal-i Sevap',
       'memorial_tool_subtitle': 'Vefat edenler için',
-      'memorial_sign_in': 'Bir yakınınız için İsal-i Sevap sayfası oluşturmak veya katılmak için giriş yapın.',
-      'memorial_intro': 'Vefat eden bir yakınınız için sayfa oluşturup WhatsApp\'ta paylaşın. Aile ve arkadaşlar cüz alarak hatmi tamamlayabilir, ortak hedeflere zikir ekleyebilir ve onun için iyilikler yazabilir.',
+      'memorial_sign_in':
+          'Bir yakınınız için İsal-i Sevap sayfası oluşturmak veya katılmak için giriş yapın.',
+      'memorial_intro':
+          'Vefat eden bir yakınınız için sayfa oluşturup WhatsApp\'ta paylaşın. Aile ve arkadaşlar cüz alarak hatmi tamamlayabilir, ortak hedeflere zikir ekleyebilir ve onun için iyilikler yazabilir.',
       'memorial_create': 'Sayfa oluştur',
       'memorial_join': 'Kodla katıl',
-      'memorial_none': 'Henüz sayfa yok. Bir tane oluşturun veya paylaşılan bir kodla katılın.',
+      'memorial_none':
+          'Henüz sayfa yok. Bir tane oluşturun veya paylaşılan bir kodla katılın.',
       'memorial_you_created': 'Sizin oluşturduğunuz',
       'memorial_joined': 'Katıldınız',
       'memorial_code_invalid': '8 karakterlik kodu girin',
@@ -2515,27 +2837,34 @@ class AppLocalizations {
       'memorial_goals': 'Zikir hedefleri',
       'memorial_goal': 'Hedef',
       'memorial_error_not_found': 'Bu kodla bir sayfa bulunamadı.',
-      'memorial_error_para_taken': 'Bu cüzü az önce biri aldı. Lütfen başka birini seçin.',
-      'memorial_error_generic': 'Bir sorun oluştu. İnternetinizi kontrol edip tekrar deneyin.',
+      'memorial_error_para_taken':
+          'Bu cüzü az önce biri aldı. Lütfen başka birini seçin.',
+      'memorial_error_generic':
+          'Bir sorun oluştu. İnternetinizi kontrol edip tekrar deneyin.',
       'memorial_deleted': 'Bu sayfa silindi.',
       'memorial_remove_from_list': 'Listemden kaldır',
-      'memorial_created_hint': 'Sayfa oluşturuldu. Aile ve arkadaşlarla paylaşın.',
+      'memorial_created_hint':
+          'Sayfa oluşturuldu. Aile ve arkadaşlarla paylaşın.',
       'memorial_share': 'Paylaş',
-      'memorial_share_text': '{name} için İsal-i Sevap\'a katılın. Barakah Time uygulamasında onun için bir cüz okuyun veya zikir yapın.\n\nKod: {code}\n\nUygulamayı indirin: {link}',
+      'memorial_share_text':
+          '{name} için İsal-i Sevap\'a katılın. Barakah Time uygulamasında onun için bir cüz okuyun veya zikir yapın.\n\nKod: {code}\n\nUygulamayı indirin: {link}',
       'memorial_para': '{n}. cüz',
-      'memorial_take_para_confirm': 'Bu cüzü vefat eden için okuyacaksınız. Diğerleri sizin aldığınızı görecek.',
+      'memorial_take_para_confirm':
+          'Bu cüzü vefat eden için okuyacaksınız. Diğerleri sizin aldığınızı görecek.',
       'memorial_take_para': 'Bu cüzü al',
       'memorial_para_read_by': '{n}. cüzü {name} okudu',
       'memorial_para_taken_by': '{n}. cüzü {name} okuyor',
       'memorial_para_yours': 'Bu cüzü siz okuyorsunuz',
       'memorial_mark_read': 'Okudum',
       'memorial_release_para': 'Geri ver',
-      'memorial_khatam_done': 'Hatim tamamlandı. Elhamdülillah! Yeni hatim başladı.',
+      'memorial_khatam_done':
+          'Hatim tamamlandı. Elhamdülillah! Yeni hatim başladı.',
       'memorial_para_done': 'Allah razı olsun. Allah kabul etsin.',
       'memorial_how_many': 'Kaç kez?',
       'memorial_added': 'Eklendi. Allah razı olsun.',
       'memorial_delete': 'Sayfayı sil',
-      'memorial_delete_confirm': 'Bu sayfa tüm ilerlemeyle birlikte herkes için silinir. Geri alınamaz.',
+      'memorial_delete_confirm':
+          'Bu sayfa tüm ilerlemeyle birlikte herkes için silinir. Geri alınamaz.',
       'memorial_add_deed': 'İyilik veya dua ekle',
       'memorial_deed_hint': 'ör. 10 kişiye yemek verdim veya onun için bir dua',
       'memorial_dates': 'Anma günleri',
@@ -2544,7 +2873,8 @@ class AppLocalizations {
       'memorial_invite': 'Davet et',
       'memorial_khatam_n': '{n}. hatim',
       'memorial_khatams_completed': '{n} hatim tamamlandı',
-      'memorial_khatam_hint': 'Vefat eden için okumak üzere boş bir cüze dokunun.',
+      'memorial_khatam_hint':
+          'Vefat eden için okumak üzere boş bir cüze dokunun.',
       'memorial_free': 'Boş',
       'memorial_yours': 'Sizin',
       'memorial_taken': 'Alındı',
@@ -2560,7 +2890,8 @@ class AppLocalizations {
       'memorial_day40': '40. gün (kırkı)',
       'memorial_barsi': 'Sene-i devriye',
       'memorial_reminder_title': '{name} için {day}',
-      'memorial_reminder_body': 'Bugün {name} için Kur\'an, dua veya sadaka ile anın.',
+      'memorial_reminder_body':
+          'Bugün {name} için Kur\'an, dua veya sadaka ile anın.',
       'dhikr_kareema': 'Ayet-i Kerime',
       'dhikr_darood': 'Salavat',
       'dhikr_kalma': 'Kelime-i Tevhid',
@@ -2572,13 +2903,16 @@ class AppLocalizations {
       'promise_no_ads': 'Asla reklam yok',
       'promise_no_sell': 'Verilerinizi asla satmayız veya paylaşmayız',
       'promise_no_tracking': 'İzleyici veya analiz aracı yok',
-      'promise_location': 'Konumunuz yalnızca namaz vakitleri, kıble ve yakındaki camiler için kullanılır',
+      'promise_location':
+          'Konumunuz yalnızca namaz vakitleri, kıble ve yakındaki camiler için kullanılır',
       'onboarding_privacy_title': 'Reklam yok. Verileriniz sizindir.',
-      'onboarding_privacy_desc': 'Barakah Time\'da reklam ve izleyici yoktur, verilerinizi asla satmayız. İbadetiniz sizinle Allah arasındadır.',
+      'onboarding_privacy_desc':
+          'Barakah Time\'da reklam ve izleyici yoktur, verilerinizi asla satmayız. İbadetiniz sizinle Allah arasındadır.',
       'qaza_tracker': 'Kaza Takibi',
       'witr': 'Vitir',
       'qaza_intro_title': 'Kaçırılan namazları kaza edin',
-      'qaza_intro_body': 'Kaç namaz borcunuz olduğunu tahmin edin, sonra bunları tek tek kılın. İlerlemeniz kaydedilir ve hesabınızla eşitlenir.',
+      'qaza_intro_body':
+          'Kaç namaz borcunuz olduğunu tahmin edin, sonra bunları tek tek kılın. İlerlemeniz kaydedilir ve hesabınızla eşitlenir.',
       'qaza_calculate': 'Kaza namazlarını hesapla',
       'qaza_enter_manually': 'Sayıları elle gir',
       'qaza_remaining': 'Kalan',
@@ -2592,9 +2926,11 @@ class AppLocalizations {
       'qaza_months': 'Ay',
       'qaza_days': 'Gün',
       'qaza_include_witr': 'Vitir dahil (Hanefi)',
-      'qaza_calc_desc': 'Ne kadar süre namaz kılmadınız? Örneğin ergenlikten düzenli namaza başlayana kadar.',
+      'qaza_calc_desc':
+          'Ne kadar süre namaz kılmadınız? Örneğin ergenlikten düzenli namaza başlayana kadar.',
       'qaza_calc_result': 'Her namazdan {n} eklenir',
-      'qaza_estimate_note': 'Tedbir olarak bir yıl 365 gün sayılır. Emin değilseniz bir âlime danışın.',
+      'qaza_estimate_note':
+          'Tedbir olarak bir yıl 365 gün sayılır. Emin değilseniz bir âlime danışın.',
       'qaza_add': 'Takibe ekle',
       'qaza_reset': 'Takibi sıfırla',
       'qaza_reset_confirm': 'Tüm sayılar ve ilerleme silinir. Geri alınamaz.',
@@ -2603,15 +2939,19 @@ class AppLocalizations {
       // Auth / onboarding / profile / settings / about pages
       'app_tagline': 'Vaktinize bereket katın',
       'onboarding_pulse_title': 'Manevi Nabız',
-      'onboarding_pulse_desc': 'Manevi istikrarınızı takip edin ve kalıcı alışkanlıklar edinin. Bağlı kalın, istikrarlı kalın.',
+      'onboarding_pulse_desc':
+          'Manevi istikrarınızı takip edin ve kalıcı alışkanlıklar edinin. Bağlı kalın, istikrarlı kalın.',
       'onboarding_prayer_title': 'Hiçbir Namazı Kaçırmayın',
-      'onboarding_prayer_desc': 'Konumunuza göre doğru namaz vakitleri, canlı geri sayım ve hatırlatıcılar.',
+      'onboarding_prayer_desc':
+          'Konumunuza göre doğru namaz vakitleri, canlı geri sayım ve hatırlatıcılar.',
       'onboarding_inspiration_title': 'Günlük İlham',
-      'onboarding_inspiration_desc': 'Günlük ayetler, Esmaül Hüsna, dualar ve daha fazlasıyla ruhunuza huzur bulun.',
+      'onboarding_inspiration_desc':
+          'Günlük ayetler, Esmaül Hüsna, dualar ve daha fazlasıyla ruhunuza huzur bulun.',
       'onboarding_next': 'İleri',
       'onboarding_get_started': 'Başlayın',
       'auth_welcome_back': 'Tekrar Hoş Geldiniz',
-      'auth_sign_in_subtitle': 'Manevi yolculuğunuza devam etmek için giriş yapın',
+      'auth_sign_in_subtitle':
+          'Manevi yolculuğunuza devam etmek için giriş yapın',
       'auth_email_address': 'E-posta Adresi',
       'auth_password': 'Şifre',
       'auth_sign_in': 'Giriş Yap',
@@ -2623,12 +2963,14 @@ class AppLocalizations {
       'auth_full_name': 'Ad Soyad',
       'auth_register': 'Kayıt Ol',
       'auth_have_account': 'Zaten hesabınız var mı?',
-      'auth_account_created_verify': 'Hesap oluşturuldu! {email} adresine doğrulama bağlantısı gönderdik.',
+      'auth_account_created_verify':
+          'Hesap oluşturuldu! {email} adresine doğrulama bağlantısı gönderdik.',
       'profile_saved_verses': 'Kaydedilen ayetler',
       'profile_saved_count': '{n} kayıtlı',
       'profile_activity_history': 'Etkinlik geçmişi',
       'profile_last_activity': 'Son: {activity}',
-      'profile_no_saved_verses': 'Henüz kayıtlı ayet yok. Bir ayeti buraya kaydetmek için yer imine dokunun.',
+      'profile_no_saved_verses':
+          'Henüz kayıtlı ayet yok. Bir ayeti buraya kaydetmek için yer imine dokunun.',
       'profile_remove_verse': 'Kaydedilenlerden kaldır',
       'profile_undo': 'Geri al',
       'profile_change_photo': 'Fotoğrafı değiştir',
@@ -2641,18 +2983,21 @@ class AppLocalizations {
       'settings_support_us': 'Çalışmamızı destekleyin',
       'settings_version': 'Sürüm {v}',
       'about_title': 'Bereket Vakti Hakkında',
-      'about_description': 'Namaz vakitleri, Kur\'an, zikir ve günlük manevi gelişim için İslami bir yol arkadaşı; vaktinize bereket katmak için tasarlandı.',
+      'about_description':
+          'Namaz vakitleri, Kur\'an, zikir ve günlük manevi gelişim için İslami bir yol arkadaşı; vaktinize bereket katmak için tasarlandı.',
       'about_credits': 'Katkılar ve veri kaynakları',
       'about_quran_data': 'Kur\'an metni, mealler ve ses',
       'about_map_data': 'Harita ve yer verileri',
-      'about_map_license': '© OpenStreetMap katkıda bulunanları, Açık Veritabanı Lisansı (ODbL) kapsamında',
+      'about_map_license':
+          '© OpenStreetMap katkıda bulunanları, Açık Veritabanı Lisansı (ODbL) kapsamında',
       'about_prayer_calc': 'Namaz vakti hesaplama',
       'about_prayer_calc_source': 'adhan kütüphanesi (açık kaynak)',
       'about_privacy': 'Gizlilik Politikası',
       'about_terms': 'Hizmet Şartları',
       'about_licenses': 'Açık kaynak lisansları',
       'about_made_with_love': 'Ümmet için ❤️ ile yapıldı',
-      'about_link_failed': 'Bağlantı açılamadı. Lütfen daha sonra tekrar deneyin.',
+      'about_link_failed':
+          'Bağlantı açılamadı. Lütfen daha sonra tekrar deneyin.',
       'search_surahs': 'Ad veya numarayla ara',
       'continue_reading': 'Okumaya devam et',
       'no_surahs_found': 'Aramanızla eşleşen sure yok',
@@ -2719,8 +3064,10 @@ class AppLocalizations {
       'all_tools': 'Tüm Araçlar',
       'ayah': 'Ayet',
       'ayahs': 'Ayet',
-      'calibrate_compass': 'Yön yanlış görünüyorsa pusulayı kalibre etmek için telefonunuzu 8 çizerek hareket ettirin.',
-      'compass_unavailable': 'Bu cihazda pusula yok — kuzeye dönün, ardından gösterilen açı kadar dönün.',
+      'calibrate_compass':
+          'Yön yanlış görünüyorsa pusulayı kalibre etmek için telefonunuzu 8 çizerek hareket ettirin.',
+      'compass_unavailable':
+          'Bu cihazda pusula yok — kuzeye dönün, ardından gösterilen açı kadar dönün.',
       'could_not_open_maps': 'Harita açılamadı',
       'degrees_from_north': 'Kuzeyden {deg}°',
       'detecting_location': 'Konum belirleniyor...',
@@ -2729,9 +3076,11 @@ class AppLocalizations {
       'finding_mosques': 'Yakındaki camiler aranıyor...',
       'in_days': '{n} gün sonra',
       'listen_translation': 'Meali dinle',
-      'location_error_message': 'Konumunuz alınamadı. Konum servislerini ve iznini açıp tekrar deneyin.',
+      'location_error_message':
+          'Konumunuz alınamadı. Konum servislerini ve iznini açıp tekrar deneyin.',
       'mark_as_read': 'Okundu olarak işaretle',
-      'mosques_load_error': 'Yakındaki camiler yüklenemedi. İnternet bağlantınızı kontrol edin.',
+      'mosques_load_error':
+          'Yakındaki camiler yüklenemedi. İnternet bağlantınızı kontrol edin.',
       'no_mosques_match': 'Aramanızla eşleşen cami yok',
       'no_mosques_nearby': '5 km içinde cami bulunamadı',
       'now_playing': 'Çalıyor',
@@ -2739,13 +3088,16 @@ class AppLocalizations {
       'pause': 'Duraklat',
       'play': 'Oynat',
       'play_surah': 'Sureyi oynat',
-      'quran_load_error': 'Kur\'an yüklenemedi. İnternet bağlantınızı kontrol edip tekrar deneyin.',
-      'reset_counter_message': 'Sayaç 0’a dönecek. Şimdiye kadarki zikriniz Manevi Nabız’a kaydedilecek.',
+      'quran_load_error':
+          'Kur\'an yüklenemedi. İnternet bağlantınızı kontrol edip tekrar deneyin.',
+      'reset_counter_message':
+          'Sayaç 0’a dönecek. Şimdiye kadarki zikriniz Manevi Nabız’a kaydedilecek.',
       'reset_counter_title': 'Sayaç sıfırlansın mı?',
       'share': 'Paylaş',
       'stop': 'Durdur',
       'surah_already_logged_today': 'Bugün zaten kaydedildi ✓',
-      'surah_load_error': 'Bu sure yüklenemedi. İnternet bağlantınızı kontrol edip tekrar deneyin.',
+      'surah_load_error':
+          'Bu sure yüklenemedi. İnternet bağlantınızı kontrol edip tekrar deneyin.',
       'surah_logged': '{name} suresi kaydedildi! ✨',
       'today': 'Bugün',
       'tomorrow': 'Yarın',
@@ -2759,8 +3111,10 @@ class AppLocalizations {
       'zakat_liabilities': 'Vadesi gelen borçlar',
       'zakat_net_wealth': 'Zekâta tabi net servet',
       'zakat_nisab_standard': 'Nisab ölçüsü',
-      'zakat_nisab_unknown': 'Nisabı kontrol etmek için aşağıya metal fiyatını girin',
-      'zakat_no_wealth': 'Borçlardan sonra zekâta tabi servet yok — zekât gerekmez',
+      'zakat_nisab_unknown':
+          'Nisabı kontrol etmek için aşağıya metal fiyatını girin',
+      'zakat_no_wealth':
+          'Borçlardan sonra zekâta tabi servet yok — zekât gerekmez',
       'zakat_silver_nisab': 'Gümüş (612,36 g)',
       'zakat_silver_price': 'Gümüşün güncel gram fiyatı',
       'mawlid': 'Mevlid Kandili',
@@ -2780,21 +3134,27 @@ class AppLocalizations {
       'err_email_in_use': 'Bu e-postayla zaten bir hesap var.',
       'err_network': 'Ağ hatası. Bağlantınızı kontrol edin.',
       'err_too_many_requests': 'Çok fazla deneme. Daha sonra tekrar deneyin.',
-      'err_recent_login': 'Güvenliğiniz için e-postanızı değiştirmeden önce çıkış yapıp tekrar giriş yapın.',
+      'err_recent_login':
+          'Güvenliğiniz için e-postanızı değiştirmeden önce çıkış yapıp tekrar giriş yapın.',
       'err_upload_failed': 'Fotoğraf yüklenemedi. Lütfen tekrar deneyin.',
-      'err_profile_update_failed': 'Profil güncellenemedi. Lütfen tekrar deneyin.',
+      'err_profile_update_failed':
+          'Profil güncellenemedi. Lütfen tekrar deneyin.',
       'err_google_failed': 'Google ile giriş başarısız. Lütfen tekrar deneyin.',
       'profile_updated': 'Profil güncellendi.',
       'photo_updated': 'Profil fotoğrafı güncellendi.',
-      'verification_email_sent': 'Yeni e-postanıza bir doğrulama bağlantısı gönderildi. Onayladığınızda e-postanız güncellenecek.',
+      'verification_email_sent':
+          'Yeni e-postanıza bir doğrulama bağlantısı gönderildi. Onayladığınızda e-postanız güncellenecek.',
       'forgot_password': 'Şifremi Unuttum?',
       'reset_password': 'Şifreyi Sıfırla',
-      'reset_password_hint': 'E-postanızı girin, size şifre sıfırlama bağlantısı gönderelim.',
+      'reset_password_hint':
+          'E-postanızı girin, size şifre sıfırlama bağlantısı gönderelim.',
       'send_link': 'Bağlantı Gönder',
-      'reset_email_sent': 'Şifre sıfırlama e-postası gönderildi. Gelen kutunuzu kontrol edin.',
+      'reset_email_sent':
+          'Şifre sıfırlama e-postası gönderildi. Gelen kutunuzu kontrol edin.',
       'email': 'E-posta',
       'name': 'Ad',
-      'photo_permission_denied': 'Fotoğraf erişimi reddedildi. Lütfen cihaz ayarlarından izin verin.',
+      'photo_permission_denied':
+          'Fotoğraf erişimi reddedildi. Lütfen cihaz ayarlarından izin verin.',
       'photo_pick_failed': 'Fotoğraflar açılamadı. Lütfen tekrar deneyin.',
       'member_since': 'Üyelik tarihi',
       'my_profile': 'Profilim',
@@ -2809,9 +3169,12 @@ class AppLocalizations {
       'location_required': 'Lütfen bir şehir girin.',
       'rate_now': 'Şimdi Değerlendir',
       'later': 'Daha Sonra',
-      'rate_us_message': 'Barakah Time\'ı beğendiyseniz lütfen bizi değerlendirin! ✨',
-      'app_store_coming_soon': 'Barakah Time yakında App Store\'da. Desteğiniz için teşekkürler!',
-      'store_open_failed': 'Mağaza açılamadı. Lütfen daha sonra tekrar deneyin.',
+      'rate_us_message':
+          'Barakah Time\'ı beğendiyseniz lütfen bizi değerlendirin! ✨',
+      'app_store_coming_soon':
+          'Barakah Time yakında App Store\'da. Desteğiniz için teşekkürler!',
+      'store_open_failed':
+          'Mağaza açılamadı. Lütfen daha sonra tekrar deneyin.',
       'close': 'Kapat',
       'skip': 'Atla',
       'app_name': 'Bereket Vakti',
@@ -2925,10 +3288,13 @@ class AppLocalizations {
       'note': 'Not',
       'sunrise': 'Güneş',
       'tomorrow_fajr': 'Yarının Sabah namazı',
-      'location_not_found': '"{city}" bulunamadı. Farklı bir yazım deneyin veya ülke ekleyin.',
+      'location_not_found':
+          '"{city}" bulunamadı. Farklı bir yazım deneyin veya ülke ekleyin.',
       'location_services_disabled': 'Konum servisleri kapalı',
-      'location_permission_denied': 'Bulunduğunuz yerin namaz vakitlerini göstermek için konum izni gerekli.',
-      'location_permission_denied_forever': 'Konum izni engellendi. Uygulama ayarlarından açın veya şehri elle girin.',
+      'location_permission_denied':
+          'Bulunduğunuz yerin namaz vakitlerini göstermek için konum izni gerekli.',
+      'location_permission_denied_forever':
+          'Konum izni engellendi. Uygulama ayarlarından açın veya şehri elle girin.',
       'location_timeout': 'Konumunuz zamanında alınamadı.',
       'location_access_required': 'Konum Erişimi Gerekli',
       'open_settings': 'Ayarları Aç',
@@ -2963,8 +3329,10 @@ class AppLocalizations {
       'motivation_achieved': 'MaşaAllah! Bugünkü manevi hedeflerine ulaştın. ✨',
       'motivation_almost': 'Harika ilerleme! Hedefine az kaldı. 🚀',
       'motivation_halfway': 'Yolun yarısındasın! Böyle devam. 💪',
-      'motivation_started': 'İyi başlangıç! Hedeflerine doğru ilerlemeye devam et. ⚡',
-      'motivation_start': 'Bugünkü manevi yolculuğuna başla. Her adım önemli! 🌱',
+      'motivation_started':
+          'İyi başlangıç! Hedeflerine doğru ilerlemeye devam et. ⚡',
+      'motivation_start':
+          'Bugünkü manevi yolculuğuna başla. Her adım önemli! 🌱',
       'method_mwl': 'Müslüman Dünya Birliği',
       'method_karachi': 'İslami İlimler Üniversitesi, Karaçi',
       'method_isna': 'Kuzey Amerika İslam Birliği (ISNA)',
@@ -2981,23 +3349,31 @@ class AppLocalizations {
       'default_user_name': 'Bereket Kullanıcısı',
       'sign_in_with_apple': 'Apple ile Giriş Yap',
       'continue_as_guest': 'Misafir olarak devam et',
-      'guest_mode_notice': 'Uygulamayı misafir olarak kullanıyorsun. İlerlemeni yedeklemek ve diğer cihazlarda kullanmak için giriş yap.',
+      'guest_mode_notice':
+          'Uygulamayı misafir olarak kullanıyorsun. İlerlemeni yedeklemek ve diğer cihazlarda kullanmak için giriş yap.',
       'sign_in_to_sync': 'Senkronize etmek için giriş yap',
-      'auth_unavailable_notice': 'Giriş şu anda kullanılamıyor. Uygulamayı kullanmaya devam edebilirsin; verilerin bu cihazda kalır.',
-      'err_auth_unavailable': 'Giriş şu anda yapılamıyor. Bağlantını kontrol edip uygulamayı yeniden başlat.',
+      'auth_unavailable_notice':
+          'Giriş şu anda kullanılamıyor. Uygulamayı kullanmaya devam edebilirsin; verilerin bu cihazda kalır.',
+      'err_auth_unavailable':
+          'Giriş şu anda yapılamıyor. Bağlantını kontrol edip uygulamayı yeniden başlat.',
       'err_apple_failed': 'Apple ile giriş başarısız oldu. Lütfen tekrar dene.',
       'err_user_disabled': 'Bu hesap devre dışı bırakıldı.',
-      'err_account_exists_different_provider': 'Bu e-postayla farklı bir giriş yöntemi kullanan bir hesap zaten var.',
+      'err_account_exists_different_provider':
+          'Bu e-postayla farklı bir giriş yöntemi kullanan bir hesap zaten var.',
       'err_user_mismatch': 'Lütfen sildiğin hesapla giriş yap.',
       'session_expired': 'Oturumun kapatıldı. Lütfen tekrar giriş yap.',
-      'email_not_verified': 'E-postan henüz doğrulanmadı. Doğrulama bağlantısı için gelen kutunu kontrol et.',
+      'email_not_verified':
+          'E-postan henüz doğrulanmadı. Doğrulama bağlantısı için gelen kutunu kontrol et.',
       'resend_verification': 'Doğrulama e-postasını tekrar gönder',
-      'verification_link_resent': 'Doğrulama e-postası gönderildi. Gelen kutunu kontrol et.',
+      'verification_link_resent':
+          'Doğrulama e-postası gönderildi. Gelen kutunu kontrol et.',
       'delete_account': 'Hesabı sil',
       'delete_confirm_word': 'SİL',
       'delete_account_confirm_title': 'Hesabın silinsin mi?',
-      'delete_account_confirm_message': 'Bu işlem hesabını, ilerlemeni, rozetlerini, kayıtlı ayetlerini ve profil fotoğrafını kalıcı olarak siler. Geri alınamaz.',
-      'reauth_required_delete': 'Güvenliğin için hesabını silmeden önce girişini doğrula.',
+      'delete_account_confirm_message':
+          'Bu işlem hesabını, ilerlemeni, rozetlerini, kayıtlı ayetlerini ve profil fotoğrafını kalıcı olarak siler. Geri alınamaz.',
+      'reauth_required_delete':
+          'Güvenliğin için hesabını silmeden önce girişini doğrula.',
       'confirm_with_password': 'Devam etmek için şifreni gir',
       'confirm_with_provider': '{provider} ile doğrula',
       'account_deleted': 'Hesabın silindi.',
@@ -3006,8 +3382,20 @@ class AppLocalizations {
       'longest_streak': 'En uzun seri',
       'adhan_sound': 'Ezan sesi',
       'adhan_sound_desc': 'Namaz hatırlatmalarında ezan çal',
-      'exact_alarms_hint': 'Namaz hatırlatmalarının tam vaktinde gelmesi için "Alarmlar ve hatırlatıcılar" iznini ver.',
-      'notifications_permission_revoked': 'Bildirim izni sistem ayarlarından kapatıldı, bu yüzden namaz hatırlatmaları devre dışı bırakıldı.',
+      'adjust_times': 'Namaz vakitlerini ayarla',
+      'app_theme': 'Tema',
+      'theme_system': 'Sistem varsayılanı',
+      'theme_light': 'Açık',
+      'theme_dark': 'Koyu',
+      'adjust_times_desc': 'Her vakti camiinize göre kaydırın',
+      'adjust_times_none': 'Değişiklik yok',
+      'minutes_short': '{n} dk',
+      'adjust_times_note':
+          'Vakitler hesaplanan saatten kaydırılır. Yalnızca yerel caminiz farklıysa kullanın.',
+      'exact_alarms_hint':
+          'Namaz hatırlatmalarının tam vaktinde gelmesi için "Alarmlar ve hatırlatıcılar" iznini ver.',
+      'notifications_permission_revoked':
+          'Bildirim izni sistem ayarlarından kapatıldı, bu yüzden namaz hatırlatmaları devre dışı bırakıldı.',
       'good_morning': 'Günaydın',
       'good_afternoon': 'Tünaydın',
       'good_evening': 'İyi akşamlar',
@@ -3030,13 +3418,15 @@ class AppLocalizations {
       'more': 'Daha fazla',
       'read_full_ayah': 'Ayetin tamamını oku',
       'shared_from_app': 'Barakah Time ile paylaşıldı',
-      'pulse_share_text': 'Barakah Time ilerlemem: {streak} günlük seri ve bu hafta {points} puan.',
+      'pulse_share_text':
+          'Barakah Time ilerlemem: {streak} günlük seri ve bu hafta {points} puan.',
       'points_this_week': 'Bu haftaki puan',
       'current_streak': 'Mevcut seri',
       'day_streak_count': '{n} günlük seri',
       'weekday_points': '{day}: {n} puan',
       'recent_activity': 'Son etkinlikler',
-      'no_recent_activity': 'Henüz etkinlik yok. Başlamak için bir namaz kaydet, Kuran oku veya zikir çek.',
+      'no_recent_activity':
+          'Henüz etkinlik yok. Başlamak için bir namaz kaydet, Kuran oku veya zikir çek.',
       'activity_prayer': '{prayer} namazı',
       'activity_quran': 'Kuran okuma',
       'activity_dhikr': 'Zikir',
@@ -3071,8 +3461,10 @@ class AppLocalizations {
   String get onboarding_pulse_desc => translate('onboarding_pulse_desc');
   String get onboarding_prayer_title => translate('onboarding_prayer_title');
   String get onboarding_prayer_desc => translate('onboarding_prayer_desc');
-  String get onboarding_inspiration_title => translate('onboarding_inspiration_title');
-  String get onboarding_inspiration_desc => translate('onboarding_inspiration_desc');
+  String get onboarding_inspiration_title =>
+      translate('onboarding_inspiration_title');
+  String get onboarding_inspiration_desc =>
+      translate('onboarding_inspiration_desc');
   String get onboarding_next => translate('onboarding_next');
   String get onboarding_get_started => translate('onboarding_get_started');
   String get auth_welcome_back => translate('auth_welcome_back');
@@ -3231,9 +3623,12 @@ class AppLocalizations {
   String get sunrise => translate('sunrise');
   String get tomorrow_fajr => translate('tomorrow_fajr');
   String get location_not_found => translate('location_not_found');
-  String get location_services_disabled => translate('location_services_disabled');
-  String get location_permission_denied => translate('location_permission_denied');
-  String get location_permission_denied_forever => translate('location_permission_denied_forever');
+  String get location_services_disabled =>
+      translate('location_services_disabled');
+  String get location_permission_denied =>
+      translate('location_permission_denied');
+  String get location_permission_denied_forever =>
+      translate('location_permission_denied_forever');
   String get location_timeout => translate('location_timeout');
   String get location_required => translate('location_required');
   String get open_settings => translate('open_settings');
@@ -3243,7 +3638,8 @@ class AppLocalizations {
   String get location_unavailable => translate('location_unavailable');
   String get prayer_not_started => translate('prayer_not_started');
   String get prayer_already_logged => translate('prayer_already_logged');
-  String get prayer_notification_title => translate('prayer_notification_title');
+  String get prayer_notification_title =>
+      translate('prayer_notification_title');
   String get prayer_notification_body => translate('prayer_notification_body');
   String get pulse_load_failed => translate('pulse_load_failed');
   String get names_99_short => translate('names_99_short');
@@ -3264,7 +3660,8 @@ class AppLocalizations {
   String get err_too_many_requests => translate('err_too_many_requests');
   String get err_recent_login => translate('err_recent_login');
   String get err_upload_failed => translate('err_upload_failed');
-  String get err_profile_update_failed => translate('err_profile_update_failed');
+  String get err_profile_update_failed =>
+      translate('err_profile_update_failed');
   String get err_google_failed => translate('err_google_failed');
   String get profile_updated => translate('profile_updated');
   String get photo_updated => translate('photo_updated');
@@ -3325,7 +3722,8 @@ class AppLocalizations {
   String get reset_counter_title => translate('reset_counter_title');
   String get share => translate('share');
   String get stop => translate('stop');
-  String get surah_already_logged_today => translate('surah_already_logged_today');
+  String get surah_already_logged_today =>
+      translate('surah_already_logged_today');
   String get surah_load_error => translate('surah_load_error');
   String get surah_logged => translate('surah_logged');
   String get today => translate('today');
@@ -3367,9 +3765,11 @@ class AppLocalizations {
   String get badge_streak_100 => translate('badge_streak_100');
   String get badge_streak_100_desc => translate('badge_streak_100_desc');
   String get badge_daily_achiever => translate('badge_daily_achiever');
-  String get badge_daily_achiever_desc => translate('badge_daily_achiever_desc');
+  String get badge_daily_achiever_desc =>
+      translate('badge_daily_achiever_desc');
   String get badge_spiritual_veteran => translate('badge_spiritual_veteran');
-  String get badge_spiritual_veteran_desc => translate('badge_spiritual_veteran_desc');
+  String get badge_spiritual_veteran_desc =>
+      translate('badge_spiritual_veteran_desc');
   String get badge_points_1000 => translate('badge_points_1000');
   String get badge_points_1000_desc => translate('badge_points_1000_desc');
   String get no_badges_yet => translate('no_badges_yet');
@@ -3400,25 +3800,40 @@ class AppLocalizations {
   String get err_auth_unavailable => translate('err_auth_unavailable');
   String get err_apple_failed => translate('err_apple_failed');
   String get err_user_disabled => translate('err_user_disabled');
-  String get err_account_exists_different_provider => translate('err_account_exists_different_provider');
+  String get err_account_exists_different_provider =>
+      translate('err_account_exists_different_provider');
   String get err_user_mismatch => translate('err_user_mismatch');
   String get session_expired => translate('session_expired');
   String get email_not_verified => translate('email_not_verified');
   String get resend_verification => translate('resend_verification');
   String get verification_link_resent => translate('verification_link_resent');
   String get delete_account => translate('delete_account');
-  String get delete_account_confirm_title => translate('delete_account_confirm_title');
-  String get delete_account_confirm_message => translate('delete_account_confirm_message');
+  String get delete_account_confirm_title =>
+      translate('delete_account_confirm_title');
+  String get delete_account_confirm_message =>
+      translate('delete_account_confirm_message');
   String get reauth_required_delete => translate('reauth_required_delete');
   String get confirm_with_password => translate('confirm_with_password');
   String get account_deleted => translate('account_deleted');
-  String get err_delete_account_failed => translate('err_delete_account_failed');
+  String get err_delete_account_failed =>
+      translate('err_delete_account_failed');
   String get lifetime_points => translate('lifetime_points');
   String get longest_streak => translate('longest_streak');
   String get adhan_sound => translate('adhan_sound');
   String get adhan_sound_desc => translate('adhan_sound_desc');
+  String get adjust_times => translate('adjust_times');
+  String get app_theme => translate('app_theme');
+  String get theme_system => translate('theme_system');
+  String get theme_light => translate('theme_light');
+  String get theme_dark => translate('theme_dark');
+  String get adjust_times_desc => translate('adjust_times_desc');
+  String get adjust_times_none => translate('adjust_times_none');
+  String get adjust_times_note => translate('adjust_times_note');
+  String minutesShort(int n) =>
+      translate('minutes_short').replaceAll('{n}', n > 0 ? '+$n' : '$n');
   String get exact_alarms_hint => translate('exact_alarms_hint');
-  String get notifications_permission_revoked => translate('notifications_permission_revoked');
+  String get notifications_permission_revoked =>
+      translate('notifications_permission_revoked');
 
   String get good_morning => translate('good_morning');
   String get good_afternoon => translate('good_afternoon');
@@ -3492,7 +3907,8 @@ class AppLocalizations {
   String get tasbeeh_round => translate('tasbeeh_round');
   String get tasbeeh_total => translate('tasbeeh_total');
   String get tasbeeh_target_reached => translate('tasbeeh_target_reached');
-  String get tasbeeh_counter_semantics => translate('tasbeeh_counter_semantics');
+  String get tasbeeh_counter_semantics =>
+      translate('tasbeeh_counter_semantics');
   String get tasbeeh_target_invalid => translate('tasbeeh_target_invalid');
   String get zakat_currency => translate('zakat_currency');
   String get zakat_currency_hint => translate('zakat_currency_hint');

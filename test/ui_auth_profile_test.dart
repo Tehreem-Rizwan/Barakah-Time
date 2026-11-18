@@ -86,7 +86,11 @@ Future<void> _pump(
 
 Future<AuthBloc> _authBloc() async {
   final prefs = await SharedPreferences.getInstance();
-  return AuthBloc(prefs, SupabaseService(idTokenProvider: () async => null), FirebaseService());
+  return AuthBloc(
+    prefs,
+    SupabaseService(idTokenProvider: () async => null),
+    FirebaseService(),
+  );
 }
 
 void main() {

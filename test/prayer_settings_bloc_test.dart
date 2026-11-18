@@ -43,37 +43,40 @@ void main() {
     await bloc.close();
   });
 
-  test('UpdateManualLocation geocodes and persists; failure sets error',
-      () async {
-    final prefs = await prefsWith({});
-    final bloc = SettingsBloc(
-      prefs,
-      geocoder: (q) async =>
-          q == 'Istanbul' ? (latitude: 41.0, longitude: 28.9) : null,
-    );
-    bloc.add(const UpdateManualLocation('Nowhereville'));
-    await Future<void>.delayed(const Duration(milliseconds: 10));
-    expect(bloc.state.locationError, isNotNull);
-    expect(bloc.state.manualLocation, SettingsState.defaultManualLocation);
+  test(
+    'UpdateManualLocation geocodes and persists; failure sets error',
+    () async {
+      final prefs = await prefsWith({});
+      final bloc = SettingsBloc(
+        prefs,
+        geocoder:
+            (q) async =>
+                q == 'Istanbul' ? (latitude: 41.0, longitude: 28.9) : null,
+      );
+      bloc.add(const UpdateManualLocation('Nowhereville'));
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+      expect(bloc.state.locationError, isNotNull);
+      expect(bloc.state.manualLocation, SettingsState.defaultManualLocation);
 
-    // Same failure twice still produces a fresh error emission.
-    final errors = <String?>[];
-    final sub = bloc.stream.listen((s) => errors.add(s.locationError));
-    bloc.add(const UpdateManualLocation('Nowhereville'));
-    await Future<void>.delayed(const Duration(milliseconds: 10));
-    expect(errors.length, 2);
-    expect(errors.first, isNull);
-    expect(errors.last, isNotNull);
-    await sub.cancel();
+      // Same failure twice still produces a fresh error emission.
+      final errors = <String?>[];
+      final sub = bloc.stream.listen((s) => errors.add(s.locationError));
+      bloc.add(const UpdateManualLocation('Nowhereville'));
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+      expect(errors.length, 2);
+      expect(errors.first, isNull);
+      expect(errors.last, isNotNull);
+      await sub.cancel();
 
-    bloc.add(const UpdateManualLocation('Istanbul'));
-    await Future<void>.delayed(const Duration(milliseconds: 10));
-    expect(bloc.state.locationError, isNull);
-    expect(bloc.state.manualLatitude, 41.0);
-    expect(prefs.getDouble('manual_longitude'), 28.9);
-    expect(SettingsBloc.readFromPrefs(prefs).manualLocation, 'Istanbul');
-    await bloc.close();
-  });
+      bloc.add(const UpdateManualLocation('Istanbul'));
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+      expect(bloc.state.locationError, isNull);
+      expect(bloc.state.manualLatitude, 41.0);
+      expect(prefs.getDouble('manual_longitude'), 28.9);
+      expect(SettingsBloc.readFromPrefs(prefs).manualLocation, 'Istanbul');
+      await bloc.close();
+    },
+  );
 
   test('ToggleNotifications without permission reverts to false', () async {
     final prefs = await prefsWith({});

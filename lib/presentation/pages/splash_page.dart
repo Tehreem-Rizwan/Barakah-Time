@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get_it/get_it.dart';
 
 import '../../core/localization/app_localizations.dart';
@@ -33,13 +32,6 @@ class _SplashPageState extends State<SplashPage>
     parent: _controller,
     curve: const Interval(0.0, 0.6, curve: Curves.easeIn),
   );
-  late final Animation<double> _scale = Tween<double>(begin: 0.8, end: 1.0)
-      .animate(
-        CurvedAnimation(
-          parent: _controller,
-          curve: const Interval(0.0, 0.7, curve: Curves.easeOutBack),
-        ),
-      );
 
   @override
   void initState() {
@@ -94,50 +86,55 @@ class _SplashPageState extends State<SplashPage>
           children: [
             // Same turquoise tile pattern as Home and the app icon.
             const IslamicHeaderBand(height: double.infinity),
+            // The mark sits exactly where (and about as large as) Android
+            // 12+'s system splash draws the app icon, so the hand-off from
+            // the system splash to this page doesn't jump.
             Center(
-              child: SingleChildScrollView(
-                padding: AppSpacing.page,
-                child: FadeTransition(
-                  opacity: _fade,
-                  child: ScaleTransition(
-                    scale: _scale,
-                    child: Semantics(
-                      label: l10n.app_name,
-                      excludeSemantics: true,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Image.asset(
-                            'assets/images/brand_mark.png',
-                            width: 150.r,
-                            height: 150.r,
-                            errorBuilder:
-                                (_, _, _) => Icon(
-                                  Icons.mosque_rounded,
-                                  size: 80.sp,
-                                  color: AppColors.brass,
-                                ),
-                          ),
-                          SizedBox(height: AppSpacing.vLg),
-                          Text(
-                            l10n.app_name,
-                            textAlign: TextAlign.center,
-                            style: textTheme.displaySmall?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.ivoryOnTeal,
-                            ),
-                          ),
-                          SizedBox(height: AppSpacing.vSm),
-                          Text(
-                            l10n.app_tagline,
-                            textAlign: TextAlign.center,
-                            style: textTheme.bodyLarge?.copyWith(
-                              color: AppColors.brass,
-                              letterSpacing: 0.3,
-                            ),
-                          ),
-                        ],
+              child: Semantics(
+                label: l10n.app_name,
+                excludeSemantics: true,
+                child: Image.asset(
+                  'assets/images/brand_mark.png',
+                  width: 188,
+                  height: 188,
+                  errorBuilder:
+                      (_, _, _) => const Icon(
+                        Icons.mosque_rounded,
+                        size: 80,
+                        color: AppColors.brass,
                       ),
+                ),
+              ),
+            ),
+            // Name and tagline fade in below the mark.
+            Align(
+              alignment: const Alignment(0, 0.42),
+              child: FadeTransition(
+                opacity: _fade,
+                child: Padding(
+                  padding: AppSpacing.pageHorizontal,
+                  child: ExcludeSemantics(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          l10n.app_name,
+                          textAlign: TextAlign.center,
+                          style: textTheme.displaySmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.ivoryOnTeal,
+                          ),
+                        ),
+                        SizedBox(height: AppSpacing.vSm),
+                        Text(
+                          l10n.app_tagline,
+                          textAlign: TextAlign.center,
+                          style: textTheme.bodyLarge?.copyWith(
+                            color: AppColors.brass,
+                            letterSpacing: 0.3,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),

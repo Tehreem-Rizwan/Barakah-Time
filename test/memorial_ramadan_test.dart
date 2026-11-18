@@ -111,9 +111,14 @@ void main() {
       expect(info.isRamadan, isFalse);
       expect(info.year, 1448);
       final start = cal.hijriToGregorian(1448, 9, 1);
-      expect(info.daysUntil, DateTime(start.year, start.month, start.day)
-          .difference(DateTime(before.year, before.month, before.day))
-          .inDays);
+      expect(
+        info.daysUntil,
+        DateTime(
+          start.year,
+          start.month,
+          start.day,
+        ).difference(DateTime(before.year, before.month, before.day)).inDays,
+      );
 
       // After Ramadan the next one is next Hijri year.
       final after = cal.hijriToGregorian(1448, 11, 1);
@@ -135,11 +140,7 @@ void main() {
         3,
         const FastDay(status: FastStatus.fasted, taraweeh: true),
       );
-      await service.saveDay(
-        1448,
-        4,
-        const FastDay(status: FastStatus.missed),
-      );
+      await service.saveDay(1448, 4, const FastDay(status: FastStatus.missed));
       expect(service.loadLog(1448)[3]!.taraweeh, isTrue);
       expect(service.loadLog(1448)[4]!.status, FastStatus.missed);
       await service.saveDay(1448, 3, FastDay.empty);
@@ -152,9 +153,7 @@ void main() {
       final lastShaban = cal.hijriToGregorian(1448, 8, 29);
       final days = [
         for (var i = 0; i < 3; i++)
-          _day(
-            DateTime(lastShaban.year, lastShaban.month, lastShaban.day + i),
-          ),
+          _day(DateTime(lastShaban.year, lastShaban.month, lastShaban.day + i)),
       ];
       final ramadanDays =
           days.where((d) => HijriCalendar.fromDate(d.date).hMonth == 9).length;

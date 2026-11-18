@@ -7,5 +7,6 @@ abstract class PrayerRepository {
     double longitude, {
     String method,
     String? madhab,
+    Map<String, int> offsets,
   });
 }

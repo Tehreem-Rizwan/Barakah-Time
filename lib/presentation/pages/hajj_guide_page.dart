@@ -66,7 +66,7 @@ class HajjGuidePage extends StatelessWidget {
                       width: 32.r,
                       height: 32.r,
                       alignment: Alignment.center,
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         color: AppColors.secondaryGold,
                         shape: BoxShape.circle,
                       ),

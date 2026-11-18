@@ -2,4 +2,6 @@
 <resources>
     <!-- Brand turquoise shown while the app starts (matches the splash). -->
     <color name="splash_background">#0A4650</color>
+    <!-- Window behind the Flutter UI (matches the app's stone background). -->
+    <color name="app_background">#EEF2EF</color>
 </resources>

@@ -125,8 +125,7 @@ class _SignUpPageState extends State<SignUpPage> {
           return Center(
             child: SingleChildScrollView(
               padding: AppSpacing.page,
-              keyboardDismissBehavior:
-                  ScrollViewKeyboardDismissBehavior.onDrag,
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 480),
                 child: AutofillGroup(

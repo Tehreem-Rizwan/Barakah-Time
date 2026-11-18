@@ -152,8 +152,7 @@ class _SignInPageState extends State<SignInPage> {
           return Center(
             child: SingleChildScrollView(
               padding: AppSpacing.page,
-              keyboardDismissBehavior:
-                  ScrollViewKeyboardDismissBehavior.onDrag,
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 480),
                 child: AutofillGroup(
@@ -304,7 +303,11 @@ class AuthLogo extends StatelessWidget {
             color: AppColors.secondaryGold.withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
-          child: Icon(Icons.mosque, size: 56.sp, color: AppColors.secondaryGold),
+          child: Icon(
+            Icons.mosque,
+            size: 56.sp,
+            color: AppColors.secondaryGold,
+          ),
         ),
       ),
     );
@@ -372,17 +375,20 @@ class AuthNotice extends StatelessWidget {
     super.key,
     required this.message,
     this.icon = Icons.info_outline_rounded,
-    this.color = AppColors.warning,
+    this.color,
     this.action,
   });
 
   final String message;
   final IconData icon;
-  final Color color;
+
+  /// Defaults to [AppColors.warning].
+  final Color? color;
   final Widget? action;
 
   @override
   Widget build(BuildContext context) {
+    final color = this.color ?? AppColors.warning;
     return AppCard(
       color: color,
       border: Border.all(color: color.withValues(alpha: 0.4)),
@@ -470,7 +476,11 @@ class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog> {
           onPressed: () => Navigator.pop(context),
           child: Text(l10n.cancel),
         ),
-        FilledButton(onPressed: _send, child: Text(l10n.send_link)),
+        FilledButton(
+          style: dialogActionStyle(),
+          onPressed: _send,
+          child: Text(l10n.send_link),
+        ),
       ],
     );
   }

@@ -10,24 +10,25 @@ const _locales = [Locale('en'), Locale('ar')];
 
 Widget _app(Widget home, Locale locale) => ScreenUtilInit(
   designSize: const Size(375, 812),
-  builder: (_, _) => MaterialApp(
-    theme: AppTheme.dark(locale, useGoogleFonts: false),
-    locale: locale,
-    supportedLocales: const [
-      Locale('en'),
-      Locale('ar'),
-      Locale('fa'),
-      Locale('ur'),
-      Locale('tr'),
-    ],
-    localizationsDelegates: const [
-      AppLocalizationsDelegate(),
-      GlobalMaterialLocalizations.delegate,
-      GlobalWidgetsLocalizations.delegate,
-      GlobalCupertinoLocalizations.delegate,
-    ],
-    home: home,
-  ),
+  builder:
+      (_, _) => MaterialApp(
+        theme: AppTheme.dark(locale, useGoogleFonts: false),
+        locale: locale,
+        supportedLocales: const [
+          Locale('en'),
+          Locale('ar'),
+          Locale('fa'),
+          Locale('ur'),
+          Locale('tr'),
+        ],
+        localizationsDelegates: const [
+          AppLocalizationsDelegate(),
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        home: home,
+      ),
 );
 
 Future<void> _pump(WidgetTester tester, Widget home, Locale locale) async {
@@ -331,7 +332,10 @@ void main() {
         locale,
       );
       final arabic = tester.widget<Text>(
-        find.descendant(of: find.byType(ArabicText), matching: find.byType(Text)),
+        find.descendant(
+          of: find.byType(ArabicText),
+          matching: find.byType(Text),
+        ),
       );
       expect(arabic.textDirection, TextDirection.rtl);
       final translation = tester.widget<Text>(
@@ -409,7 +413,10 @@ void main() {
       );
       await tester.pumpAndSettle();
       FilledButton confirm() => tester.widget<FilledButton>(
-        find.ancestor(of: find.text('Delete'), matching: find.byType(FilledButton)),
+        find.ancestor(
+          of: find.text('Delete'),
+          matching: find.byType(FilledButton),
+        ),
       );
       expect(confirm().onPressed, isNull);
       await tester.enterText(find.byType(TextField), 'DEL');

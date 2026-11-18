@@ -1,3 +1,4 @@
+import '../../core/utils/date_labels.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -375,9 +376,9 @@ class _PrayerStrip extends StatelessWidget {
                         pulse is PulseLoaded &&
                         pulse.isPrayerLoggedToday(prayer.key);
                     final label = l10n.translate(prayer.key);
-                    final time = DateFormat.jm(
-                      locale,
-                    ).format(times.today.timeOf(prayer));
+                    final time = ltrTime(
+                      DateFormat.jm(locale).format(times.today.timeOf(prayer)),
+                    );
                     return Semantics(
                       label:
                           '$label $time'
