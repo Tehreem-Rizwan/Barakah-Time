@@ -78,36 +78,32 @@ class _AppSearchFieldState extends State<AppSearchField> {
       onChanged: widget.onChanged,
       onSubmitted: widget.onSubmitted,
       textInputAction: TextInputAction.search,
-      style: Theme.of(
-        context,
-      ).textTheme.bodyLarge?.copyWith(fontSize: 15.sp),
+      style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 15.sp),
       decoration: InputDecoration(
         hintText: widget.hint,
         border: OutlineInputBorder(borderRadius: AppRadius.pillAll),
         enabledBorder: OutlineInputBorder(
           borderRadius: AppRadius.pillAll,
-          borderSide: const BorderSide(color: AppColors.glassStroke),
+          borderSide: BorderSide(color: AppColors.glassStroke),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: AppRadius.pillAll,
-          borderSide: const BorderSide(
-            color: AppColors.secondaryGold,
-            width: 1.5,
-          ),
+          borderSide: BorderSide(color: AppColors.secondaryGold, width: 1.5),
         ),
         contentPadding: EdgeInsetsDirectional.symmetric(
           horizontal: AppSpacing.lg,
           vertical: AppSpacing.vMd,
         ),
         prefixIcon: Icon(Icons.search_rounded, size: 22.sp),
-        suffixIcon: hasText
-            ? IconButton(
-                tooltip: context.l10n.clear_search,
-                icon: Icon(Icons.close_rounded, size: 20.sp),
-                color: AppColors.textSecondary,
-                onPressed: _clear,
-              )
-            : null,
+        suffixIcon:
+            hasText
+                ? IconButton(
+                  tooltip: context.l10n.clear_search,
+                  icon: Icon(Icons.close_rounded, size: 20.sp),
+                  color: AppColors.textSecondary,
+                  onPressed: _clear,
+                )
+                : null,
       ),
     );
   }

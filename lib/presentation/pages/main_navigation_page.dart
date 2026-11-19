@@ -6,7 +6,6 @@ import '../../core/localization/app_localizations.dart';
 import '../widgets/widgets.dart';
 import '../../core/services/notification_service.dart';
 import '../../injection_container.dart';
-import '../widgets/audio_control_bar.dart';
 import 'home_page.dart';
 import 'main_navigation_scope.dart';
 import 'prayer_times_page.dart';
@@ -134,8 +133,8 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
               label: l10n.pulse,
             ),
             IslamicNavItem(
-              icon: Icons.tune_outlined,
-              selectedIcon: Icons.tune_rounded,
+              icon: Icons.settings_outlined,
+              selectedIcon: Icons.settings_rounded,
               label: l10n.settings,
             ),
           ],

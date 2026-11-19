@@ -72,14 +72,30 @@ class QuranRepository {
     'tr': '128/tr.vakfi-audio',
   };
 
+  /// Reader of the human-voice translation for [languageCode], if any.
+  static String? translationReciter(String languageCode) =>
+      switch (languageCode) {
+        'ur' => 'Shamshad Ali Khan',
+        'en' => 'Ibrahim Walk',
+        'fa' => 'Hedayatfar',
+        'tr' => 'Diyanet Vakfı',
+        _ => null,
+      };
+
   /// MP3 of the translation of ayah [globalAyahNumber] (1..6236) read by a
   /// person, or null when there is none for [languageCode] (then use TTS).
-  static String? translationAudioUrl(String languageCode, int globalAyahNumber) {
+  static String? translationAudioUrl(
+    String languageCode,
+    int globalAyahNumber,
+  ) {
     final path = _translationAudio[languageCode];
     if (path == null || globalAyahNumber < 1) return null;
     return 'https://cdn.islamic.network/quran/audio/$path/$globalAyahNumber.mp3';
   }
-  static const String defaultTranslationEdition = 'en.asad';
+
+  /// Text editions match the human-voice audio (see [_translationAudio]):
+  /// English Saheeh International (read by Ibrahim Walk).
+  static const String defaultTranslationEdition = 'en.sahih';
 
   /// alquran.cloud translation edition for an app language.
   /// ar uses the Tafsir al-Muyassar (simplified Arabic explanation).
@@ -88,9 +104,9 @@ class QuranRepository {
       case 'ur':
         return 'ur.jalandhry';
       case 'tr':
-        return 'tr.diyanet';
+        return 'tr.vakfi';
       case 'fa':
-        return 'fa.makarem';
+        return 'fa.fooladvand';
       case 'ar':
         return 'ar.muyassar';
       case 'en':

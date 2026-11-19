@@ -64,9 +64,12 @@ class ActivityHistoryPage extends StatelessWidget {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     // Calendar-day difference (UTC avoids DST's 23/25-hour days).
-    final diff = DateTime.utc(today.year, today.month, today.day)
-        .difference(DateTime.utc(day.year, day.month, day.day))
-        .inDays;
+    final diff =
+        DateTime.utc(
+          today.year,
+          today.month,
+          today.day,
+        ).difference(DateTime.utc(day.year, day.month, day.day)).inDays;
     if (diff == 0) return l10n.today;
     if (diff == 1) return l10n.profile_yesterday;
     return formatLocalizedDate(context, day, (l) => DateFormat.yMMMEd(l));
@@ -88,9 +91,8 @@ class ActivityHistoryPage extends StatelessWidget {
               onRetry: () => context.read<PulseBloc>().add(LoadPulseData()),
             );
           }
-          final activities = [
-            ...(state as PulseLoaded).pulse.allActivities,
-          ]..sort((a, b) => b.timestamp.compareTo(a.timestamp));
+          final activities = [...(state as PulseLoaded).pulse.allActivities]
+            ..sort((a, b) => b.timestamp.compareTo(a.timestamp));
           if (activities.isEmpty) {
             return StateView.empty(
               icon: Icons.history_rounded,
@@ -102,7 +104,9 @@ class ActivityHistoryPage extends StatelessWidget {
           final groups = <DateTime, List<SpiritualActivity>>{};
           for (final a in activities) {
             final t = a.timestamp.toLocal();
-            groups.putIfAbsent(DateTime(t.year, t.month, t.day), () => []).add(a);
+            groups
+                .putIfAbsent(DateTime(t.year, t.month, t.day), () => [])
+                .add(a);
           }
 
           return ListView(

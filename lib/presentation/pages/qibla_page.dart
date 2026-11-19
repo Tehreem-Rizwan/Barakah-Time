@@ -187,10 +187,7 @@ class _QiblaPageState extends State<QiblaPage> {
                 height: dialSize,
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color:
-                      facing
-                          ? AppColors.success
-                          : AppColors.secondaryGold.withValues(alpha: 0.3),
+                  color: facing ? AppColors.success : AppColors.brass,
                   width: facing ? 4 : 2,
                 ),
                 child: Stack(
@@ -216,8 +213,8 @@ class _QiblaPageState extends State<QiblaPage> {
                     // Kaaba / mosque icon in centre
                     Icon(
                       Icons.mosque,
-                      color: AppColors.glassFill,
-                      size: 100.sp,
+                      color: AppColors.brass.withValues(alpha: 0.25),
+                      size: 84.sp,
                     ),
                     // Qibla pointer
                     Transform.rotate(

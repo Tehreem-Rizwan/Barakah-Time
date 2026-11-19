@@ -1,4 +1,3 @@
-
 const Map<String, Map<String, String>> kDuaMeanings = {
   'ur': {
     'dua_before_sleeping':

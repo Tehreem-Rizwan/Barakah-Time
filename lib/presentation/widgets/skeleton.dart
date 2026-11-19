@@ -6,8 +6,10 @@ import '../../core/localization/app_localizations.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_tokens.dart';
 
-const Color _skeletonBase = AppColors.cardDark;
-const Color _skeletonHighlight = Color(0xFFF7F4EA);
+// Soft blocks with a card-coloured sweep, for either palette.
+Color get _skeletonBase =>
+    AppColors.isDark ? const Color(0xFF1E3438) : const Color(0xFFE6ECE8);
+Color get _skeletonHighlight => AppColors.cardDark;
 
 /// A single rounded placeholder block. Use inside a [Skeleton] (or any
 /// [Shimmer]) to animate.
@@ -85,44 +87,51 @@ class SkeletonList extends StatelessWidget {
       child: ListView.separated(
         padding: padding ?? AppSpacing.page,
         shrinkWrap: shrinkWrap,
-        physics: shrinkWrap
-            ? const NeverScrollableScrollPhysics()
-            : const AlwaysScrollableScrollPhysics(),
+        physics:
+            shrinkWrap
+                ? const NeverScrollableScrollPhysics()
+                : const AlwaysScrollableScrollPhysics(),
         itemCount: itemCount,
         separatorBuilder: (_, _) => SizedBox(height: AppSpacing.vMd),
-        itemBuilder: (_, _) => Container(
-          height: h,
-          padding: AppSpacing.tile,
-          decoration: BoxDecoration(
-            color: AppColors.cardDark.withValues(alpha: 0.5),
-            borderRadius: AppRadius.mdAll,
-          ),
-          child: Row(
-            children: [
-              if (showLeading) ...[
-                SkeletonBox(width: 44.r, height: 44.r, radius: AppRadius.sm),
-                SizedBox(width: AppSpacing.md),
-              ],
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    FractionallySizedBox(
-                      widthFactor: 0.6,
-                      child: SkeletonBox(height: 12.h, radius: 6.r),
-                    ),
-                    SizedBox(height: AppSpacing.vSm),
-                    FractionallySizedBox(
-                      widthFactor: 0.4,
-                      child: SkeletonBox(height: 10.h, radius: 5.r),
-                    ),
-                  ],
-                ),
+        itemBuilder:
+            (_, _) => Container(
+              height: h,
+              padding: AppSpacing.tile,
+              decoration: BoxDecoration(
+                color: AppColors.cardDark,
+                borderRadius: AppRadius.mdAll,
+                border: Border.all(color: AppColors.glassStroke),
               ),
-            ],
-          ),
-        ),
+              child: Row(
+                children: [
+                  if (showLeading) ...[
+                    SkeletonBox(
+                      width: 44.r,
+                      height: 44.r,
+                      radius: AppRadius.sm,
+                    ),
+                    SizedBox(width: AppSpacing.md),
+                  ],
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        FractionallySizedBox(
+                          widthFactor: 0.6,
+                          child: SkeletonBox(height: 12.h, radius: 6.r),
+                        ),
+                        SizedBox(height: AppSpacing.vSm),
+                        FractionallySizedBox(
+                          widthFactor: 0.4,
+                          child: SkeletonBox(height: 10.h, radius: 5.r),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
       ),
     );
   }

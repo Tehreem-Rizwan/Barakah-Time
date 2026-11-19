@@ -1,3 +1,4 @@
+import '../../core/utils/date_labels.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -425,7 +426,7 @@ class _PrayerHeaderCard extends StatelessWidget {
                       style: textTheme.headlineMedium,
                     ),
                     Text(
-                      DateFormat.jm(locale).format(next.time),
+                      ltrTime(DateFormat.jm(locale).format(next.time)),
                       style: textTheme.bodyMedium?.copyWith(
                         color: AppColors.secondaryGold,
                       ),
@@ -539,7 +540,7 @@ class _PrayerRow extends StatelessWidget {
             ),
             SizedBox(width: AppSpacing.sm),
             Text(
-              DateFormat.jm(locale).format(time),
+              ltrTime(DateFormat.jm(locale).format(time)),
               style: (dimmed ? textTheme.bodyMedium : textTheme.titleMedium)
                   ?.copyWith(color: foreground, fontWeight: FontWeight.w700),
             ),

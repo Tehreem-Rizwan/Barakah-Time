@@ -63,21 +63,23 @@ class ActionTile extends StatelessWidget {
             color: destructive ? AppColors.error : AppColors.textMain,
           ),
         ),
-        subtitle: subtitle == null
-            ? null
-            : Text(
-                subtitle!,
-                style: textTheme.bodySmall?.copyWith(fontSize: 12.sp),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-        trailing: trailing ??
+        subtitle:
+            subtitle == null
+                ? null
+                : Text(
+                  subtitle!,
+                  style: textTheme.bodySmall?.copyWith(fontSize: 12.sp),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+        trailing:
+            trailing ??
             (onTap != null
                 ? Icon(
-                    Icons.chevron_right_rounded,
-                    color: AppColors.textSecondary,
-                    size: 22.sp,
-                  )
+                  Icons.chevron_right_rounded,
+                  color: AppColors.textSecondary,
+                  size: 22.sp,
+                )
                 : null),
       ),
     );

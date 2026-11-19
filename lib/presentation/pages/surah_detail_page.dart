@@ -241,7 +241,7 @@ class _SurahDetailPageState extends State<SurahDetailPage> {
             style: Theme.of(context).textTheme.titleMedium,
           ),
           // Room for the Arabic diacritics so they don't touch the line above.
-          const SizedBox(height: 4),
+          SizedBox(height: 4.h),
           ArabicText(
             widget.surah.name,
             fontSize: 13.sp,
@@ -263,7 +263,8 @@ class _SurahDetailPageState extends State<SurahDetailPage> {
                     : Icons.check_circle_outline_rounded,
               ),
               onPressed: _markAsRead,
-              tooltip: logged ? l10n.surah_already_logged_today : l10n.mark_as_read,
+              tooltip:
+                  logged ? l10n.surah_already_logged_today : l10n.mark_as_read,
             );
           },
         ),
@@ -285,10 +286,11 @@ class _SurahDetailPageState extends State<SurahDetailPage> {
                         : Icons.play_circle_fill_rounded,
                   ),
                   onPressed: () {
-                    final urls = snapshot.data!
-                        .map((a) => a.audio)
-                        .whereType<String>()
-                        .toList();
+                    final urls =
+                        snapshot.data!
+                            .map((a) => a.audio)
+                            .whereType<String>()
+                            .toList();
                     audioService.playList(
                       urls,
                       title: widget.surah.englishName,
@@ -376,9 +378,12 @@ class _SurahDetailPageState extends State<SurahDetailPage> {
     final lang = _translationLang;
 
     return AppCard(
-      border: highlighted
-          ? Border.all(color: AppColors.secondaryGold.withValues(alpha: 0.6))
-          : null,
+      border:
+          highlighted
+              ? Border.all(
+                color: AppColors.secondaryGold.withValues(alpha: 0.6),
+              )
+              : null,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -392,14 +397,16 @@ class _SurahDetailPageState extends State<SurahDetailPage> {
                       state is PulseLoaded &&
                       state.savedVerses.any((v) => v.id == verseId);
                   return IconButton(
-                    tooltip: isSaved ? l10n.remove_saved_verse : l10n.save_verse,
+                    tooltip:
+                        isSaved ? l10n.remove_saved_verse : l10n.save_verse,
                     icon: Icon(
                       isSaved
                           ? Icons.bookmark_rounded
                           : Icons.bookmark_border_rounded,
-                      color: isSaved
-                          ? AppColors.secondaryGold
-                          : AppColors.textSecondary,
+                      color:
+                          isSaved
+                              ? AppColors.secondaryGold
+                              : AppColors.textSecondary,
                       size: 22.sp,
                     ),
                     onPressed: () => _toggleSave(ayah, isSaved),
@@ -425,61 +432,74 @@ class _SurahDetailPageState extends State<SurahDetailPage> {
                           size: 24.sp,
                         ),
                         tooltip: isPlaying ? l10n.pause : l10n.play,
-                        onPressed: ayah.audio == null
-                            ? null
-                            : () {
-                                QuranLastRead.save(
-                                  widget.surah.number,
-                                  ayah.numberInSurah,
-                                );
-                                audioService.playUrl(
-                                  ayah.audio!,
-                                  title:
-                                      '${widget.surah.englishName} : ${l10n.ayah} ${ayah.numberInSurah}',
-                                  mediaId: ayahMediaId,
-                                );
-                              },
+                        onPressed:
+                            ayah.audio == null
+                                ? null
+                                : () {
+                                  QuranLastRead.save(
+                                    widget.surah.number,
+                                    ayah.numberInSurah,
+                                  );
+                                  audioService.playUrl(
+                                    ayah.audio!,
+                                    title:
+                                        '${widget.surah.englishName} : ${l10n.ayah} ${ayah.numberInSurah}',
+                                    mediaId: ayahMediaId,
+                                  );
+                                },
                       ),
                       IconButton(
                         icon: Icon(
                           isTransPlaying
                               ? Icons.stop_circle_outlined
                               : Icons.record_voice_over_outlined,
-                          color: isTransPlaying
-                              ? AppColors.secondaryGold
-                              : AppColors.textSecondary,
+                          color:
+                              isTransPlaying
+                                  ? AppColors.secondaryGold
+                                  : AppColors.textSecondary,
                           size: 22.sp,
                         ),
-                        tooltip: isTransPlaying
-                            ? l10n.stop
-                            : l10n.listen_translation,
-                        onPressed: (ayah.translation ?? '').isEmpty
-                            ? null
-                            : () {
-                                final title =
-                                    '${l10n.translation}: ${l10n.ayah} ${ayah.numberInSurah}';
-                                // Prefer a person reading the translation
-                                // (e.g. Urdu by Shamshad Ali Khan); fall back
-                                // to the phone's text-to-speech.
-                                final url = QuranRepository.translationAudioUrl(
-                                  lang,
-                                  ayah.number,
-                                );
-                                if (url != null) {
-                                  audioService.playUrl(
-                                    url,
-                                    title: title,
-                                    mediaId: transMediaId,
-                                  );
-                                } else {
-                                  audioService.playTts(
-                                    ayah.translation!,
-                                    title: title,
-                                    mediaId: transMediaId,
-                                    languageCode: lang,
-                                  );
-                                }
-                              },
+                        tooltip:
+                            isTransPlaying
+                                ? l10n.stop
+                                : l10n.listen_translation,
+                        onPressed:
+                            (ayah.translation ?? '').isEmpty
+                                ? null
+                                : () {
+                                  if (isTransPlaying) {
+                                    audioService.stop();
+                                    return;
+                                  }
+                                  final title =
+                                      '${l10n.translation}: ${l10n.ayah} ${ayah.numberInSurah}';
+                                  // Prefer a person reading the translation
+                                  // (e.g. Urdu by Shamshad Ali Khan); fall back
+                                  // to the phone's text-to-speech.
+                                  final url =
+                                      QuranRepository.translationAudioUrl(
+                                        lang,
+                                        ayah.number,
+                                      );
+                                  if (url != null) {
+                                    audioService.playUrl(
+                                      url,
+                                      title: title,
+                                      artist:
+                                          QuranRepository.translationReciter(
+                                            lang,
+                                          ),
+                                      mediaId: transMediaId,
+                                    );
+                                  } else {
+                                    audioService.playTts(
+                                      ayah.translation!,
+                                      title: title,
+                                      mediaId: transMediaId,
+                                      languageCode: lang,
+                                    );
+                                  }
+                                },
                       ),
                     ],
                   );
@@ -499,11 +519,12 @@ class _SurahDetailPageState extends State<SurahDetailPage> {
           SizedBox(height: AppSpacing.vMd),
           BlocBuilder<SettingsBloc, SettingsState>(
             buildWhen: (p, c) => p.quranFontSize != c.quranFontSize,
-            builder: (context, settingsState) => ArabicText(
-              ayah.text,
-              fontSize: settingsState.quranFontSize.sp,
-              height: 2.2,
-            ),
+            builder:
+                (context, settingsState) => ArabicText(
+                  ayah.text,
+                  fontSize: settingsState.quranFontSize.sp,
+                  height: 2.2,
+                ),
           ),
           if ((ayah.translation ?? '').isNotEmpty) ...[
             SizedBox(height: AppSpacing.vMd),
@@ -535,7 +556,7 @@ class _SurahHeader extends StatelessWidget {
       padding: EdgeInsetsDirectional.only(bottom: AppSpacing.vLg),
       child: AppCard(
         blur: true,
-        color: AppColors.emeraldDeep,
+        border: Border.all(color: AppColors.brass, width: 1.2),
         child: Column(
           children: [
             Text(

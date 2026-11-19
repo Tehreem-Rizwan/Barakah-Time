@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../core/localization/app_localizations.dart';
 import '../../core/theme/app_colors.dart';
@@ -22,14 +23,15 @@ Future<bool> showConfirmDialog(
 }) async {
   final result = await showDialog<bool>(
     context: context,
-    builder: (_) => _ConfirmDialog(
-      title: title,
-      message: message,
-      confirmLabel: confirmLabel,
-      cancelLabel: cancelLabel,
-      destructive: destructive,
-      requireTypedText: requireTypedText,
-    ),
+    builder:
+        (_) => _ConfirmDialog(
+          title: title,
+          message: message,
+          confirmLabel: confirmLabel,
+          cancelLabel: cancelLabel,
+          destructive: destructive,
+          requireTypedText: requireTypedText,
+        ),
   );
   return result ?? false;
 }
@@ -110,12 +112,17 @@ class _ConfirmDialogState extends State<_ConfirmDialog> {
         FilledButton(
           onPressed: _canConfirm ? () => Navigator.of(context).pop(true) : null,
           style: FilledButton.styleFrom(
-            minimumSize: const Size(88, 48),
+            minimumSize: Size(72.w, 40.h),
+            padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 8.h),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(50.r),
+            ),
             backgroundColor: widget.destructive ? AppColors.error : null,
             foregroundColor: widget.destructive ? AppColors.onGold : null,
-            disabledBackgroundColor: widget.destructive
-                ? AppColors.error.withValues(alpha: 0.3)
-                : null,
+            disabledBackgroundColor:
+                widget.destructive
+                    ? AppColors.error.withValues(alpha: 0.3)
+                    : null,
           ),
           child: Text(widget.confirmLabel ?? l10n.confirm),
         ),

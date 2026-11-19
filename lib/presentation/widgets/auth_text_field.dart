@@ -59,9 +59,10 @@ class _AuthTextFieldState extends State<AuthTextField> {
       obscureText: _obscured,
       enableSuggestions: !widget.isPassword,
       autocorrect: !widget.isPassword,
-      keyboardType: widget.isPassword
-          ? TextInputType.visiblePassword
-          : widget.keyboardType,
+      keyboardType:
+          widget.isPassword
+              ? TextInputType.visiblePassword
+              : widget.keyboardType,
       textInputAction: widget.textInputAction,
       autofillHints: widget.autofillHints,
       onFieldSubmitted: widget.onFieldSubmitted,
@@ -70,18 +71,19 @@ class _AuthTextFieldState extends State<AuthTextField> {
         labelText: widget.label,
         hintText: widget.hint,
         prefixIcon: Icon(widget.icon, size: 20.sp),
-        suffixIcon: widget.isPassword
-            ? IconButton(
-                tooltip: _obscured ? l10n.show_password : l10n.hide_password,
-                icon: Icon(
-                  _obscured
-                      ? Icons.visibility_outlined
-                      : Icons.visibility_off_outlined,
-                  size: 20.sp,
-                ),
-                onPressed: () => setState(() => _obscured = !_obscured),
-              )
-            : null,
+        suffixIcon:
+            widget.isPassword
+                ? IconButton(
+                  tooltip: _obscured ? l10n.show_password : l10n.hide_password,
+                  icon: Icon(
+                    _obscured
+                        ? Icons.visibility_outlined
+                        : Icons.visibility_off_outlined,
+                    size: 20.sp,
+                  ),
+                  onPressed: () => setState(() => _obscured = !_obscured),
+                )
+                : null,
       ),
     );
   }

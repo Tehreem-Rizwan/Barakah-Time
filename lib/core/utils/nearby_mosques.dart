@@ -105,8 +105,10 @@ class NearbyMosquesService {
       final decoded = json.decode(body);
       final remark = decoded is Map ? decoded['remark'] : null;
       return remark is String &&
-          RegExp('runtime error|timed out|out of memory', caseSensitive: false)
-              .hasMatch(remark);
+          RegExp(
+            'runtime error|timed out|out of memory',
+            caseSensitive: false,
+          ).hasMatch(remark);
     } catch (_) {
       return false;
     }

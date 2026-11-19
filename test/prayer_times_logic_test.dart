@@ -95,19 +95,35 @@ void main() {
       expect(t.isha.isBefore(t.tomorrow.fajr), isTrue);
     });
 
-    test('Hanafi Asr is later than Shafi Asr; Karachi defaults to Hanafi',
-        () async {
-      final now = DateTime(2026, 6, 1, 12);
-      final shafi = await AdhanService().getTimes(
-        24.86, 67.0, method: 'MWL', madhab: AsrMadhab.shafi, now: now);
-      final hanafi = await AdhanService().getTimes(
-        24.86, 67.0, method: 'MWL', madhab: AsrMadhab.hanafi, now: now);
-      expect(hanafi.asr.isAfter(shafi.asr), isTrue);
-      expect(AsrMadhab.defaultFor('Karachi'), AsrMadhab.hanafi);
-      expect(AsrMadhab.defaultFor('ISNA'), AsrMadhab.shafi);
-      final mwlDefault =
-          await AdhanService().getTimes(24.86, 67.0, method: 'MWL', now: now);
-      expect(mwlDefault.asr, shafi.asr);
-    });
+    test(
+      'Hanafi Asr is later than Shafi Asr; Karachi defaults to Hanafi',
+      () async {
+        final now = DateTime(2026, 6, 1, 12);
+        final shafi = await AdhanService().getTimes(
+          24.86,
+          67.0,
+          method: 'MWL',
+          madhab: AsrMadhab.shafi,
+          now: now,
+        );
+        final hanafi = await AdhanService().getTimes(
+          24.86,
+          67.0,
+          method: 'MWL',
+          madhab: AsrMadhab.hanafi,
+          now: now,
+        );
+        expect(hanafi.asr.isAfter(shafi.asr), isTrue);
+        expect(AsrMadhab.defaultFor('Karachi'), AsrMadhab.hanafi);
+        expect(AsrMadhab.defaultFor('ISNA'), AsrMadhab.shafi);
+        final mwlDefault = await AdhanService().getTimes(
+          24.86,
+          67.0,
+          method: 'MWL',
+          now: now,
+        );
+        expect(mwlDefault.asr, shafi.asr);
+      },
+    );
   });
 }

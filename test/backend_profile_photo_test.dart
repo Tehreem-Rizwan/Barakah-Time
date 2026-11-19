@@ -17,27 +17,33 @@ void main() {
 
   tearDown(() => tmp.delete(recursive: true));
 
-  test('upload sends Firebase token, anon key, content type and bytes', () async {
-    late http.Request sent;
-    final service = SupabaseService(
-      idTokenProvider: () async => 'firebase-token',
-      functionUrl: 'https://x.supabase.co/functions/v1/profile-photo',
-      anonKey: 'anon',
-      client: MockClient((req) async {
-        sent = req;
-        return http.Response(jsonEncode({'url': 'https://x/u.png'}), 200);
-      }),
-    );
+  test(
+    'upload sends Firebase token, anon key, content type and bytes',
+    () async {
+      late http.Request sent;
+      final service = SupabaseService(
+        idTokenProvider: () async => 'firebase-token',
+        functionUrl: 'https://x.supabase.co/functions/v1/profile-photo',
+        anonKey: 'anon',
+        client: MockClient((req) async {
+          sent = req;
+          return http.Response(jsonEncode({'url': 'https://x/u.png'}), 200);
+        }),
+      );
 
-    final url = await service.uploadProfileImage(uid: 'u1', filePath: photo.path);
+      final url = await service.uploadProfileImage(
+        uid: 'u1',
+        filePath: photo.path,
+      );
 
-    expect(url, 'https://x/u.png');
-    expect(sent.method, 'POST');
-    expect(sent.headers['Authorization'], 'Bearer firebase-token');
-    expect(sent.headers['apikey'], 'anon');
-    expect(sent.headers['Content-Type'], startsWith('image/png'));
-    expect(sent.bodyBytes, [1, 2, 3, 4]);
-  });
+      expect(url, 'https://x/u.png');
+      expect(sent.method, 'POST');
+      expect(sent.headers['Authorization'], 'Bearer firebase-token');
+      expect(sent.headers['apikey'], 'anon');
+      expect(sent.headers['Content-Type'], startsWith('image/png'));
+      expect(sent.bodyBytes, [1, 2, 3, 4]);
+    },
+  );
 
   test('upload fails clearly when signed out or server rejects', () async {
     final signedOut = SupabaseService(
@@ -51,7 +57,9 @@ void main() {
 
     final rejected = SupabaseService(
       idTokenProvider: () async => 't',
-      client: MockClient((_) async => http.Response('{"error":"unauthorized"}', 401)),
+      client: MockClient(
+        (_) async => http.Response('{"error":"unauthorized"}', 401),
+      ),
     );
     expect(
       () => rejected.uploadProfileImage(uid: 'u1', filePath: photo.path),

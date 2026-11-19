@@ -251,10 +251,7 @@ class _Indicator extends StatelessWidget {
       height: 8.r,
       width: isActive ? 24.r : 8.r,
       decoration: BoxDecoration(
-        color:
-            isActive
-                ? AppColors.secondaryGold
-                : AppColors.textSecondary.withValues(alpha: 0.3),
+        color: isActive ? AppColors.secondaryGold : AppColors.glassStrokeStrong,
         borderRadius: AppRadius.pillAll,
       ),
     );

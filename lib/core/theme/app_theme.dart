@@ -16,91 +16,163 @@ import 'app_tokens.dart';
 abstract final class AppTheme {
   /// Status bar over light pages: transparent, dark icons; the gesture /
   /// navigation bar matches the ivory tab bar.
-  static const SystemUiOverlayStyle overlayOnLight = SystemUiOverlayStyle(
+  static SystemUiOverlayStyle get overlayOnLight => SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
-    statusBarIconBrightness: Brightness.dark,
-    statusBarBrightness: Brightness.light,
+    statusBarIconBrightness:
+        AppColors.isDark ? Brightness.light : Brightness.dark,
+    statusBarBrightness: AppColors.isDark ? Brightness.dark : Brightness.light,
     systemNavigationBarColor: AppColors.cardDark,
-    systemNavigationBarIconBrightness: Brightness.dark,
+    systemNavigationBarIconBrightness:
+        AppColors.isDark ? Brightness.light : Brightness.dark,
     systemNavigationBarDividerColor: Colors.transparent,
   );
 
   /// Status bar over the turquoise header band (Home, Pulse): light icons.
-  static const SystemUiOverlayStyle overlayOnBand = SystemUiOverlayStyle(
+  static SystemUiOverlayStyle get overlayOnBand => SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
     statusBarIconBrightness: Brightness.light,
     statusBarBrightness: Brightness.dark,
     systemNavigationBarColor: AppColors.cardDark,
-    systemNavigationBarIconBrightness: Brightness.dark,
+    systemNavigationBarIconBrightness:
+        AppColors.isDark ? Brightness.light : Brightness.dark,
     systemNavigationBarDividerColor: Colors.transparent,
   );
 
   static ThemeData get darkTheme => dark(const Locale('en'));
 
-  static const ColorScheme colorScheme = ColorScheme(
-    brightness: Brightness.light,
-    primary: AppColors.secondaryGold,
-    onPrimary: AppColors.onGold,
-    primaryContainer: Color(0xFFD5EBEE),
-    onPrimaryContainer: Color(0xFF06323A),
-    secondary: AppColors.success,
-    onSecondary: AppColors.onGold,
-    secondaryContainer: Color(0xFFF1E5C8),
-    onSecondaryContainer: Color(0xFF3D2E0E),
-    tertiary: AppColors.info,
-    onTertiary: AppColors.onGold,
-    error: AppColors.error,
-    onError: AppColors.onGold,
-    errorContainer: Color(0xFFF9DEDC),
-    onErrorContainer: Color(0xFF410E0B),
-    surface: AppColors.backgroundSlate,
-    onSurface: AppColors.textMain,
-    onSurfaceVariant: AppColors.textSecondary,
-    surfaceContainerLowest: Color(0xFFFFFFFF),
-    surfaceContainerLow: Color(0xFFF7F8F4),
-    surfaceContainer: Color(0xFFF3F5F1),
-    surfaceContainerHigh: AppColors.cardDark,
-    surfaceContainerHighest: Color(0xFFE6ECE8),
-    outline: Color(0xFF7C8C8B),
-    outlineVariant: AppColors.glassStrokeStrong,
-    shadow: Colors.black,
-    scrim: Colors.black,
-    inverseSurface: AppColors.textMain,
-    onInverseSurface: AppColors.backgroundSlate,
-    inversePrimary: Color(0xFF8FD3DC),
-    surfaceTint: Colors.transparent,
-  );
+  /// Colour scheme for the active palette ([AppColors.isDark]).
+  static ColorScheme get colorScheme {
+    final d = AppColors.isDark;
+    Color c(int light, int dark) => Color(d ? dark : light);
+    return ColorScheme(
+      brightness: d ? Brightness.dark : Brightness.light,
+      primary: AppColors.secondaryGold,
+      onPrimary: AppColors.onGold,
+      primaryContainer: c(0xFFD5EBEE, 0xFF0F4A53),
+      onPrimaryContainer: c(0xFF06323A, 0xFFCDEFF3),
+      secondary: AppColors.success,
+      onSecondary: AppColors.onGold,
+      secondaryContainer: c(0xFFF1E5C8, 0xFF4A3B1A),
+      onSecondaryContainer: c(0xFF3D2E0E, 0xFFF1E5C8),
+      tertiary: AppColors.info,
+      onTertiary: AppColors.onGold,
+      error: AppColors.error,
+      onError: c(0xFFFFFFFF, 0xFF601410),
+      errorContainer: c(0xFFF9DEDC, 0xFF8C1D18),
+      onErrorContainer: c(0xFF410E0B, 0xFFF9DEDC),
+      surface: AppColors.backgroundSlate,
+      onSurface: AppColors.textMain,
+      onSurfaceVariant: AppColors.textSecondary,
+      surfaceContainerLowest: c(0xFFFFFFFF, 0xFF081416),
+      surfaceContainerLow: c(0xFFF7F8F4, 0xFF112225),
+      surfaceContainer: c(0xFFF3F5F1, 0xFF132629),
+      surfaceContainerHigh: AppColors.cardDark,
+      surfaceContainerHighest: c(0xFFE6ECE8, 0xFF1E3438),
+      outline: c(0xFF7C8C8B, 0xFF7F918F),
+      outlineVariant: AppColors.glassStrokeStrong,
+      shadow: Colors.black,
+      scrim: Colors.black,
+      inverseSurface: c(0xFF16302F, 0xFFEDE7D6),
+      onInverseSurface: c(0xFFEEF2EF, 0xFF16302F),
+      inversePrimary: c(0xFF8FD3DC, 0xFF0E5A66),
+      surfaceTint: Colors.transparent,
+    );
+  }
 
   /// Base type scale (sizes/weights) before font family and color.
   static const TextTheme _typeScale = TextTheme(
-    displayLarge: TextStyle(fontSize: 48, fontWeight: FontWeight.w700, height: 1.15),
-    displayMedium: TextStyle(fontSize: 40, fontWeight: FontWeight.w700, height: 1.15),
-    displaySmall: TextStyle(fontSize: 32, fontWeight: FontWeight.w700, height: 1.2),
-    headlineLarge: TextStyle(fontSize: 28, fontWeight: FontWeight.w700, height: 1.25),
-    headlineMedium: TextStyle(fontSize: 24, fontWeight: FontWeight.w600, height: 1.25),
-    headlineSmall: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, height: 1.3),
-    titleLarge: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, height: 1.3),
-    titleMedium: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, height: 1.35),
-    titleSmall: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, height: 1.4),
-    bodyLarge: TextStyle(fontSize: 16, fontWeight: FontWeight.w400, height: 1.5),
-    bodyMedium: TextStyle(fontSize: 14, fontWeight: FontWeight.w400, height: 1.5),
-    bodySmall: TextStyle(fontSize: 12, fontWeight: FontWeight.w400, height: 1.45),
-    labelLarge: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, height: 1.3),
-    labelMedium: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, height: 1.3),
-    labelSmall: TextStyle(fontSize: 11, fontWeight: FontWeight.w500, height: 1.3, letterSpacing: 0.4),
+    displayLarge: TextStyle(
+      fontSize: 48,
+      fontWeight: FontWeight.w700,
+      height: 1.15,
+    ),
+    displayMedium: TextStyle(
+      fontSize: 40,
+      fontWeight: FontWeight.w700,
+      height: 1.15,
+    ),
+    displaySmall: TextStyle(
+      fontSize: 32,
+      fontWeight: FontWeight.w700,
+      height: 1.2,
+    ),
+    headlineLarge: TextStyle(
+      fontSize: 28,
+      fontWeight: FontWeight.w700,
+      height: 1.25,
+    ),
+    headlineMedium: TextStyle(
+      fontSize: 24,
+      fontWeight: FontWeight.w600,
+      height: 1.25,
+    ),
+    headlineSmall: TextStyle(
+      fontSize: 20,
+      fontWeight: FontWeight.w600,
+      height: 1.3,
+    ),
+    titleLarge: TextStyle(
+      fontSize: 18,
+      fontWeight: FontWeight.w700,
+      height: 1.3,
+    ),
+    titleMedium: TextStyle(
+      fontSize: 16,
+      fontWeight: FontWeight.w600,
+      height: 1.35,
+    ),
+    titleSmall: TextStyle(
+      fontSize: 14,
+      fontWeight: FontWeight.w600,
+      height: 1.4,
+    ),
+    bodyLarge: TextStyle(
+      fontSize: 16,
+      fontWeight: FontWeight.w400,
+      height: 1.5,
+    ),
+    bodyMedium: TextStyle(
+      fontSize: 14,
+      fontWeight: FontWeight.w400,
+      height: 1.5,
+    ),
+    bodySmall: TextStyle(
+      fontSize: 12,
+      fontWeight: FontWeight.w400,
+      height: 1.45,
+    ),
+    labelLarge: TextStyle(
+      fontSize: 15,
+      fontWeight: FontWeight.w600,
+      height: 1.3,
+    ),
+    labelMedium: TextStyle(
+      fontSize: 13,
+      fontWeight: FontWeight.w500,
+      height: 1.3,
+    ),
+    labelSmall: TextStyle(
+      fontSize: 11,
+      fontWeight: FontWeight.w500,
+      height: 1.3,
+      letterSpacing: 0.4,
+    ),
   );
 
   /// Builds the text theme for [locale] (colors + font family applied).
   static TextTheme textTheme(Locale locale) {
     final colored = _typeScale
-        .apply(
-          bodyColor: AppColors.textMain,
-          displayColor: AppColors.textMain,
-        )
+        .apply(bodyColor: AppColors.textMain, displayColor: AppColors.textMain)
         .copyWith(
-          bodyMedium: _typeScale.bodyMedium!.copyWith(color: AppColors.textSecondary),
-          bodySmall: _typeScale.bodySmall!.copyWith(color: AppColors.textSecondary),
-          labelSmall: _typeScale.labelSmall!.copyWith(color: AppColors.textSecondary),
+          bodyMedium: _typeScale.bodyMedium!.copyWith(
+            color: AppColors.textSecondary,
+          ),
+          bodySmall: _typeScale.bodySmall!.copyWith(
+            color: AppColors.textSecondary,
+          ),
+          labelSmall: _typeScale.labelSmall!.copyWith(
+            color: AppColors.textSecondary,
+          ),
         );
     return AppFonts.textTheme(colored, locale);
   }
@@ -120,7 +192,7 @@ abstract final class AppTheme {
   }
 
   static ThemeData _build(Locale locale) {
-    const cs = colorScheme;
+    final cs = colorScheme;
     final text = textTheme(locale);
 
     final mdShape = RoundedRectangleBorder(
@@ -141,7 +213,7 @@ abstract final class AppTheme {
 
     return ThemeData(
       useMaterial3: true,
-      brightness: Brightness.light,
+      brightness: cs.brightness,
       colorScheme: cs,
       primaryColor: AppColors.secondaryGold,
       scaffoldBackgroundColor: AppColors.backgroundSlate,
@@ -153,8 +225,8 @@ abstract final class AppTheme {
       materialTapTargetSize: MaterialTapTargetSize.padded,
       textTheme: text,
       primaryTextTheme: text,
-      iconTheme: const IconThemeData(color: AppColors.textMain, size: 24),
-      primaryIconTheme: const IconThemeData(color: AppColors.secondaryGold),
+      iconTheme: IconThemeData(color: AppColors.textMain, size: 24),
+      primaryIconTheme: IconThemeData(color: AppColors.secondaryGold),
       textSelectionTheme: TextSelectionThemeData(
         cursorColor: AppColors.secondaryGold,
         selectionColor: AppColors.secondaryGold.withValues(alpha: 0.35),
@@ -177,8 +249,8 @@ abstract final class AppTheme {
         scrolledUnderElevation: 0,
         centerTitle: true,
         foregroundColor: AppColors.textMain,
-        iconTheme: const IconThemeData(color: AppColors.secondaryGold),
-        actionsIconTheme: const IconThemeData(color: AppColors.secondaryGold),
+        iconTheme: IconThemeData(color: AppColors.secondaryGold),
+        actionsIconTheme: IconThemeData(color: AppColors.secondaryGold),
         titleTextStyle: text.titleLarge,
         systemOverlayStyle: AppTheme.overlayOnLight,
       ),
@@ -195,7 +267,9 @@ abstract final class AppTheme {
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.secondaryGold,
           foregroundColor: AppColors.onGold,
-          disabledBackgroundColor: AppColors.secondaryGold.withValues(alpha: 0.35),
+          disabledBackgroundColor: AppColors.secondaryGold.withValues(
+            alpha: 0.35,
+          ),
           disabledForegroundColor: AppColors.onGold.withValues(alpha: 0.55),
           elevation: 0,
           minimumSize: minButtonSize,
@@ -208,7 +282,9 @@ abstract final class AppTheme {
         style: FilledButton.styleFrom(
           backgroundColor: AppColors.secondaryGold,
           foregroundColor: AppColors.onGold,
-          disabledBackgroundColor: AppColors.secondaryGold.withValues(alpha: 0.35),
+          disabledBackgroundColor: AppColors.secondaryGold.withValues(
+            alpha: 0.35,
+          ),
           disabledForegroundColor: AppColors.onGold.withValues(alpha: 0.55),
           minimumSize: minButtonSize,
           padding: buttonPadding,
@@ -257,23 +333,26 @@ abstract final class AppTheme {
           minimumSize: const WidgetStatePropertyAll(Size(48, 48)),
           textStyle: WidgetStatePropertyAll(text.labelMedium),
           shape: WidgetStatePropertyAll(mdShape),
-          side: const WidgetStatePropertyAll(
+          side: WidgetStatePropertyAll(
             BorderSide(color: AppColors.glassStrokeStrong),
           ),
           backgroundColor: WidgetStateProperty.resolveWith(
-            (s) => s.contains(WidgetState.selected)
-                ? AppColors.secondaryGold
-                : AppColors.glassBase,
+            (s) =>
+                s.contains(WidgetState.selected)
+                    ? AppColors.secondaryGold
+                    : AppColors.glassBase,
           ),
           foregroundColor: WidgetStateProperty.resolveWith(
-            (s) => s.contains(WidgetState.selected)
-                ? AppColors.onGold
-                : AppColors.textMain,
+            (s) =>
+                s.contains(WidgetState.selected)
+                    ? AppColors.onGold
+                    : AppColors.textMain,
           ),
           iconColor: WidgetStateProperty.resolveWith(
-            (s) => s.contains(WidgetState.selected)
-                ? AppColors.onGold
-                : AppColors.textMain,
+            (s) =>
+                s.contains(WidgetState.selected)
+                    ? AppColors.onGold
+                    : AppColors.textMain,
           ),
         ),
       ),
@@ -281,25 +360,30 @@ abstract final class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.glassFill,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 16,
+        ),
         floatingLabelBehavior: FloatingLabelBehavior.auto,
         labelStyle: text.bodyMedium!.copyWith(color: AppColors.textSecondary),
         floatingLabelStyle: WidgetStateTextStyle.resolveWith(
           (s) => text.bodyMedium!.copyWith(
-            color: s.contains(WidgetState.error)
-                ? AppColors.error
-                : s.contains(WidgetState.focused)
-                ? AppColors.secondaryGold
-                : AppColors.textSecondary,
+            color:
+                s.contains(WidgetState.error)
+                    ? AppColors.error
+                    : s.contains(WidgetState.focused)
+                    ? AppColors.secondaryGold
+                    : AppColors.textSecondary,
           ),
         ),
         hintStyle: text.bodyMedium!.copyWith(color: AppColors.textTertiary),
         helperStyle: text.bodySmall,
         errorStyle: text.bodySmall!.copyWith(color: AppColors.error),
         prefixIconColor: WidgetStateColor.resolveWith(
-          (s) => s.contains(WidgetState.error)
-              ? AppColors.error
-              : AppColors.secondaryGold,
+          (s) =>
+              s.contains(WidgetState.error)
+                  ? AppColors.error
+                  : AppColors.secondaryGold,
         ),
         suffixIconColor: AppColors.textSecondary,
         border: inputBorder(AppColors.glassStroke),
@@ -321,7 +405,7 @@ abstract final class AppTheme {
         titleTextStyle: text.titleLarge,
         contentTextStyle: text.bodyMedium,
       ),
-      bottomSheetTheme: const BottomSheetThemeData(
+      bottomSheetTheme: BottomSheetThemeData(
         backgroundColor: AppColors.cardDark,
         surfaceTintColor: Colors.transparent,
         modalBackgroundColor: AppColors.cardDark,
@@ -335,15 +419,21 @@ abstract final class AppTheme {
       ),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
-        backgroundColor: AppColors.textMain,
-        contentTextStyle: text.bodyMedium!.copyWith(color: AppColors.cardDark),
+        // Always a dark ink bar (status icons use the *OnDark colours).
+        backgroundColor:
+            AppColors.isDark
+                ? const Color(0xFF29474B)
+                : const Color(0xFF16302F),
+        contentTextStyle: text.bodyMedium!.copyWith(
+          color: const Color(0xFFFFFDF6),
+        ),
         actionTextColor: AppColors.brass,
-        closeIconColor: AppColors.textSecondary,
+        closeIconColor: AppColors.ivoryOnTeal.withValues(alpha: 0.7),
         elevation: 4,
         insetPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadius.mdRaw),
-          side: const BorderSide(color: AppColors.glassStroke),
+          side: BorderSide(color: AppColors.glassStroke),
         ),
       ),
       tooltipTheme: TooltipThemeData(
@@ -357,37 +447,49 @@ abstract final class AppTheme {
 
       switchTheme: SwitchThemeData(
         thumbColor: WidgetStateProperty.resolveWith(
-          (s) => s.contains(WidgetState.disabled)
-              ? AppColors.textTertiary
-              : s.contains(WidgetState.selected)
-              ? AppColors.onGold
-              : AppColors.textSecondary,
+          (s) =>
+              s.contains(WidgetState.disabled)
+                  ? (s.contains(WidgetState.selected)
+                      ? AppColors.cardDark
+                      : AppColors.textTertiary.withValues(alpha: 0.6))
+                  : s.contains(WidgetState.selected)
+                  ? AppColors.onGold
+                  : AppColors.textSecondary,
         ),
+        // Disabled switches fade out instead of looking "on but broken".
         trackColor: WidgetStateProperty.resolveWith(
-          (s) => s.contains(WidgetState.selected)
-              ? AppColors.secondaryGold
-              : AppColors.glassFill,
+          (s) =>
+              s.contains(WidgetState.selected)
+                  ? AppColors.secondaryGold.withValues(
+                    alpha: s.contains(WidgetState.disabled) ? 0.38 : 1,
+                  )
+                  : s.contains(WidgetState.disabled)
+                  ? AppColors.glassBase
+                  : AppColors.glassFill,
         ),
         trackOutlineColor: WidgetStateProperty.resolveWith(
-          (s) => s.contains(WidgetState.selected)
-              ? Colors.transparent
-              : AppColors.textTertiary,
+          (s) =>
+              s.contains(WidgetState.selected)
+                  ? Colors.transparent
+                  : AppColors.textTertiary,
         ),
       ),
       checkboxTheme: CheckboxThemeData(
         fillColor: WidgetStateProperty.resolveWith(
-          (s) => s.contains(WidgetState.selected)
-              ? AppColors.secondaryGold
-              : Colors.transparent,
+          (s) =>
+              s.contains(WidgetState.selected)
+                  ? AppColors.secondaryGold
+                  : Colors.transparent,
         ),
-        checkColor: const WidgetStatePropertyAll(AppColors.onGold),
-        side: const BorderSide(color: AppColors.textSecondary, width: 1.5),
+        checkColor: WidgetStatePropertyAll(AppColors.onGold),
+        side: BorderSide(color: AppColors.textSecondary, width: 1.5),
       ),
       radioTheme: RadioThemeData(
         fillColor: WidgetStateProperty.resolveWith(
-          (s) => s.contains(WidgetState.selected)
-              ? AppColors.secondaryGold
-              : AppColors.textSecondary,
+          (s) =>
+              s.contains(WidgetState.selected)
+                  ? AppColors.secondaryGold
+                  : AppColors.textSecondary,
         ),
       ),
       sliderTheme: SliderThemeData(
@@ -402,7 +504,7 @@ abstract final class AppTheme {
         activeTickMarkColor: AppColors.onGold.withValues(alpha: 0.4),
         inactiveTickMarkColor: AppColors.textSecondary,
       ),
-      progressIndicatorTheme: const ProgressIndicatorThemeData(
+      progressIndicatorTheme: ProgressIndicatorThemeData(
         color: AppColors.secondaryGold,
         linearTrackColor: AppColors.glassStroke,
         circularTrackColor: Colors.transparent,
@@ -421,7 +523,7 @@ abstract final class AppTheme {
         selectedColor: AppColors.secondaryGold,
         selectedTileColor: AppColors.glassFill,
       ),
-      expansionTileTheme: const ExpansionTileThemeData(
+      expansionTileTheme: ExpansionTileThemeData(
         iconColor: AppColors.secondaryGold,
         collapsedIconColor: AppColors.textSecondary,
         textColor: AppColors.textMain,
@@ -435,15 +537,17 @@ abstract final class AppTheme {
         disabledColor: AppColors.glassBase,
         checkmarkColor: AppColors.onGold,
         labelStyle: text.labelMedium!.copyWith(color: AppColors.textMain),
-        secondaryLabelStyle: text.labelMedium!.copyWith(color: AppColors.onGold),
-        side: const BorderSide(color: AppColors.glassStroke),
+        secondaryLabelStyle: text.labelMedium!.copyWith(
+          color: AppColors.onGold,
+        ),
+        side: BorderSide(color: AppColors.glassStroke),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadius.pillRaw),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-        iconTheme: const IconThemeData(color: AppColors.secondaryGold, size: 18),
+        iconTheme: IconThemeData(color: AppColors.secondaryGold, size: 18),
       ),
-      dividerTheme: const DividerThemeData(
+      dividerTheme: DividerThemeData(
         color: AppColors.glassStroke,
         thickness: 1,
         space: 1,
@@ -463,7 +567,9 @@ abstract final class AppTheme {
         backgroundColor: AppColors.cardDark,
         selectedItemColor: AppColors.secondaryGold,
         unselectedItemColor: AppColors.textSecondary,
-        selectedLabelStyle: text.labelSmall!.copyWith(fontWeight: FontWeight.w600),
+        selectedLabelStyle: text.labelSmall!.copyWith(
+          fontWeight: FontWeight.w600,
+        ),
         unselectedLabelStyle: text.labelSmall,
         type: BottomNavigationBarType.fixed,
         elevation: 0,
@@ -478,19 +584,22 @@ abstract final class AppTheme {
         labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
         iconTheme: WidgetStateProperty.resolveWith(
           (s) => IconThemeData(
-            color: s.contains(WidgetState.selected)
-                ? AppColors.secondaryGold
-                : AppColors.textSecondary,
+            color:
+                s.contains(WidgetState.selected)
+                    ? AppColors.secondaryGold
+                    : AppColors.textSecondary,
           ),
         ),
         labelTextStyle: WidgetStateProperty.resolveWith(
           (s) => text.labelSmall!.copyWith(
-            color: s.contains(WidgetState.selected)
-                ? AppColors.secondaryGold
-                : AppColors.textSecondary,
-            fontWeight: s.contains(WidgetState.selected)
-                ? FontWeight.w600
-                : FontWeight.w500,
+            color:
+                s.contains(WidgetState.selected)
+                    ? AppColors.secondaryGold
+                    : AppColors.textSecondary,
+            fontWeight:
+                s.contains(WidgetState.selected)
+                    ? FontWeight.w600
+                    : FontWeight.w500,
           ),
         ),
       ),

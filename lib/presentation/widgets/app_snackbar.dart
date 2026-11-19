@@ -7,11 +7,12 @@ import '../../core/theme/app_tokens.dart';
 enum SnackType { info, success, error, warning }
 
 extension on SnackType {
+  /// Icon colours chosen for the dark-ink snackbar background.
   Color get color => switch (this) {
-    SnackType.info => AppColors.secondaryGold,
-    SnackType.success => AppColors.success,
-    SnackType.error => AppColors.error,
-    SnackType.warning => AppColors.warning,
+    SnackType.info => AppColors.infoOnDark,
+    SnackType.success => AppColors.successOnDark,
+    SnackType.error => AppColors.errorOnDark,
+    SnackType.warning => AppColors.brass,
   };
 
   IconData get icon => switch (this) {
@@ -45,7 +46,7 @@ void showAppSnackBar(
         duration: duration,
         shape: RoundedRectangleBorder(
           borderRadius: AppRadius.mdAll,
-          side: BorderSide(color: color.withValues(alpha: 0.5)),
+          side: BorderSide(color: color.withValues(alpha: 0.35)),
         ),
         content: Row(
           children: [
@@ -54,9 +55,10 @@ void showAppSnackBar(
             Expanded(child: Text(message)),
           ],
         ),
-        action: actionLabel != null && onAction != null
-            ? SnackBarAction(label: actionLabel, onPressed: onAction)
-            : null,
+        action:
+            actionLabel != null && onAction != null
+                ? SnackBarAction(label: actionLabel, onPressed: onAction)
+                : null,
       ),
     );
 }

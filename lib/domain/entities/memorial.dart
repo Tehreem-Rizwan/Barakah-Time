@@ -18,8 +18,16 @@ class DhikrPreset {
       'لَا إِلٰهَ إِلَّا أَنْتَ سُبْحَانَكَ إِنِّي كُنْتُ مِنَ الظَّالِمِينَ',
       125000,
     ),
-    DhikrPreset('darood', 'اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ', 10000),
-    DhikrPreset('kalma', 'لَا إِلٰهَ إِلَّا اللّٰهُ مُحَمَّدٌ رَسُولُ اللّٰهِ', 70000),
+    DhikrPreset(
+      'darood',
+      'اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ',
+      10000,
+    ),
+    DhikrPreset(
+      'kalma',
+      'لَا إِلٰهَ إِلَّا اللّٰهُ مُحَمَّدٌ رَسُولُ اللّٰهِ',
+      70000,
+    ),
     DhikrPreset('ikhlas', 'قُلْ هُوَ اللّٰهُ أَحَدٌ', 1000),
     DhikrPreset('yaseen', 'يٰسٓ', 41),
     DhikrPreset('istighfar', 'أَسْتَغْفِرُ اللّٰهَ', 10000),
@@ -194,7 +202,11 @@ class MemorialLink {
   final String id;
   final String name;
   final bool owner;
-  const MemorialLink({required this.id, required this.name, required this.owner});
+  const MemorialLink({
+    required this.id,
+    required this.name,
+    required this.owner,
+  });
 }
 
 /// Customary remembrance days after a death.

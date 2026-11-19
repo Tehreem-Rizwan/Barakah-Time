@@ -667,7 +667,7 @@ class _MemorialViewState extends State<_MemorialView> {
                   ),
                   if (mine)
                     ListTile(
-                      leading: const Icon(
+                      leading: Icon(
                         Icons.check_circle_outline,
                         color: AppColors.success,
                       ),
@@ -752,9 +752,10 @@ class _MemorialViewState extends State<_MemorialView> {
       final error = l10n.translate('memorial_error_generic');
       final memorial = m;
       final me = widget.me;
+      final stopping = _stopReminders(memorial);
       // Leave first: deleting makes this page's stream emit "deleted".
       Navigator.of(context).pop();
-      await _stopReminders(memorial);
+      await stopping;
       try {
         await _repo.delete(me, memorial.id);
       } catch (_) {
@@ -770,14 +771,13 @@ class _MemorialViewState extends State<_MemorialView> {
   }
 
   /// Removes this page's remembrance-day reminders from this device.
+  /// Read before any await/pop: the page may be gone afterwards.
   Future<void> _stopReminders(Memorial memorial) async {
+    final languageCode = Localizations.localeOf(context).languageCode;
     final reminders = sl<MemorialReminderService>();
     if (!reminders.isEnabled(memorial.id)) return;
     await reminders.setEnabled(memorial, false);
-    await reminders.reschedule(
-      sl<NotificationService>(),
-      Localizations.localeOf(context).languageCode,
-    );
+    await reminders.reschedule(sl<NotificationService>(), languageCode);
   }
 
   @override
@@ -886,7 +886,7 @@ class _MemorialViewState extends State<_MemorialView> {
             spacing: AppSpacing.sm,
             children: [
               ActionChip(
-                avatar: const Icon(Icons.copy_rounded, size: 16),
+                avatar: Icon(Icons.copy_rounded, size: 16.sp),
                 label: Text('${l10n.translate('memorial_code')}: ${m.id}'),
                 onPressed: () {
                   Clipboard.setData(ClipboardData(text: m.id));
@@ -898,7 +898,7 @@ class _MemorialViewState extends State<_MemorialView> {
               ),
               FilledButton.icon(
                 onPressed: _share,
-                icon: const Icon(Icons.share_rounded, size: 18),
+                icon: Icon(Icons.share_rounded, size: 18.sp),
                 label: Text(l10n.translate('memorial_invite')),
               ),
             ],
@@ -988,14 +988,14 @@ class _MemorialViewState extends State<_MemorialView> {
     mainAxisSize: MainAxisSize.min,
     children: [
       Container(
-        width: 12,
-        height: 12,
+        width: 12.r,
+        height: 12.r,
         decoration: BoxDecoration(
           color: color,
-          borderRadius: BorderRadius.circular(3),
+          borderRadius: BorderRadius.circular(3.r),
         ),
       ),
-      const SizedBox(width: 4),
+      SizedBox(width: 4.w),
       Text(label, style: Theme.of(context).textTheme.labelSmall),
     ],
   );
@@ -1070,14 +1070,14 @@ class _MemorialViewState extends State<_MemorialView> {
                           ),
                         ),
                         if (reached)
-                          const Icon(
+                          Icon(
                             Icons.check_circle_rounded,
                             color: AppColors.success,
-                            size: 18,
+                            size: 18.sp,
                           ),
                         TextButton.icon(
                           onPressed: () => _addDhikr(e.key),
-                          icon: const Icon(Icons.add_rounded, size: 18),
+                          icon: Icon(Icons.add_rounded, size: 18.sp),
                           label: Text(l10n.translate('memorial_add_count')),
                         ),
                       ],
@@ -1276,7 +1276,7 @@ class _MemorialFeed extends StatelessWidget {
                         'dhikr' => Icons.blur_circular_outlined,
                         _ => Icons.favorite_border_rounded,
                       },
-                      size: 18,
+                      size: 18.sp,
                       color: AppColors.secondaryGold,
                     ),
                     SizedBox(width: AppSpacing.sm),

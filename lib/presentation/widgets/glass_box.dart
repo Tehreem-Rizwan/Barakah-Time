@@ -55,7 +55,10 @@ class GlassBox extends StatelessWidget {
         color:
             c == null
                 ? AppColors.cardDark
-                : Color.alphaBlend(c.withValues(alpha: 0.08), AppColors.cardDark),
+                : Color.alphaBlend(
+                  c.withValues(alpha: 0.08),
+                  AppColors.cardDark,
+                ),
       ),
       child: child,
     );

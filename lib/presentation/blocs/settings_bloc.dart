@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:async';
 import 'dart:ui' show Locale, PlatformDispatcher;
 
@@ -87,6 +88,28 @@ class UpdateQuranFontSize extends SettingsEvent {
   List<Object?> get props => [fontSize];
 }
 
+/// Shifts one prayer's time by [minutes] (−30..+30; 0 resets it).
+class UpdatePrayerOffset extends SettingsEvent {
+  final String prayer;
+  final int minutes;
+  const UpdatePrayerOffset(this.prayer, this.minutes);
+  @override
+  List<Object?> get props => [prayer, minutes];
+}
+
+/// [mode] is 'system', 'light' or 'dark'.
+class UpdateThemeMode extends SettingsEvent {
+  final String mode;
+  const UpdateThemeMode(this.mode);
+  @override
+  List<Object?> get props => [mode];
+}
+
+/// Resets every prayer offset to 0.
+class ResetPrayerOffsets extends SettingsEvent {
+  const ResetPrayerOffsets();
+}
+
 class UpdateLanguage extends SettingsEvent {
   final String languageCode;
   const UpdateLanguage(this.languageCode);
@@ -119,6 +142,13 @@ class SettingsState extends Equatable {
   /// Set when the manual city could not be geocoded; cleared on success.
   final String? locationError;
 
+  /// Minutes added to each prayer ('fajr', 'dhuhr', 'asr', 'maghrib',
+  /// 'isha') to match the local mosque. Missing = 0.
+  final Map<String, int> prayerOffsets;
+
+  /// 'system' (follow the phone), 'light' or 'dark'.
+  final String themeMode;
+
   const SettingsState({
     this.calculationMethod = CalculationMethods.karachi,
     this.quranFontSize = 24.0,
@@ -131,6 +161,8 @@ class SettingsState extends Equatable {
     this.adhanSoundEnabled = true,
     this.customAsrMadhab,
     this.locationError,
+    this.prayerOffsets = const {},
+    this.themeMode = 'system',
   });
 
   /// Effective Asr madhab: 'shafi' or 'hanafi'.
@@ -150,6 +182,8 @@ class SettingsState extends Equatable {
     String? customAsrMadhab,
     String? locationError,
     bool clearLocationError = false,
+    Map<String, int>? prayerOffsets,
+    String? themeMode,
   }) {
     return SettingsState(
       calculationMethod: calculationMethod ?? this.calculationMethod,
@@ -164,6 +198,8 @@ class SettingsState extends Equatable {
       customAsrMadhab: customAsrMadhab ?? this.customAsrMadhab,
       locationError:
           clearLocationError ? null : (locationError ?? this.locationError),
+      prayerOffsets: prayerOffsets ?? this.prayerOffsets,
+      themeMode: themeMode ?? this.themeMode,
     );
   }
 
@@ -180,6 +216,8 @@ class SettingsState extends Equatable {
     adhanSoundEnabled,
     customAsrMadhab,
     locationError,
+    prayerOffsets,
+    themeMode,
   ];
 }
 
@@ -230,6 +268,9 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     on<ToggleNotifications>(_onToggleNotifications);
     on<ToggleAdhanSound>(_onToggleAdhanSound);
     on<RecheckNotificationPermission>(_onRecheckPermission);
+    on<UpdatePrayerOffset>(_onUpdatePrayerOffset);
+    on<ResetPrayerOffsets>(_onResetPrayerOffsets);
+    on<UpdateThemeMode>(_onUpdateThemeMode);
   }
 
   /// Device region (e.g. 'PK'), or null.
@@ -237,15 +278,19 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     // Many phones in South Asia use "English (United States)", so the
     // locale alone would pick the North American method. The time zone is
     // a better hint for these regions.
-    final fromZone = countryForUtcOffset(
-      utcOffset ?? DateTime.now().timeZoneOffset,
-    );
-    if (fromZone != null) return fromZone;
+    String? fromLocale;
     try {
-      return PlatformDispatcher.instance.locale.countryCode;
+      fromLocale = PlatformDispatcher.instance.locale.countryCode;
     } catch (_) {
-      return null;
+      fromLocale = null;
     }
+    // Trust a specific region (e.g. UZ, RU); only an empty or default "US"
+    // locale is overridden by the time zone.
+    if (fromLocale != null && fromLocale.isNotEmpty && fromLocale != 'US') {
+      return fromLocale;
+    }
+    return countryForUtcOffset(utcOffset ?? DateTime.now().timeZoneOffset) ??
+        fromLocale;
   }
 
   /// Country implied by a UTC offset where that is unambiguous enough to
@@ -291,6 +336,13 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
           (madhab == AsrMadhab.hanafi || madhab == AsrMadhab.shafi)
               ? madhab
               : null,
+      prayerOffsets: SettingsPrefs.readOffsets(prefs),
+      themeMode:
+          SettingsPrefs.themeModes.contains(
+                prefs.getString(SettingsPrefs.themeMode),
+              )
+              ? prefs.getString(SettingsPrefs.themeMode)!
+              : 'system',
     );
   }
 
@@ -448,6 +500,36 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   ) async {
     await prefs.setBool(_kAdhanSound, event.enabled);
     emit(state.copyWith(adhanSoundEnabled: event.enabled));
+  }
+
+  Future<void> _onUpdatePrayerOffset(
+    UpdatePrayerOffset event,
+    Emitter<SettingsState> emit,
+  ) async {
+    if (!SettingsPrefs.offsetPrayers.contains(event.prayer)) return;
+    final next = SettingsPrefs.cleanOffsets({
+      ...state.prayerOffsets,
+      event.prayer: event.minutes,
+    });
+    await prefs.setString(SettingsPrefs.prayerOffsets, jsonEncode(next));
+    emit(state.copyWith(prayerOffsets: next));
+  }
+
+  Future<void> _onUpdateThemeMode(
+    UpdateThemeMode event,
+    Emitter<SettingsState> emit,
+  ) async {
+    if (!SettingsPrefs.themeModes.contains(event.mode)) return;
+    await prefs.setString(SettingsPrefs.themeMode, event.mode);
+    emit(state.copyWith(themeMode: event.mode));
+  }
+
+  Future<void> _onResetPrayerOffsets(
+    ResetPrayerOffsets event,
+    Emitter<SettingsState> emit,
+  ) async {
+    await prefs.setString(SettingsPrefs.prayerOffsets, '{}');
+    emit(state.copyWith(prayerOffsets: const {}));
   }
 
   Future<void> _onRecheckPermission(

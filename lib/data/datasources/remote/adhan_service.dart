@@ -37,11 +37,24 @@ class AdhanService {
     }
   }
 
-  static CalculationParameters _params(String method, String? madhab) {
+  static CalculationParameters _params(
+    String method,
+    String? madhab,
+    Map<String, int> offsets,
+  ) {
     final params = methodFor(method).getParameters();
     final effectiveMadhab = madhab ?? AsrMadhab.defaultFor(method);
     params.madhab =
         effectiveMadhab == AsrMadhab.hanafi ? Madhab.hanafi : Madhab.shafi;
+    // User fine-tuning (minutes) to match the local mosque; added on top of
+    // the method's own adjustments.
+    params.adjustments = PrayerAdjustments(
+      fajr: offsets['fajr'] ?? 0,
+      dhuhr: offsets['dhuhr'] ?? 0,
+      asr: offsets['asr'] ?? 0,
+      maghrib: offsets['maghrib'] ?? 0,
+      isha: offsets['isha'] ?? 0,
+    );
     return params;
   }
 
@@ -52,12 +65,13 @@ class AdhanService {
     DateTime date, {
     String method = CalculationMethods.karachi,
     String? madhab,
+    Map<String, int> offsets = const {},
   }) {
     final day = DateTime(date.year, date.month, date.day);
     final t = PrayerTimes(
       Coordinates(lat, lng),
       DateComponents(day.year, day.month, day.day),
-      _params(method, madhab),
+      _params(method, madhab, offsets),
     );
     return PrayerTimesModel.dailyFromAdhan(t, day);
   }
@@ -70,6 +84,7 @@ class AdhanService {
     int days, {
     String method = CalculationMethods.karachi,
     String? madhab,
+    Map<String, int> offsets = const {},
   }) => [
     for (var i = 0; i < days; i++)
       timesForDate(
@@ -79,6 +94,7 @@ class AdhanService {
         DateTime(from.year, from.month, from.day + i),
         method: method,
         madhab: madhab,
+        offsets: offsets,
       ),
   ];
 
@@ -88,6 +104,7 @@ class AdhanService {
     double lng, {
     String method = CalculationMethods.karachi,
     String? madhab,
+    Map<String, int> offsets = const {},
     DateTime? now,
   }) async {
     final days = timesForDays(
@@ -97,6 +114,7 @@ class AdhanService {
       2,
       method: method,
       madhab: madhab,
+      offsets: offsets,
     );
     return PrayerTimesModel(today: days[0], tomorrow: days[1]);
   }

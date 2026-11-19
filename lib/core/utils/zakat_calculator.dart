@@ -76,7 +76,8 @@ class ZakatCalculator {
     // Thousands separators must split the integer part into groups of 3.
     final intPart =
         decimal.isEmpty ? s : s.substring(0, s.lastIndexOf(decimal));
-    final groupSeps = decimal.isEmpty ? RegExp(r'[.,]') : RegExp(RegExp.escape(thousands));
+    final groupSeps =
+        decimal.isEmpty ? RegExp(r'[.,]') : RegExp(RegExp.escape(thousands));
     if (groupSeps.hasMatch(intPart)) {
       final groups = intPart.split(groupSeps);
       if (groups.first.isEmpty ||

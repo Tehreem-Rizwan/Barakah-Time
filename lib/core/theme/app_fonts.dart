@@ -15,11 +15,15 @@ abstract final class AppFonts {
 
   /// Latin UI font (Outfit).
   static TextStyle outfit([TextStyle? style]) =>
-      useGoogleFonts ? GoogleFonts.outfit(textStyle: style) : (style ?? const TextStyle());
+      useGoogleFonts
+          ? GoogleFonts.outfit(textStyle: style)
+          : (style ?? const TextStyle());
 
   /// Quranic / Arabic display font (Amiri).
   static TextStyle amiri([TextStyle? style]) =>
-      useGoogleFonts ? GoogleFonts.amiri(textStyle: style) : (style ?? const TextStyle());
+      useGoogleFonts
+          ? GoogleFonts.amiri(textStyle: style)
+          : (style ?? const TextStyle());
 
   /// Applies the locale-appropriate UI font family to [base].
   ///

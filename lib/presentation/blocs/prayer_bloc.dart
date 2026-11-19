@@ -16,12 +16,16 @@ class PrayerConfig extends Equatable {
   final double manualLatitude;
   final double manualLongitude;
 
+  /// Per-prayer minute offsets (see [SettingsState.prayerOffsets]).
+  final Map<String, int> offsets;
+
   const PrayerConfig({
     required this.method,
     required this.madhab,
     required this.useAutoLocation,
     required this.manualLatitude,
     required this.manualLongitude,
+    this.offsets = const {},
   });
 
   factory PrayerConfig.fromSettings(SettingsState s) => PrayerConfig(
@@ -30,6 +34,7 @@ class PrayerConfig extends Equatable {
     useAutoLocation: s.useAutoLocation,
     manualLatitude: s.manualLatitude,
     manualLongitude: s.manualLongitude,
+    offsets: s.prayerOffsets,
   );
 
   @override
@@ -39,6 +44,7 @@ class PrayerConfig extends Equatable {
     useAutoLocation,
     manualLatitude,
     manualLongitude,
+    offsets,
   ];
 }
 
@@ -140,6 +146,7 @@ class PrayerBloc extends Bloc<PrayerEvent, PrayerState> {
         lng,
         method: event.config.method,
         madhab: event.config.madhab,
+        offsets: event.config.offsets,
       );
       if (request != _request) return; // superseded by a newer load
       _lat = lat;
@@ -183,6 +190,7 @@ class PrayerBloc extends Bloc<PrayerEvent, PrayerState> {
         lng,
         method: config.method,
         madhab: config.madhab,
+        offsets: config.offsets,
       );
       if (request != _request) return;
       emit(PrayerLoaded(times, latitude: lat, longitude: lng));

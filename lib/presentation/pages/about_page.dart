@@ -11,28 +11,30 @@ import '../widgets/widgets.dart';
 /// [privacyPolicy] and [terms] are hosted on GitHub Pages from the
 /// `barakah-time-legal` repository.
 abstract final class AppLinks {
-  static const String privacyPolicy = 'https://tehreem-rizwan.github.io/barakah-time-legal/privacy.html';
-  static const String terms = 'https://tehreem-rizwan.github.io/barakah-time-legal/terms.html';
+  static const String privacyPolicy =
+      'https://tehreem-rizwan.github.io/barakah-time-legal/privacy.html';
+  static const String terms =
+      'https://tehreem-rizwan.github.io/barakah-time-legal/terms.html';
 
   static const String quranApi = 'https://alquran.cloud';
   static const String osmCopyright = 'https://www.openstreetmap.org/copyright';
-  static const String adhanLibrary = 'https://github.com/batoulapps/adhan-dart';
 }
 
 Future<String?>? _versionFuture;
 
 /// "1.2.3 (45)" from the platform, or null when unavailable. Cached.
-Future<String?> appVersion() => _versionFuture ??= () async {
-  try {
-    final info = await PackageInfo.fromPlatform();
-    if (info.version.isEmpty) return null;
-    return info.buildNumber.isEmpty
-        ? info.version
-        : '${info.version} (${info.buildNumber})';
-  } catch (_) {
-    return null;
-  }
-}();
+Future<String?> appVersion() =>
+    _versionFuture ??= () async {
+      try {
+        final info = await PackageInfo.fromPlatform();
+        if (info.version.isEmpty) return null;
+        return info.buildNumber.isEmpty
+            ? info.version
+            : '${info.version} (${info.buildNumber})';
+      } catch (_) {
+        return null;
+      }
+    }();
 
 /// Opens [url] externally; shows a snackbar if that fails.
 Future<void> openExternalLink(BuildContext context, String url) async {
@@ -143,9 +145,8 @@ class AboutPage extends StatelessWidget {
                 ActionTile(
                   icon: Icons.schedule_outlined,
                   title: l10n.about_prayer_calc,
+                  // Credit only: the library page is for developers.
                   subtitle: l10n.about_prayer_calc_source,
-                  trailing: const _ExternalIcon(),
-                  onTap: () => openExternalLink(context, AppLinks.adhanLibrary),
                 ),
               ],
             ),
@@ -168,20 +169,6 @@ class AboutPage extends StatelessWidget {
                   title: l10n.about_terms,
                   trailing: const _ExternalIcon(),
                   onTap: () => openExternalLink(context, AppLinks.terms),
-                ),
-                const Divider(height: 1),
-                ActionTile(
-                  icon: Icons.code_rounded,
-                  title: l10n.about_licenses,
-                  onTap: () async {
-                    final version = await appVersion();
-                    if (!context.mounted) return;
-                    showLicensePage(
-                      context: context,
-                      applicationName: l10n.app_name,
-                      applicationVersion: version,
-                    );
-                  },
                 ),
               ],
             ),

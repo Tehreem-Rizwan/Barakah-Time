@@ -92,6 +92,7 @@ class _FakePrayerRepo implements PrayerRepository {
     double longitude, {
     String method = 'Karachi',
     String? madhab,
+    Map<String, int> offsets = const {},
   }) async {
     final now = DateTime.now();
     DailyPrayerTimes day(int offset) {
@@ -517,7 +518,11 @@ void main() {
       testWidgets('home page (${locale.languageCode})', (tester) async {
         SharedPreferences.setMockInitialValues({});
         final prefs = await SharedPreferences.getInstance();
-        final auth = AuthBloc(prefs, SupabaseService(idTokenProvider: () async => null), FirebaseService());
+        final auth = AuthBloc(
+          prefs,
+          SupabaseService(idTokenProvider: () async => null),
+          FirebaseService(),
+        );
         addTearDown(auth.close);
         await _pump(
           tester,

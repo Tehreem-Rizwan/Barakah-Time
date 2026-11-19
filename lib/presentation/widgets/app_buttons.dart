@@ -25,16 +25,17 @@ class _ButtonContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final lead = loading
-        ? SizedBox(
-            width: 20.r,
-            height: 20.r,
-            child: CircularProgressIndicator(
-              strokeWidth: 2.2,
-              color: spinnerColor,
-            ),
-          )
-        : leading ?? (icon != null ? Icon(icon, size: 20.sp) : null);
+    final lead =
+        loading
+            ? SizedBox(
+              width: 20.r,
+              height: 20.r,
+              child: CircularProgressIndicator(
+                strokeWidth: 2.2,
+                color: spinnerColor,
+              ),
+            )
+            : leading ?? (icon != null ? Icon(icon, size: 20.sp) : null);
     return Row(
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
@@ -149,10 +150,13 @@ class GoogleSignInButton extends StatelessWidget {
   final String? label;
   final bool loading;
 
-  // Google's light-theme button colours (brand guidelines).
-  static const Color _fill = Color(0xFFFFFFFF);
-  static const Color _stroke = Color(0xFF747775);
-  static const Color _text = Color(0xFF1F1F1F);
+  // Google's light / dark button colours (brand guidelines).
+  static Color get _fill =>
+      AppColors.isDark ? const Color(0xFF131314) : const Color(0xFFFFFFFF);
+  static Color get _stroke =>
+      AppColors.isDark ? const Color(0xFF8E918F) : const Color(0xFF747775);
+  static Color get _text =>
+      AppColors.isDark ? const Color(0xFFE3E3E3) : const Color(0xFF1F1F1F);
 
   @override
   Widget build(BuildContext context) {
@@ -165,7 +169,7 @@ class GoogleSignInButton extends StatelessWidget {
           foregroundColor: _text,
           disabledBackgroundColor: _fill,
           disabledForegroundColor: _text.withValues(alpha: 0.6),
-          side: const BorderSide(color: _stroke),
+          side: BorderSide(color: _stroke),
           minimumSize: Size(64, AppSizes.buttonHeight.h),
         ),
         child: _ButtonContent(
@@ -196,21 +200,24 @@ class AppleSignInButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Apple: black button on light backgrounds, white on dark.
+    final bg = AppColors.isDark ? Colors.white : Colors.black;
+    final fg = AppColors.isDark ? Colors.black : Colors.white;
     return SizedBox(
       width: double.infinity,
       child: FilledButton(
         onPressed: loading ? null : onPressed,
         style: FilledButton.styleFrom(
-          backgroundColor: Colors.black,
-          foregroundColor: Colors.white,
-          disabledBackgroundColor: Colors.black.withValues(alpha: 0.6),
-          disabledForegroundColor: Colors.white70,
+          backgroundColor: bg,
+          foregroundColor: fg,
+          disabledBackgroundColor: bg.withValues(alpha: 0.6),
+          disabledForegroundColor: fg.withValues(alpha: 0.7),
           minimumSize: Size(64, AppSizes.buttonHeight.h),
         ),
         child: _ButtonContent(
           label: label ?? context.l10n.continue_with_apple,
           loading: loading,
-          spinnerColor: Colors.white,
+          spinnerColor: fg,
           leading: Icon(Icons.apple, size: 22.sp),
         ),
       ),
@@ -245,12 +252,13 @@ class _GoogleGPainter extends CustomPainter {
     final rect = Rect.fromCircle(center: center, radius: r);
     double deg(double d) => d * math.pi / 180;
 
-    Paint arc(Color c) => Paint()
-      ..color = c
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = stroke
-      ..strokeCap = StrokeCap.butt
-      ..isAntiAlias = true;
+    Paint arc(Color c) =>
+        Paint()
+          ..color = c
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = stroke
+          ..strokeCap = StrokeCap.butt
+          ..isAntiAlias = true;
 
     // Angles: 0° = 3 o'clock, positive = clockwise. The G's opening is
     // the gap between 315° (-45°) and 0°, closed by the blue crossbar.
@@ -259,10 +267,11 @@ class _GoogleGPainter extends CustomPainter {
     canvas.drawArc(rect, deg(135), deg(80), false, arc(_yellow));
     canvas.drawArc(rect, deg(215), deg(100), false, arc(_red));
 
-    final bar = Paint()
-      ..color = _blue
-      ..style = PaintingStyle.fill
-      ..isAntiAlias = true;
+    final bar =
+        Paint()
+          ..color = _blue
+          ..style = PaintingStyle.fill
+          ..isAntiAlias = true;
     canvas.drawRect(
       Rect.fromLTRB(
         center.dx - stroke * 0.05,
@@ -277,3 +286,15 @@ class _GoogleGPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
+
+/// Compact, pill-shaped style for the main action inside dialogs
+/// (Save, Rate now, Send, Delete…). Smaller than page buttons; the tap
+/// target stays 48 dp. Pass [background]/[foreground] for e.g. destructive.
+ButtonStyle dialogActionStyle({Color? background, Color? foreground}) =>
+    FilledButton.styleFrom(
+      minimumSize: Size(72.w, 40.h),
+      padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 8.h),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50.r)),
+      backgroundColor: background,
+      foregroundColor: foreground,
+    );

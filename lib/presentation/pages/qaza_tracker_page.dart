@@ -40,10 +40,9 @@ class _QazaTrackerPageState extends State<QazaTrackerPage> {
     _repo.save(next);
   }
 
-  String _num(BuildContext context, int n) =>
-      NumberFormat.decimalPattern(
-        Localizations.localeOf(context).toLanguageTag(),
-      ).format(n);
+  String _num(BuildContext context, int n) => NumberFormat.decimalPattern(
+    Localizations.localeOf(context).toLanguageTag(),
+  ).format(n);
 
   void _madeUp(String prayer) {
     final l10n = context.l10n;
@@ -292,8 +291,7 @@ class _QazaTrackerPageState extends State<QazaTrackerPage> {
             child: Text(
               _num(context, remaining),
               style: textTheme.titleLarge?.copyWith(
-                color:
-                    remaining == 0 ? AppColors.success : AppColors.textMain,
+                color: remaining == 0 ? AppColors.success : AppColors.textMain,
               ),
             ),
           ),
@@ -301,11 +299,11 @@ class _QazaTrackerPageState extends State<QazaTrackerPage> {
             tooltip: l10n
                 .translate('qaza_edit_title')
                 .replaceAll('{prayer}', name),
-            icon: const Icon(Icons.edit_outlined, size: 20),
+            icon: Icon(Icons.edit_outlined, size: 20.sp),
             color: AppColors.textSecondary,
             onPressed: () => _edit(prayer),
           ),
-          IconButton.filledTonal(
+          IconButton.filled(
             tooltip: '${l10n.translate('qaza_pray_one')}: $name',
             icon: const Icon(Icons.check_rounded),
             onPressed: remaining > 0 ? () => _madeUp(prayer) : null,
@@ -424,19 +422,14 @@ class _EstimateSheetState extends State<_EstimateSheet> {
       Localizations.localeOf(context).toLanguageTag(),
     );
     return Padding(
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.viewInsetsOf(context).bottom,
-      ),
+      padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
       child: SingleChildScrollView(
         padding: AppSpacing.page,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(
-              l10n.translate('qaza_calculate'),
-              style: textTheme.titleLarge,
-            ),
+            Text(l10n.translate('qaza_calculate'), style: textTheme.titleLarge),
             SizedBox(height: AppSpacing.vSm),
             Text(
               l10n.translate('qaza_calc_desc'),
@@ -482,9 +475,8 @@ class _EstimateSheetState extends State<_EstimateSheet> {
               icon: Icons.add_rounded,
               onPressed:
                   total > 0
-                      ? () => Navigator.of(
-                        context,
-                      ).pop((days: total, witr: _witr))
+                      ? () =>
+                          Navigator.of(context).pop((days: total, witr: _witr))
                       : null,
             ),
             SizedBox(height: AppSpacing.vLg),

@@ -67,11 +67,10 @@ class _SavedVersesPageState extends State<SavedVersesPage> {
       revelationType: '',
     );
     Navigator.of(context).push(
-      MaterialPageRoute<void>(builder:
-          (_) => SurahDetailPage(
-            surah: surah!,
-            initialAyah: verse.ayahNumber,
-          ),
+      MaterialPageRoute<void>(
+        builder:
+            (_) =>
+                SurahDetailPage(surah: surah!, initialAyah: verse.ayahNumber),
       ),
     );
   }

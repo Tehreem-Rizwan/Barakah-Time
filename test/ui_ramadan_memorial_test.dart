@@ -28,6 +28,7 @@ class _FakePrayerRepo implements PrayerRepository {
     double longitude, {
     String method = 'Karachi',
     String? madhab,
+    Map<String, int> offsets = const {},
   }) async {
     final now = DateTime.now();
     DailyPrayerTimes day(int offset) {
@@ -123,9 +124,7 @@ void main() {
   });
 
   for (final code in ['en', 'ur']) {
-    testWidgets('Ramadan page renders and logs a fast ($code)', (
-      tester,
-    ) async {
+    testWidgets('Ramadan page renders and logs a fast ($code)', (tester) async {
       final l10n = AppLocalizations(Locale(code));
       await _pump(tester, const RamadanPage(), Locale(code));
       expect(tester.takeException(), isNull);
@@ -155,9 +154,7 @@ void main() {
       );
     });
 
-    testWidgets('Esaal-e-Sawab asks guests to sign in ($code)', (
-      tester,
-    ) async {
+    testWidgets('Esaal-e-Sawab asks guests to sign in ($code)', (tester) async {
       final l10n = AppLocalizations(Locale(code));
       await _pump(tester, const MemorialsPage(), Locale(code));
       expect(tester.takeException(), isNull);

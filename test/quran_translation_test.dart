@@ -9,7 +9,10 @@ void main() {
       QuranRepository.translationAudioUrl('ur', 2),
       'https://cdn.islamic.network/quran/audio/64/ur.khan/2.mp3',
     );
-    expect(QuranRepository.translationAudioUrl('en', 262), contains('en.walk/262.mp3'));
+    expect(
+      QuranRepository.translationAudioUrl('en', 262),
+      contains('en.walk/262.mp3'),
+    );
     expect(QuranRepository.translationAudioUrl('ar', 2), isNull); // TTS
     expect(QuranRepository.translationAudioUrl('ur', 0), isNull);
   });
@@ -25,7 +28,10 @@ void main() {
 
     bloc.add(SetTranslationLanguage('ur'));
     await Future<void>.delayed(const Duration(milliseconds: 10));
-    expect(bloc.translationEdition, QuranRepository.translationEditionFor('ur'));
+    expect(
+      bloc.translationEdition,
+      QuranRepository.translationEditionFor('ur'),
+    );
 
     // App language changes don't override the user's choice.
     bloc.add(ChangeQuranLanguage('tr'));

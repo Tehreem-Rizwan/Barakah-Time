@@ -1,3 +1,4 @@
+import '../../core/utils/date_labels.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -19,9 +20,9 @@ import 'hijri_label.dart';
 String _time(BuildContext context, DateTime t) {
   final code = Localizations.localeOf(context).languageCode;
   try {
-    return DateFormat.jm(code).format(t);
+    return ltrTime(DateFormat.jm(code).format(t));
   } catch (_) {
-    return DateFormat.jm().format(t);
+    return ltrTime(DateFormat.jm().format(t));
   }
 }
 
@@ -39,6 +40,7 @@ Future<void> rescheduleRamadanReminders(BuildContext context) async {
     NotificationService.daysAhead,
     method: settings.calculationMethod,
     madhab: settings.asrMadhab,
+    offsets: settings.prayerOffsets,
   );
   await service.reschedule(notifications, days, settings.languageCode);
 }
@@ -211,9 +213,7 @@ class _RamadanPageState extends State<RamadanPage> {
               DateTime(_now.year, _now.month, _now.day + adjust),
               l10n,
             ),
-            style: textTheme.bodySmall?.copyWith(
-              color: AppColors.textTertiary,
-            ),
+            style: textTheme.bodySmall?.copyWith(color: AppColors.textTertiary),
           ),
         ],
       ),
@@ -410,8 +410,10 @@ class _RamadanPageState extends State<RamadanPage> {
     final year = _service.logYear(_now);
     final log = _service.loadLog(year);
     final current = info.isRamadan && info.year == year;
-    final fasted = log.values.where((d) => d.status == FastStatus.fasted).length;
-    final missed = log.values.where((d) => d.status == FastStatus.missed).length;
+    final fasted =
+        log.values.where((d) => d.status == FastStatus.fasted).length;
+    final missed =
+        log.values.where((d) => d.status == FastStatus.missed).length;
     final taraweeh = log.values.where((d) => d.taraweeh).length;
     return AppCard(
       padding: AppSpacing.card,
@@ -478,9 +480,7 @@ class _RamadanPageState extends State<RamadanPage> {
           if (missed > 0) ...[
             SizedBox(height: AppSpacing.vMd),
             Text(
-              l10n
-                  .translate('ramadan_qaza_fasts')
-                  .replaceAll('{n}', '$missed'),
+              l10n.translate('ramadan_qaza_fasts').replaceAll('{n}', '$missed'),
               style: textTheme.bodyMedium?.copyWith(color: AppColors.warning),
             ),
           ],
@@ -521,7 +521,7 @@ class _RamadanPageState extends State<RamadanPage> {
             borderRadius: AppRadius.smAll,
             side:
                 today
-                    ? const BorderSide(color: AppColors.secondaryGold, width: 2)
+                    ? BorderSide(color: AppColors.secondaryGold, width: 2)
                     : BorderSide.none,
           ),
           child: InkWell(
@@ -531,22 +531,22 @@ class _RamadanPageState extends State<RamadanPage> {
               children: [
                 Center(child: Text('$day')),
                 if (qadr)
-                  const PositionedDirectional(
-                    top: 2,
-                    end: 2,
+                  PositionedDirectional(
+                    top: 2.r,
+                    end: 2.r,
                     child: Icon(
                       Icons.star_rounded,
-                      size: 10,
+                      size: 10.sp,
                       color: AppColors.secondaryGold,
                     ),
                   ),
                 if (entry.taraweeh)
-                  const PositionedDirectional(
-                    bottom: 2,
-                    start: 2,
+                  PositionedDirectional(
+                    bottom: 2.r,
+                    start: 2.r,
                     child: Icon(
                       Icons.nights_stay_rounded,
-                      size: 10,
+                      size: 10.sp,
                       color: AppColors.info,
                     ),
                   ),

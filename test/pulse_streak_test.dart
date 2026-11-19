@@ -32,8 +32,10 @@ void main() {
 
   test('streak still counts when last activity was yesterday', () {
     expect(
-      streak([DateTime(2026, 11, 13), DateTime(2026, 11, 12)],
-          DateTime(2026, 11, 14, 10)),
+      streak([
+        DateTime(2026, 11, 13),
+        DateTime(2026, 11, 12),
+      ], DateTime(2026, 11, 14, 10)),
       2,
     );
   });

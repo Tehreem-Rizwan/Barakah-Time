@@ -13,12 +13,14 @@ class PrayerRepositoryImpl implements PrayerRepository {
     double longitude, {
     String method = 'Karachi',
     String? madhab,
+    Map<String, int> offsets = const {},
   }) {
     return adhanService.getTimes(
       latitude,
       longitude,
       method: method,
       madhab: madhab,
+      offsets: offsets,
     );
   }
 }

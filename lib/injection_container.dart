@@ -73,7 +73,8 @@ Future<void> init() async {
   sl.registerLazySingleton(() => AdhanService());
   sl.registerLazySingleton(() => LocationService(prefs: sl()));
   sl.registerLazySingleton(
-    () => SupabaseService(idTokenProvider: () => sl<FirebaseService>().idToken()),
+    () =>
+        SupabaseService(idTokenProvider: () => sl<FirebaseService>().idToken()),
   );
   sl.registerLazySingleton(() => FirebaseService());
   sl.registerLazySingleton(() => UserDataSyncService(sl(), sl()));

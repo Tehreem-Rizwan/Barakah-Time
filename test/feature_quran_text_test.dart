@@ -61,7 +61,7 @@ void main() {
             200,
           );
         }
-        if (path.endsWith('en.asad')) {
+        if (path.endsWith('en.sahih')) {
           return http.Response(
             body([_ayah(1, 'Alif. Lam. Mim.'), _ayah(2, 'This')]),
             200,
@@ -84,7 +84,7 @@ void main() {
       'mismatched lengths throw QuranLoadException, not RangeError',
       () async {
         final client = MockClient((req) async {
-          if (req.url.path.endsWith('en.asad')) {
+          if (req.url.path.endsWith('en.sahih')) {
             return http.Response(body([_ayah(1, 'x')]), 200);
           }
           return http.Response(body([_ayah(1, 'x'), _ayah(2, 'y')]), 200);

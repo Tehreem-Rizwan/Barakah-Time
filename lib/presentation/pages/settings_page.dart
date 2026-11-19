@@ -14,8 +14,15 @@ import '../blocs/auth_bloc.dart';
 import '../blocs/settings_bloc.dart';
 import '../widgets/widgets.dart';
 import 'about_page.dart';
+import 'prayer_offsets_sheet.dart';
 import 'auth/sign_in_page.dart';
-import 'profile_page.dart' show ProfilePage, UserAvatar;
+import 'profile_page.dart'
+    show
+        ProfilePage,
+        UserAvatar,
+        accountAuthListenWhen,
+        accountAuthListener,
+        confirmDeleteAccount;
 
 /// Supported UI languages, in picker order.
 const List<String> _languageCodes = ['en', 'ar', 'fa', 'ur', 'tr'];
@@ -75,135 +82,195 @@ class SettingsPage extends StatelessWidget {
       ],
       child: AppScaffold(
         title: l10n.settings,
-        body: BlocBuilder<SettingsBloc, SettingsState>(
-          builder: (context, state) {
-            return ListView(
-              padding: AppSpacing.page,
-              children: [
-                _section(l10n.settings_account, Icons.person_outline),
-                const _AccountCard(),
-                _gap(),
-                _section(l10n.settings_prayer, Icons.mosque_outlined),
-                _group([
-                  ActionTile(
-                    icon: Icons.calculate_outlined,
-                    title: l10n.calculation_method,
-                    subtitle: _methodName(l10n, state.calculationMethod),
-                    onTap: () => _showCalculationMethodDialog(context, state),
-                  ),
-                  ActionTile(
-                    icon: Icons.wb_sunny_outlined,
-                    title: l10n.asr_calculation,
-                    subtitle:
-                        state.asrMadhab == AsrMadhab.hanafi
-                            ? l10n.asr_hanafi
-                            : l10n.asr_shafi,
-                    onTap: () => _showMadhabDialog(context, state.asrMadhab),
-                  ),
-                  ActionTile(
-                    icon: Icons.location_on_outlined,
-                    title: l10n.location,
-                    subtitle:
-                        state.useAutoLocation
-                            ? l10n.auto_location
-                            : state.manualLocation,
-                    onTap: () => _showLocationDialog(context, state),
-                  ),
-                ]),
-                _gap(),
-                _section(l10n.notifications, Icons.notifications_none),
-                _group([
-                  ActionTile(
-                    icon: Icons.notifications_active_outlined,
-                    title: l10n.notifications,
-                    subtitle: l10n.notifications_subtitle,
-                    onTap:
-                        () => context.read<SettingsBloc>().add(
-                          ToggleNotifications(!state.notificationsEnabled),
-                        ),
-                    trailing: Switch(
-                      value: state.notificationsEnabled,
-                      onChanged:
-                          (value) => context.read<SettingsBloc>().add(
-                            ToggleNotifications(value),
-                          ),
-                    ),
-                  ),
-                  ActionTile(
-                    icon: Icons.volume_up_outlined,
-                    title: l10n.adhan_sound,
-                    subtitle: l10n.adhan_sound_desc,
-                    enabled: state.notificationsEnabled,
-                    onTap:
-                        () => context.read<SettingsBloc>().add(
-                          ToggleAdhanSound(!state.adhanSoundEnabled),
-                        ),
-                    trailing: Switch(
-                      value: state.adhanSoundEnabled,
-                      onChanged:
-                          state.notificationsEnabled
-                              ? (value) => context.read<SettingsBloc>().add(
-                                ToggleAdhanSound(value),
-                              )
-                              : null,
-                    ),
-                  ),
-                  if (state.notificationsEnabled)
-                    const _ExactAlarmHint(),
-                ]),
-                _gap(),
-                _section(l10n.quran, Icons.menu_book_outlined),
-                _group([
-                  ActionTile(
-                    icon: Icons.format_size,
-                    title: l10n.quran_font_size,
-                    subtitle: '${state.quranFontSize.toInt()}',
-                    onTap: () => _showFontSizeDialog(context),
-                  ),
-                ]),
-                _gap(),
-                _section(l10n.language, Icons.language),
-                _group([
-                  ActionTile(
-                    icon: Icons.translate_rounded,
-                    title: l10n.language,
-                    subtitle: _languageName(l10n, state.languageCode),
-                    onTap: () => _showLanguageDialog(context, state),
-                  ),
-                ]),
-                _gap(),
-                _section(l10n.support, Icons.favorite_border_rounded),
-                _group([
-                  if (_canRate)
+        body: BlocListener<AuthBloc, AuthState>(
+          listenWhen: accountAuthListenWhen,
+          listener: accountAuthListener,
+          child: BlocBuilder<SettingsBloc, SettingsState>(
+            builder: (context, state) {
+              return ListView(
+                padding: AppSpacing.page,
+                children: [
+                  _section(l10n.settings_account, Icons.person_outline),
+                  const _AccountCard(),
+                  _gap(),
+                  _section(l10n.settings_prayer, Icons.mosque_outlined),
+                  _group([
                     ActionTile(
-                      icon: Icons.star_outline_rounded,
-                      title: l10n.rate_us,
-                      subtitle: l10n.settings_support_us,
-                      onTap: () => _handleRateUs(context),
+                      icon: Icons.calculate_outlined,
+                      title: l10n.calculation_method,
+                      subtitle: _methodName(l10n, state.calculationMethod),
+                      onTap: () => _showCalculationMethodDialog(context, state),
                     ),
-                  FutureBuilder<String?>(
-                    future: appVersion(),
-                    builder:
-                        (context, snapshot) => ActionTile(
-                          icon: Icons.info_outline_rounded,
-                          title: l10n.about,
-                          subtitle:
-                              snapshot.data == null
-                                  ? null
-                                  : l10n.settingsVersion(snapshot.data!),
-                          onTap:
-                              () => Navigator.of(context).push(
-                                MaterialPageRoute<void>(
-                                  builder: (_) => const AboutPage(),
-                                ),
+                    ActionTile(
+                      icon: Icons.wb_sunny_outlined,
+                      title: l10n.asr_calculation,
+                      subtitle:
+                          state.asrMadhab == AsrMadhab.hanafi
+                              ? l10n.asr_hanafi
+                              : l10n.asr_shafi,
+                      onTap: () => _showMadhabDialog(context, state.asrMadhab),
+                    ),
+                    ActionTile(
+                      icon: Icons.tune_rounded,
+                      title: l10n.adjust_times,
+                      subtitle: prayerOffsetsSummary(l10n, state.prayerOffsets),
+                      onTap: () => showPrayerOffsetsSheet(context),
+                    ),
+                    ActionTile(
+                      icon: Icons.location_on_outlined,
+                      title: l10n.location,
+                      subtitle:
+                          state.useAutoLocation
+                              ? l10n.auto_location
+                              : state.manualLocation,
+                      onTap: () => _showLocationDialog(context, state),
+                    ),
+                  ]),
+                  _gap(),
+                  _section(l10n.notifications, Icons.notifications_none),
+                  _group([
+                    ActionTile(
+                      icon: Icons.notifications_active_outlined,
+                      title: l10n.notifications,
+                      subtitle: l10n.notifications_subtitle,
+                      onTap:
+                          () => context.read<SettingsBloc>().add(
+                            ToggleNotifications(!state.notificationsEnabled),
+                          ),
+                      trailing: Transform.scale(
+                        // A bit smaller than Material's default switch.
+                        scale: 0.8,
+                        child: Switch(
+                          value: state.notificationsEnabled,
+                          onChanged:
+                              (value) => context.read<SettingsBloc>().add(
+                                ToggleNotifications(value),
                               ),
                         ),
+                      ),
+                    ),
+                    ActionTile(
+                      icon: Icons.volume_up_outlined,
+                      title: l10n.adhan_sound,
+                      subtitle: l10n.adhan_sound_desc,
+                      enabled: state.notificationsEnabled,
+                      onTap:
+                          () => context.read<SettingsBloc>().add(
+                            ToggleAdhanSound(!state.adhanSoundEnabled),
+                          ),
+                      trailing: Transform.scale(
+                        // A bit smaller than Material's default switch.
+                        scale: 0.8,
+                        child: Switch(
+                          value: state.adhanSoundEnabled,
+                          onChanged:
+                              state.notificationsEnabled
+                                  ? (value) => context.read<SettingsBloc>().add(
+                                    ToggleAdhanSound(value),
+                                  )
+                                  : null,
+                        ),
+                      ),
+                    ),
+                    if (state.notificationsEnabled) const _ExactAlarmHint(),
+                  ]),
+                  _gap(),
+                  _section(l10n.quran, Icons.menu_book_outlined),
+                  _group([
+                    ActionTile(
+                      icon: Icons.format_size,
+                      title: l10n.quran_font_size,
+                      subtitle: '${state.quranFontSize.toInt()}',
+                      onTap: () => _showFontSizeDialog(context),
+                    ),
+                  ]),
+                  _gap(),
+                  _section(l10n.language, Icons.language),
+                  _group([
+                    ActionTile(
+                      icon: Icons.translate_rounded,
+                      title: l10n.language,
+                      subtitle: _languageName(l10n, state.languageCode),
+                      onTap: () => _showLanguageDialog(context, state),
+                    ),
+                    ActionTile(
+                      icon: Icons.dark_mode_outlined,
+                      title: l10n.app_theme,
+                      subtitle: _themeName(l10n, state.themeMode),
+                      onTap: () => _showThemeDialog(context, state.themeMode),
+                    ),
+                  ]),
+                  _gap(),
+                  _section(l10n.support, Icons.favorite_border_rounded),
+                  _group([
+                    if (_canRate)
+                      ActionTile(
+                        icon: Icons.star_outline_rounded,
+                        title: l10n.rate_us,
+                        subtitle: l10n.settings_support_us,
+                        onTap: () => _handleRateUs(context),
+                      ),
+                    FutureBuilder<String?>(
+                      future: appVersion(),
+                      builder:
+                          (context, snapshot) => ActionTile(
+                            icon: Icons.info_outline_rounded,
+                            title: l10n.about,
+                            subtitle:
+                                snapshot.data == null
+                                    ? null
+                                    : l10n.settingsVersion(snapshot.data!),
+                            onTap:
+                                () => Navigator.of(context).push(
+                                  MaterialPageRoute<void>(
+                                    builder: (_) => const AboutPage(),
+                                  ),
+                                ),
+                          ),
+                    ),
+                  ]),
+                  // Sign out / delete account at the very end (as on My Profile).
+                  BlocBuilder<AuthBloc, AuthState>(
+                    builder: (context, auth) {
+                      if (auth is! Authenticated)
+                        return const SizedBox.shrink();
+                      final busy = auth.isUpdating;
+                      return Padding(
+                        padding: EdgeInsetsDirectional.only(
+                          top: AppSpacing.vXl,
+                        ),
+                        child: _group([
+                          ActionTile(
+                            icon: Icons.logout_rounded,
+                            title: l10n.sign_out,
+                            enabled: !busy,
+                            onTap: () async {
+                              final bloc = context.read<AuthBloc>();
+                              final ok = await showConfirmDialog(
+                                context,
+                                title: l10n.sign_out,
+                                message: l10n.sign_out_confirm,
+                                confirmLabel: l10n.sign_out,
+                              );
+                              if (ok) bloc.add(SignOutRequested());
+                            },
+                          ),
+                          ActionTile(
+                            icon: Icons.delete_forever_outlined,
+                            title: l10n.delete_account,
+                            destructive: true,
+                            enabled: !busy,
+                            onTap: () => confirmDeleteAccount(context),
+                          ),
+                        ]),
+                      );
+                    },
                   ),
-                ]),
-                SizedBox(height: AppSpacing.vLg),
-              ],
-            );
-          },
+                  SizedBox(height: AppSpacing.vLg),
+                ],
+              );
+            },
+          ),
         ),
       ),
     );
@@ -276,7 +343,7 @@ class SettingsPage extends StatelessWidget {
                       selected: value == selected,
                       trailing:
                           value == selected
-                              ? const Icon(
+                              ? Icon(
                                 Icons.check_rounded,
                                 color: AppColors.secondaryGold,
                               )
@@ -307,7 +374,8 @@ class SettingsPage extends StatelessWidget {
       title: l10n.calculation_method,
       selected: state.calculationMethod,
       options: [
-        for (final m in CalculationMethods.all) (m.id, l10n.translate(m.l10nKey)),
+        for (final m in CalculationMethods.all)
+          (m.id, l10n.translate(m.l10nKey)),
       ],
     );
     if (chosen != null && chosen != state.calculationMethod) {
@@ -328,6 +396,28 @@ class SettingsPage extends StatelessWidget {
       ],
     );
     if (chosen != null && chosen != current) bloc.add(UpdateMadhab(chosen));
+  }
+
+  static String _themeName(AppLocalizations l10n, String mode) =>
+      switch (mode) {
+        'light' => l10n.theme_light,
+        'dark' => l10n.theme_dark,
+        _ => l10n.theme_system,
+      };
+
+  Future<void> _showThemeDialog(BuildContext context, String current) async {
+    final l10n = context.l10n;
+    final bloc = context.read<SettingsBloc>();
+    final chosen = await _showChoiceDialog<String>(
+      context,
+      title: l10n.app_theme,
+      selected: current,
+      options: [
+        for (final m in const ['system', 'light', 'dark'])
+          (m, _themeName(l10n, m)),
+      ],
+    );
+    if (chosen != null && chosen != current) bloc.add(UpdateThemeMode(chosen));
   }
 
   Future<void> _showLanguageDialog(
@@ -440,6 +530,7 @@ class SettingsPage extends StatelessWidget {
                 child: Text(l10n.later),
               ),
               FilledButton(
+                style: dialogActionStyle(),
                 onPressed: () async {
                   Navigator.pop(dialogContext);
                   final opened = await _openStore();
@@ -531,9 +622,9 @@ class _ProfileTile extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     return AppCard(
       onTap:
-          () => Navigator.of(context).push(
-            MaterialPageRoute<void>(builder: (_) => const ProfilePage()),
-          ),
+          () => Navigator.of(
+            context,
+          ).push(MaterialPageRoute<void>(builder: (_) => const ProfilePage())),
       semanticLabel: l10n.my_profile,
       padding: AppSpacing.only(start: 16, top: 12, end: 4, bottom: 12),
       child: Row(
@@ -574,29 +665,19 @@ class _ProfileTile extends StatelessWidget {
               ),
             )
           else
+            // Photo, name and email are all edited on My Profile.
             IconButton(
               tooltip: l10n.edit_profile,
-              onPressed: () => _showEditProfileDialog(context),
+              onPressed:
+                  () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => const ProfilePage(),
+                    ),
+                  ),
               icon: Icon(Icons.edit_outlined, size: 20.sp),
             ),
         ],
       ),
-    );
-  }
-
-  void _showEditProfileDialog(BuildContext context) {
-    final authBloc = context.read<AuthBloc>();
-    showDialog<void>(
-      context: context,
-      builder:
-          (_) => _EditProfileDialog(
-            currentName: user.name,
-            currentEmail: user.email,
-            onSave:
-                (name, email) => authBloc.add(
-                  UpdateProfileRequested(name: name, email: email),
-                ),
-          ),
     );
   }
 }
@@ -670,96 +751,6 @@ class _ExactAlarmHintState extends State<_ExactAlarmHint>
 // ─── Dialogs ──────────────────────────────────────────────────────────────────
 
 /// Owns its controllers so they outlive the dialog's exit animation.
-class _EditProfileDialog extends StatefulWidget {
-  final String currentName;
-  final String currentEmail;
-  final void Function(String name, String email) onSave;
-
-  const _EditProfileDialog({
-    required this.currentName,
-    required this.currentEmail,
-    required this.onSave,
-  });
-
-  @override
-  State<_EditProfileDialog> createState() => _EditProfileDialogState();
-}
-
-class _EditProfileDialogState extends State<_EditProfileDialog> {
-  final _formKey = GlobalKey<FormState>();
-  late final TextEditingController _nameController = TextEditingController(
-    text: widget.currentName,
-  );
-  late final TextEditingController _emailController = TextEditingController(
-    text: widget.currentEmail,
-  );
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _emailController.dispose();
-    super.dispose();
-  }
-
-  void _save() {
-    if (!(_formKey.currentState?.validate() ?? false)) return;
-    final name = _nameController.text.trim();
-    final email = _emailController.text.trim();
-    Navigator.pop(context);
-    if (name == widget.currentName &&
-        email.toLowerCase() == widget.currentEmail.toLowerCase()) {
-      return;
-    }
-    widget.onSave(name, email);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = context.l10n;
-    return AlertDialog(
-      title: Text(l10n.edit_profile),
-      scrollable: true,
-      content: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            TextFormField(
-              controller: _nameController,
-              textCapitalization: TextCapitalization.words,
-              textInputAction: TextInputAction.next,
-              autofillHints: const [AutofillHints.name],
-              decoration: InputDecoration(labelText: l10n.name),
-              validator: (v) => validateName(l10n, v),
-            ),
-            SizedBox(height: AppSpacing.vLg),
-            TextFormField(
-              controller: _emailController,
-              keyboardType: TextInputType.emailAddress,
-              textInputAction: TextInputAction.done,
-              autofillHints: const [AutofillHints.email],
-              decoration: InputDecoration(labelText: l10n.email),
-              validator: (v) => validateEmail(l10n, v),
-              onFieldSubmitted: (_) => _save(),
-            ),
-          ],
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          style: TextButton.styleFrom(foregroundColor: AppColors.textSecondary),
-          child: Text(l10n.cancel),
-        ),
-        FilledButton(onPressed: _save, child: Text(l10n.save)),
-      ],
-    );
-  }
-}
-
-/// Location settings dialog. Toggling Auto off keeps the dialog open and
-/// reveals the manual city field; an empty city can't be saved.
 class _LocationDialog extends StatefulWidget {
   final bool initialUseAuto;
   final String initialManualLocation;
@@ -838,7 +829,11 @@ class _LocationDialogState extends State<_LocationDialog> {
           style: TextButton.styleFrom(foregroundColor: AppColors.textSecondary),
           child: Text(l10n.cancel),
         ),
-        FilledButton(onPressed: _save, child: Text(l10n.save)),
+        FilledButton(
+          style: dialogActionStyle(),
+          onPressed: _save,
+          child: Text(l10n.save),
+        ),
       ],
     );
   }

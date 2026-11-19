@@ -95,7 +95,9 @@ class IslamicCalendarPage extends StatelessWidget {
     final now = DateTime.now();
     // Same moon-sighting adjustment as the Ramadan page.
     final adjust =
-        sl.isRegistered<RamadanService>() ? sl<RamadanService>().hijriAdjust : 0;
+        sl.isRegistered<RamadanService>()
+            ? sl<RamadanService>().hijriAdjust
+            : 0;
     final hijri = HijriCalendar.fromDate(
       DateTime(now.year, now.month, now.day + adjust),
     );
@@ -116,7 +118,7 @@ class IslamicCalendarPage extends StatelessWidget {
         children: [
           AppCard(
             blur: true,
-            color: AppColors.emeraldDeep,
+            border: Border.all(color: AppColors.brass, width: 1.2),
             padding: AppSpacing.all(24),
             child: Column(
               children: [
@@ -271,7 +273,7 @@ class _MonthGrid extends StatelessWidget {
           alignment: AlignmentDirectional.center,
           decoration:
               isToday
-                  ? const BoxDecoration(
+                  ? BoxDecoration(
                     color: AppColors.secondaryGold,
                     shape: BoxShape.circle,
                   )

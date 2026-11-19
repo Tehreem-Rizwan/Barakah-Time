@@ -25,21 +25,20 @@ class HomeWidgetService {
 
   /// Pure: the JSON the widget reads. Times are epoch milliseconds, five per
   /// day in [PrayerName] order.
-  static String encode(List<DailyPrayerTimes> days, AppLocalizations l10n) =>
-      jsonEncode({
-        'labels': {
-          'next': l10n.next_prayer,
-          'empty': l10n.translate('widget_empty'),
-          for (final p in PrayerName.values) p.key: l10n.translate(p.key),
-        },
-        'days': [
-          for (final d in days)
-            [
-              for (final p in PrayerName.values)
-                d.timeOf(p).millisecondsSinceEpoch,
-            ],
-        ],
-      });
+  static String encode(
+    List<DailyPrayerTimes> days,
+    AppLocalizations l10n,
+  ) => jsonEncode({
+    'labels': {
+      'next': l10n.next_prayer,
+      'empty': l10n.translate('widget_empty'),
+      for (final p in PrayerName.values) p.key: l10n.translate(p.key),
+    },
+    'days': [
+      for (final d in days)
+        [for (final p in PrayerName.values) d.timeOf(p).millisecondsSinceEpoch],
+    ],
+  });
 
   Future<void> update(
     List<DailyPrayerTimes> days,

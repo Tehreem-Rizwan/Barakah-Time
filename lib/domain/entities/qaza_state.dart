@@ -63,10 +63,8 @@ class QazaState extends Equatable {
     );
   }
 
-  QazaState withRemaining(String prayer, int count) => QazaState(
-    remaining: {...remaining, prayer: count},
-    done: done,
-  );
+  QazaState withRemaining(String prayer, int count) =>
+      QazaState(remaining: {...remaining, prayer: count}, done: done);
 
   /// Adds [days] missed days of every prayer (Witr only if [includeWitr]).
   QazaState addDays(int days, {bool includeWitr = true}) {

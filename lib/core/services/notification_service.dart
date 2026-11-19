@@ -322,13 +322,8 @@ class NotificationService {
   }) {
     final gen = _cancelGeneration;
     final run = _scheduleChain.then(
-      (_) => _schedule(
-        days,
-        languageCode,
-        adhanSound,
-        now ?? DateTime.now(),
-        gen,
-      ),
+      (_) =>
+          _schedule(days, languageCode, adhanSound, now ?? DateTime.now(), gen),
     );
     _scheduleChain = run.catchError((_) {});
     return _scheduleChain;
@@ -441,8 +436,9 @@ class NotificationService {
         iOS: DarwinNotificationDetails(presentSound: true),
         macOS: DarwinNotificationDetails(presentSound: true),
       );
-      final future = items.where((r) => r.time.isAfter(now)).toList()
-        ..sort((a, b) => a.time.compareTo(b.time));
+      final future =
+          items.where((r) => r.time.isAfter(now)).toList()
+            ..sort((a, b) => a.time.compareTo(b.time));
       for (var i = 0; i < future.length && i < ReminderGroups.size; i++) {
         if (gen != _cancelGeneration) return;
         final r = future[i];

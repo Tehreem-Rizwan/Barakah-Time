@@ -49,7 +49,11 @@ const List<Dhikr> kDhikrs = [
   Dhikr('alhamdulillah', 'ٱلْحَمْدُ لِلَّٰهِ', 'Alhamdulillah'),
   Dhikr('allahu_akbar', 'ٱللَّٰهُ أَكْبَرُ', 'Allahu Akbar'),
   Dhikr('astaghfirullah', 'أَسْتَغْفِرُ ٱللَّٰهَ', 'Astaghfirullah'),
-  Dhikr('la_ilaha_illallah', 'لَا إِلَٰهَ إِلَّا ٱللَّٰهُ', 'La ilaha illallah'),
+  Dhikr(
+    'la_ilaha_illallah',
+    'لَا إِلَٰهَ إِلَّا ٱللَّٰهُ',
+    'La ilaha illallah',
+  ),
 ];
 
 const List<int> kTasbeehPresetTargets = [33, 99, 100];
@@ -347,11 +351,12 @@ class _CounterButton extends StatelessWidget {
               child: TweenAnimationBuilder<double>(
                 tween: Tween(end: progress.fraction),
                 duration: AppDurations.fast,
-                builder: (context, value, _) => CircularProgressIndicator(
-                  value: value,
-                  strokeWidth: stroke,
-                  backgroundColor: AppColors.glassStrokeStrong,
-                ),
+                builder:
+                    (context, value, _) => CircularProgressIndicator(
+                      value: value,
+                      strokeWidth: stroke,
+                      backgroundColor: AppColors.brass.withValues(alpha: 0.3),
+                    ),
               ),
             ),
             Padding(
@@ -363,7 +368,7 @@ class _CounterButton extends StatelessWidget {
                 child: Ink(
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: AppColors.secondaryGold.withValues(alpha: 0.08),
+                    color: AppColors.cardDark,
                     border: Border.all(color: AppColors.glassStroke),
                   ),
                   child: InkWell(
@@ -461,7 +466,11 @@ class _CustomTargetDialogState extends State<_CustomTargetDialog> {
           onPressed: () => Navigator.of(context).pop(),
           child: Text(l10n.cancel),
         ),
-        FilledButton(onPressed: _submit, child: Text(l10n.save)),
+        FilledButton(
+          style: dialogActionStyle(),
+          onPressed: _submit,
+          child: Text(l10n.save),
+        ),
       ],
     );
   }

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// SharedPreferences keys for app settings, and their mapping to the
@@ -15,6 +17,42 @@ class SettingsPrefs {
   static const notifications = 'notifications_enabled';
   static const madhab = 'asr_madhab';
   static const adhanSound = 'adhan_sound_enabled';
+  static const prayerOffsets = 'prayer_offsets';
+  static const themeMode = 'theme_mode';
+
+  /// Allowed [themeMode] values.
+  static const themeModes = ['system', 'light', 'dark'];
+
+  /// Prayers whose time the user can shift.
+  static const offsetPrayers = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
+
+  /// Largest shift either way, in minutes.
+  static const maxOffset = 30;
+
+  /// Validated offsets from a decoded JSON/cloud map: known prayers only,
+  /// clamped to ±[maxOffset], zeros dropped.
+  static Map<String, int> cleanOffsets(Object? raw) {
+    if (raw is! Map) return const {};
+    final out = <String, int>{};
+    for (final p in offsetPrayers) {
+      final v = raw[p];
+      if (v is num) {
+        final m = v.round().clamp(-maxOffset, maxOffset);
+        if (m != 0) out[p] = m;
+      }
+    }
+    return out;
+  }
+
+  static Map<String, int> readOffsets(SharedPreferences prefs) {
+    final s = prefs.getString(prayerOffsets);
+    if (s == null || s.isEmpty) return const {};
+    try {
+      return cleanOffsets(jsonDecode(s));
+    } catch (_) {
+      return const {};
+    }
+  }
 
   /// Cloud payload from the persisted settings. Only keys that have been
   /// saved are included (unset values keep their device defaults).
@@ -35,6 +73,10 @@ class SettingsPrefs {
     put('quranFontSize', prefs.getDouble(fontSize));
     put('notificationsEnabled', prefs.getBool(notifications));
     put('adhanSoundEnabled', prefs.getBool(adhanSound));
+    put('themeMode', prefs.getString(themeMode));
+    if (prefs.getString(prayerOffsets) != null) {
+      map['prayerOffsets'] = readOffsets(prefs);
+    }
     return map;
   }
 
@@ -72,5 +114,15 @@ class SettingsPrefs {
     await str('languageCode', language);
     await dbl('quranFontSize', fontSize);
     await boolean('adhanSoundEnabled', adhanSound);
+    final t = data['themeMode'];
+    if (t is String && themeModes.contains(t)) {
+      await prefs.setString(themeMode, t);
+    }
+    if (data['prayerOffsets'] is Map) {
+      await prefs.setString(
+        prayerOffsets,
+        jsonEncode(cleanOffsets(data['prayerOffsets'])),
+      );
+    }
   }
 }
