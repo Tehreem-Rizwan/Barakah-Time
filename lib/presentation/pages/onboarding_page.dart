@@ -1,18 +1,22 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/localization/app_localizations.dart';
-import '../../core/services/app_init_status.dart';
 import '../../core/services/entry_route.dart';
 import '../widgets/widgets.dart';
-import 'auth/sign_in_page.dart';
+import '../blocs/auth_bloc.dart';
 import 'main_navigation_page.dart';
 
 class OnboardingPage extends StatefulWidget {
-  const OnboardingPage({super.key});
+  const OnboardingPage({super.key, this.nextPage});
+
+  /// Page opened after onboarding (the app itself). Overridable in tests.
+  @visibleForTesting
+  final WidgetBuilder? nextPage;
 
   @override
   State<OnboardingPage> createState() => _OnboardingPageState();
@@ -54,8 +58,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
     ),
   ];
 
-  /// Marks onboarding as seen (read by `resolveEntryRoute`) and moves on:
-  /// to Sign In, or straight into the app when sign-in is unavailable.
+  /// Marks onboarding as seen (read by `resolveEntryRoute`) and opens the
+  /// app. No sign-in step: an account is optional (Profile → Sign in).
   Future<void> _finishOnboarding() async {
     if (_finishing) return;
     _finishing = true;
@@ -66,13 +70,12 @@ class _OnboardingPageState extends State<OnboardingPage> {
       // Non-fatal: worst case onboarding is shown again next launch.
     }
     if (!mounted) return;
-    final Widget next =
-        AppInitStatus.firebaseReady
-            ? const SignInPage()
-            : const MainNavigationPage();
-    Navigator.of(
-      context,
-    ).pushReplacement(MaterialPageRoute<void>(builder: (_) => next));
+    context.read<AuthBloc>().add(ContinueAsGuest());
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute<void>(
+        builder: widget.nextPage ?? (_) => const MainNavigationPage(),
+      ),
+    );
   }
 
   void _next() {

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import '../../core/services/location_service.dart';
@@ -11,9 +13,21 @@ abstract class LocationEvent extends Equatable {
 /// Fetches the GPS location. Only dispatch in automatic-location mode.
 class FetchLocation extends LocationEvent {
   final bool forceRefresh;
-  FetchLocation({this.forceRefresh = false});
+
+  /// Background refresh: when a location is already loaded, keep showing it
+  /// (no loading state) and keep it if the new fix fails.
+  final bool silent;
+
+  /// Completed with true when a location was loaded, false otherwise (also
+  /// when the result equals the current state, so no new state is emitted).
+  final Completer<bool>? completer;
+  FetchLocation({
+    this.forceRefresh = false,
+    this.silent = false,
+    this.completer,
+  });
   @override
-  List<Object?> get props => [forceRefresh];
+  List<Object?> get props => [forceRefresh, silent];
 }
 
 /// Uses a manually configured location (never touches GPS).
@@ -88,7 +102,9 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
   LocationBloc(this._locationService) : super(LocationInitial()) {
     on<FetchLocation>((event, emit) async {
       final request = ++_request;
-      emit(LocationLoading());
+      final previous = state;
+      final keepPrevious = event.silent && previous is LocationLoaded;
+      if (!keepPrevious) emit(LocationLoading());
       try {
         final position = await _locationService.getCurrentPosition(
           forceRefresh: event.forceRefresh,
@@ -97,7 +113,11 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
           position.latitude,
           position.longitude,
         );
-        if (request != _request) return;
+        if (request != _request) {
+          event.completer?.complete(false);
+          return;
+        }
+        event.completer?.complete(true);
         emit(
           LocationLoaded(
             latitude: position.latitude,
@@ -107,10 +127,16 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
           ),
         );
       } on LocationException catch (e) {
-        if (request != _request) return;
+        if (!(event.completer?.isCompleted ?? true)) {
+          event.completer!.complete(false);
+        }
+        if (request != _request || keepPrevious) return;
         emit(LocationError(e.message, failure: e.failure));
       } catch (e) {
-        if (request != _request) return;
+        if (!(event.completer?.isCompleted ?? true)) {
+          event.completer!.complete(false);
+        }
+        if (request != _request || keepPrevious) return;
         emit(LocationError(e.toString()));
       }
     });

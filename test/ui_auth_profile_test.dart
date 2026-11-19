@@ -15,6 +15,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:barakah_time/core/services/entry_route.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -168,6 +169,32 @@ void main() {
       );
       expect(tester.takeException(), isNull);
     });
+  });
+
+  testWidgets('onboarding opens the app directly, without sign-in', (
+    tester,
+  ) async {
+    final l10n = AppLocalizations(const Locale('en'));
+    final bloc = await _authBloc();
+    addTearDown(bloc.close);
+    await _pump(
+      tester,
+      _app(
+        OnboardingPage(nextPage: (_) => const Scaffold(body: Text('HOME'))),
+        const Locale('en'),
+        authBloc: bloc,
+      ),
+    );
+    // Skip finishes onboarding just like "Get started" on the last page.
+    await tester.tap(find.text(l10n.skip));
+    await tester.pumpAndSettle();
+
+    expect(find.text('HOME'), findsOneWidget);
+    expect(find.byType(SignInPage), findsNothing);
+    expect(bloc.state, isA<GuestMode>());
+    final prefs = await SharedPreferences.getInstance();
+    expect(prefs.getBool(EntryPrefsKeys.hasSeenOnboarding), isTrue);
+    expect(prefs.getBool(EntryPrefsKeys.guestMode), isTrue);
   });
 
   group('sign in', () {

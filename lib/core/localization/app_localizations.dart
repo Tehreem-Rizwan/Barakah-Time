@@ -16,7 +16,7 @@ class AppLocalizations {
       'quran_translation_same_as_app': 'Same as app language',
       'quran_translation_audio_note':
           'Urdu, English, Farsi and Turkish translations are read aloud by a person.',
-      'audio_error_play': 'Could not play audio. Check your connection.',
+      'audio_error_play': 'Could not play audio. New recitations need internet the first time; ones you have heard before play offline.',
       'audio_error_speech': 'Speech playback failed',
       'name_too_long': 'Name must be 100 characters or fewer',
       'reminders_need_notifications':
@@ -231,7 +231,7 @@ class AppLocalizations {
       'profile_change_photo': 'Change photo',
       'profile_take_photo': 'Take photo',
       'profile_choose_gallery': 'Choose from gallery',
-      'profile_guest_title': 'Welcome, guest',
+      'profile_guest_title': 'Welcome',
       'profile_yesterday': 'Yesterday',
       'settings_account': 'Account',
       'settings_prayer': 'Prayer',
@@ -598,11 +598,13 @@ class AppLocalizations {
       'method_singapore': 'Singapore, Malaysia & Indonesia',
       'method_moonsighting': 'Moonsighting Committee Worldwide',
       'unknown_city': 'Unknown location',
+      'refresh_location': 'Update location',
+      'location_updated': 'Location updated',
       'default_user_name': 'Barakah User',
       'sign_in_with_apple': 'Sign in with Apple',
-      'continue_as_guest': 'Continue as guest',
+      'continue_as_guest': 'Not now',
       'guest_mode_notice':
-          'You are using Barakah Time as a guest. Sign in to back up your progress and use it on other devices.',
+          'Everything works without an account. Sign in only if you want to back up your progress and use it on other devices.',
       'sign_in_to_sync': 'Sign in to sync',
       'auth_unavailable_notice':
           'Sign-in is unavailable right now. You can keep using the app; your data stays on this device.',
@@ -708,7 +710,7 @@ class AppLocalizations {
       'quran_translation_same_as_app': 'نفس لغة التطبيق',
       'quran_translation_audio_note':
           'تُقرأ الترجمات الأردية والإنجليزية والفارسية والتركية بصوت قارئ بشري.',
-      'audio_error_play': 'تعذّر تشغيل الصوت. تحقق من الاتصال.',
+      'audio_error_play': 'تعذّر تشغيل الصوت. تحتاج التلاوات الجديدة إلى الإنترنت في المرة الأولى، أما ما استمعت إليه من قبل فيعمل دون اتصال.',
       'audio_error_speech': 'تعذّر تشغيل القراءة الصوتية',
       'name_too_long': 'يجب ألا يتجاوز الاسم 100 حرف',
       'reminders_need_notifications': 'فعّل إشعارات الصلاة من الإعدادات أولًا.',
@@ -913,7 +915,7 @@ class AppLocalizations {
       'profile_change_photo': 'تغيير الصورة',
       'profile_take_photo': 'التقاط صورة',
       'profile_choose_gallery': 'اختيار من المعرض',
-      'profile_guest_title': 'مرحباً أيها الضيف',
+      'profile_guest_title': 'مرحباً بك',
       'profile_yesterday': 'أمس',
       'settings_account': 'الحساب',
       'settings_prayer': 'الصلاة',
@@ -1276,11 +1278,13 @@ class AppLocalizations {
       'method_singapore': 'سنغافورة وماليزيا وإندونيسيا',
       'method_moonsighting': 'لجنة رؤية الهلال العالمية',
       'unknown_city': 'موقع غير معروف',
+      'refresh_location': 'تحديث الموقع',
+      'location_updated': 'تم تحديث الموقع',
       'default_user_name': 'مستخدم بركة',
       'sign_in_with_apple': 'تسجيل الدخول باستخدام Apple',
-      'continue_as_guest': 'المتابعة كضيف',
+      'continue_as_guest': 'ليس الآن',
       'guest_mode_notice':
-          'أنت تستخدم التطبيق كضيف. سجّل الدخول لحفظ تقدّمك واستخدامه على أجهزة أخرى.',
+          'كل الميزات تعمل بدون حساب. سجّل الدخول فقط إذا أردت حفظ تقدّمك واستخدامه على أجهزة أخرى.',
       'sign_in_to_sync': 'سجّل الدخول للمزامنة',
       'auth_unavailable_notice':
           'تسجيل الدخول غير متاح حاليًا. يمكنك متابعة استخدام التطبيق وستبقى بياناتك على هذا الجهاز.',
@@ -1384,7 +1388,7 @@ class AppLocalizations {
       'quran_translation_same_as_app': 'همان زبان برنامه',
       'quran_translation_audio_note':
           'ترجمه‌های اردو، انگلیسی، فارسی و ترکی با صدای یک قاری خوانده می‌شود.',
-      'audio_error_play': 'پخش صدا ممکن نشد. اتصال خود را بررسی کنید.',
+      'audio_error_play': 'پخش صدا ممکن نشد. تلاوت‌های جدید بار اول به اینترنت نیاز دارند؛ آنچه قبلاً شنیده‌اید بدون اینترنت هم پخش می‌شود.',
       'audio_error_speech': 'پخش گفتار ناموفق بود',
       'name_too_long': 'نام باید حداکثر ۱۰۰ نویسه باشد',
       'reminders_need_notifications':
@@ -1598,7 +1602,7 @@ class AppLocalizations {
       'profile_change_photo': 'تغییر عکس',
       'profile_take_photo': 'گرفتن عکس',
       'profile_choose_gallery': 'انتخاب از گالری',
-      'profile_guest_title': 'مهمان گرامی، خوش آمدید',
+      'profile_guest_title': 'خوش آمدید',
       'profile_yesterday': 'دیروز',
       'settings_account': 'حساب کاربری',
       'settings_prayer': 'نماز',
@@ -1963,11 +1967,13 @@ class AppLocalizations {
       'method_singapore': 'سنگاپور، مالزی و اندونزی',
       'method_moonsighting': 'کمیتهٔ جهانی رؤیت هلال',
       'unknown_city': 'مکان نامشخص',
+      'refresh_location': 'به‌روزرسانی مکان',
+      'location_updated': 'مکان به‌روز شد',
       'default_user_name': 'کاربر برکت',
       'sign_in_with_apple': 'ورود با Apple',
-      'continue_as_guest': 'ادامه به‌عنوان مهمان',
+      'continue_as_guest': 'فعلاً نه',
       'guest_mode_notice':
-          'شما به‌عنوان مهمان از برنامه استفاده می‌کنید. برای پشتیبان‌گیری از پیشرفت و استفاده در دستگاه‌های دیگر وارد شوید.',
+          'همه امکانات بدون حساب کار می‌کنند. فقط اگر می‌خواهید از پیشرفت خود پشتیبان بگیرید و در دستگاه‌های دیگر استفاده کنید، وارد شوید.',
       'sign_in_to_sync': 'برای همگام‌سازی وارد شوید',
       'auth_unavailable_notice':
           'ورود در حال حاضر در دسترس نیست. می‌توانید به استفاده ادامه دهید؛ داده‌ها روی همین دستگاه می‌مانند.',
@@ -2072,7 +2078,7 @@ class AppLocalizations {
       'quran_translation_same_as_app': 'ایپ والی زبان',
       'quran_translation_audio_note':
           'اردو، انگریزی، فارسی اور ترکی ترجمہ انسانی آواز میں سنایا جاتا ہے۔',
-      'audio_error_play': 'آڈیو نہیں چل سکی۔ انٹرنیٹ چیک کریں۔',
+      'audio_error_play': 'آڈیو نہیں چل سکی۔ نئی تلاوت پہلی بار سننے کے لیے انٹرنیٹ چاہیے، جو آپ پہلے سن چکے ہیں وہ انٹرنیٹ کے بغیر بھی چلتی ہے۔',
       'audio_error_speech': 'آواز میں پڑھائی نہیں چل سکی',
       'name_too_long': 'نام 100 حروف سے زیادہ نہیں ہو سکتا',
       'reminders_need_notifications':
@@ -2286,7 +2292,7 @@ class AppLocalizations {
       'profile_change_photo': 'تصویر تبدیل کریں',
       'profile_take_photo': 'تصویر کھینچیں',
       'profile_choose_gallery': 'گیلری سے منتخب کریں',
-      'profile_guest_title': 'خوش آمدید، مہمان',
+      'profile_guest_title': 'خوش آمدید',
       'profile_yesterday': 'کل',
       'settings_account': 'اکاؤنٹ',
       'settings_prayer': 'نماز',
@@ -2651,11 +2657,13 @@ class AppLocalizations {
       'method_singapore': 'سنگاپور، ملائیشیا اور انڈونیشیا',
       'method_moonsighting': 'مون سائٹنگ کمیٹی ورلڈ وائیڈ',
       'unknown_city': 'نامعلوم مقام',
+      'refresh_location': 'مقام اپ ڈیٹ کریں',
+      'location_updated': 'مقام اپ ڈیٹ ہو گیا',
       'default_user_name': 'برکت صارف',
       'sign_in_with_apple': 'Apple کے ساتھ سائن ان کریں',
-      'continue_as_guest': 'مہمان کے طور پر جاری رکھیں',
+      'continue_as_guest': 'ابھی نہیں',
       'guest_mode_notice':
-          'آپ مہمان کے طور پر ایپ استعمال کر رہے ہیں۔ اپنی پیش رفت محفوظ کرنے اور دوسرے آلات پر استعمال کے لیے سائن ان کریں۔',
+          'ایپ کی ہر سہولت اکاؤنٹ کے بغیر چلتی ہے۔ سائن اِن صرف تب کریں جب آپ اپنا ریکارڈ محفوظ رکھنا اور دوسرے فون پر استعمال کرنا چاہیں۔',
       'sign_in_to_sync': 'ہم آہنگی کے لیے سائن ان کریں',
       'auth_unavailable_notice':
           'سائن ان اس وقت دستیاب نہیں۔ آپ ایپ استعمال کرتے رہ سکتے ہیں؛ آپ کا ڈیٹا اسی آلے پر رہے گا۔',
@@ -2761,7 +2769,7 @@ class AppLocalizations {
       'quran_translation_same_as_app': 'Uygulama diliyle aynı',
       'quran_translation_audio_note':
           'Urduca, İngilizce, Farsça ve Türkçe mealler bir okuyucunun sesiyle dinlenir.',
-      'audio_error_play': 'Ses çalınamadı. Bağlantınızı kontrol edin.',
+      'audio_error_play': 'Ses çalınamadı. Yeni tilavetler ilk seferde internet gerektirir; daha önce dinledikleriniz internetsiz de çalar.',
       'audio_error_speech': 'Sesli okuma başarısız oldu',
       'name_too_long': 'Ad en fazla 100 karakter olabilir',
       'reminders_need_notifications':
@@ -2976,7 +2984,7 @@ class AppLocalizations {
       'profile_change_photo': 'Fotoğrafı değiştir',
       'profile_take_photo': 'Fotoğraf çek',
       'profile_choose_gallery': 'Galeriden seç',
-      'profile_guest_title': 'Hoş geldiniz, misafir',
+      'profile_guest_title': 'Hoş geldiniz',
       'profile_yesterday': 'Dün',
       'settings_account': 'Hesap',
       'settings_prayer': 'Namaz',
@@ -3346,11 +3354,13 @@ class AppLocalizations {
       'method_singapore': 'Singapur, Malezya ve Endonezya',
       'method_moonsighting': 'Dünya Hilal Gözetleme Komitesi',
       'unknown_city': 'Bilinmeyen konum',
+      'refresh_location': 'Konumu güncelle',
+      'location_updated': 'Konum güncellendi',
       'default_user_name': 'Bereket Kullanıcısı',
       'sign_in_with_apple': 'Apple ile Giriş Yap',
-      'continue_as_guest': 'Misafir olarak devam et',
+      'continue_as_guest': 'Şimdi değil',
       'guest_mode_notice':
-          'Uygulamayı misafir olarak kullanıyorsun. İlerlemeni yedeklemek ve diğer cihazlarda kullanmak için giriş yap.',
+          'Her şey hesap olmadan çalışır. Yalnızca ilerlemeni yedeklemek ve diğer cihazlarda kullanmak istersen giriş yap.',
       'sign_in_to_sync': 'Senkronize etmek için giriş yap',
       'auth_unavailable_notice':
           'Giriş şu anda kullanılamıyor. Uygulamayı kullanmaya devam edebilirsin; verilerin bu cihazda kalır.',
@@ -3795,6 +3805,8 @@ class AppLocalizations {
   String get sign_in_with_apple => translate('sign_in_with_apple');
   String get continue_as_guest => translate('continue_as_guest');
   String get guest_mode_notice => translate('guest_mode_notice');
+  String get refresh_location => translate('refresh_location');
+  String get location_updated => translate('location_updated');
   String get sign_in_to_sync => translate('sign_in_to_sync');
   String get auth_unavailable_notice => translate('auth_unavailable_notice');
   String get err_auth_unavailable => translate('err_auth_unavailable');

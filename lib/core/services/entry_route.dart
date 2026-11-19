@@ -4,7 +4,7 @@ import 'app_init_status.dart';
 import 'firebase_service.dart';
 
 /// Where the splash screen should send the user.
-enum AppEntryRoute { onboarding, signIn, main }
+enum AppEntryRoute { onboarding, main }
 
 /// SharedPreferences keys shared by onboarding/guest flows.
 class EntryPrefsKeys {
@@ -15,22 +15,21 @@ class EntryPrefsKeys {
 
 /// Pure routing decision (unit-tested).
 ///
-/// * signed in → main
+/// Signing in is optional: the whole app works without an account, so the
+/// only screen shown before the app is onboarding on first launch. Sign-in
+/// lives in Profile / Settings for people who want to back up their data.
+///
+/// * signed in → main (even on a fresh install that restored a session)
 /// * first launch → onboarding
-/// * guest → main
-/// * Firebase failed to initialise → main (sign-in is impossible, so the app
-///   is used as a guest rather than stranding the user on a broken form)
-/// * otherwise → sign-in
+/// * otherwise → main
 AppEntryRoute decideEntryRoute({
   required bool firebaseReady,
   required bool signedIn,
-  required bool isGuest,
   required bool hasSeenOnboarding,
 }) {
   if (firebaseReady && signedIn) return AppEntryRoute.main;
   if (!hasSeenOnboarding) return AppEntryRoute.onboarding;
-  if (isGuest || !firebaseReady) return AppEntryRoute.main;
-  return AppEntryRoute.signIn;
+  return AppEntryRoute.main;
 }
 
 /// Resolves the entry route for the splash page. Never throws.
@@ -52,7 +51,6 @@ Future<AppEntryRoute> resolveEntryRoute({
   return decideEntryRoute(
     firebaseReady: firebaseReady,
     signedIn: signedIn,
-    isGuest: p?.getBool(EntryPrefsKeys.guestMode) ?? false,
     hasSeenOnboarding: p?.getBool(EntryPrefsKeys.hasSeenOnboarding) ?? false,
   );
 }

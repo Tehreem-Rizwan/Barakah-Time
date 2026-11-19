@@ -2,6 +2,7 @@ import 'package:barakah_time/data/datasources/remote/adhan_service.dart';
 import 'package:barakah_time/data/repositories/tasbeeh_repository.dart';
 import 'package:barakah_time/data/repositories/qaza_repository.dart';
 import 'package:barakah_time/core/services/home_widget_service.dart';
+import 'package:barakah_time/core/services/geomagnetic_service.dart';
 import 'package:barakah_time/core/services/ramadan_service.dart';
 import 'package:barakah_time/core/services/memorial_reminder_service.dart';
 import 'package:barakah_time/data/repositories/memorial_repository.dart';
@@ -59,6 +60,7 @@ Future<void> init() async {
     () => SavedVersesRepositoryImpl(sync: sl<UserDataSyncService>()),
   );
   sl.registerLazySingleton(() => QuranRepository());
+  sl.registerLazySingleton(() => GeomagneticService());
   sl.registerLazySingleton(
     () => QazaRepository(sl(), sync: sl<UserDataSyncService>()),
   );

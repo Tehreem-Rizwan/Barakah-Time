@@ -6,7 +6,6 @@ import '../../core/localization/app_localizations.dart';
 import '../../core/services/entry_route.dart';
 import '../../core/services/firebase_service.dart';
 import '../widgets/widgets.dart';
-import 'auth/sign_in_page.dart';
 import 'main_navigation_page.dart';
 import 'onboarding_page.dart';
 
@@ -53,7 +52,6 @@ class _SplashPageState extends State<SplashPage>
     final route = results[1] as AppEntryRoute;
     final Widget page = switch (route) {
       AppEntryRoute.onboarding => const OnboardingPage(),
-      AppEntryRoute.signIn => const SignInPage(),
       AppEntryRoute.main => const MainNavigationPage(),
     };
     Navigator.of(context).pushReplacement(
