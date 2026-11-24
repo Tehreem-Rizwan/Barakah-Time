@@ -1,8 +1,12 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:math' as math;
+import 'dart:ui' show PlatformDispatcher;
 
 import 'package:flutter/foundation.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Why a location could not be obtained.
@@ -56,7 +60,36 @@ class LocationService {
   static const kLastLng = 'last_gps_longitude';
   static const kLastAt = 'last_gps_at';
 
-  LocationService({this.prefs});
+  /// Last place name found, with the coordinates it belongs to, so the city
+  /// still shows when the geocoder fails or there is no internet.
+  static const kPlaceCity = 'last_place_city';
+  static const kPlaceCountry = 'last_place_country';
+  static const kPlaceLat = 'last_place_latitude';
+  static const kPlaceLng = 'last_place_longitude';
+
+  /// A saved place name is reused within this distance.
+  static const double savedPlaceRadiusKm = 10;
+
+  /// OpenStreetMap reverse geocoding, used when the phone's own geocoder
+  /// fails (common on phones without Google services). Free, no key; the
+  /// usage policy asks for an app-identifying User-Agent and at most one
+  /// request per second.
+  static const nominatimHost = 'nominatim.openstreetmap.org';
+  static const userAgent =
+      'BarakahTime/1.0 (Android; com.tehreem.barakah_time)';
+
+  /// Phone geocoder; overridable in tests.
+  final Future<List<Placemark>> Function(double lat, double lng)
+  _platformGeocoder;
+  final http.Client? _client;
+  DateTime? _lastNominatimAt;
+
+  LocationService({
+    this.prefs,
+    http.Client? client,
+    Future<List<Placemark>> Function(double lat, double lng)? platformGeocoder,
+  }) : _client = client,
+       _platformGeocoder = platformGeocoder ?? placemarkFromCoordinates;
 
   /// Last persisted GPS coordinates, if any.
   ({double latitude, double longitude})? get savedCoordinates {
@@ -194,34 +227,150 @@ class LocationService {
     }
   }
 
+  /// City and country for coordinates. Tries the phone's geocoder, then
+  /// OpenStreetMap, then the last name found nearby. Never throws; returns
+  /// [PlaceInfo.unknown] only when all three fail.
   Future<PlaceInfo> getPlace(double latitude, double longitude) async {
     final key =
         '${latitude.toStringAsFixed(3)},${longitude.toStringAsFixed(3)}';
     final cached = _placeCache[key];
     if (cached != null) return cached;
+    final found =
+        await _fromPlatform(latitude, longitude) ??
+        await _fromNominatim(latitude, longitude);
+    if (found != null && !found.isUnknown) {
+      _placeCache[key] = found;
+      _savePlace(found, latitude, longitude);
+      return found;
+    }
+    return savedPlaceNear(latitude, longitude) ?? PlaceInfo.unknown;
+  }
+
+  Future<PlaceInfo?> _fromPlatform(double latitude, double longitude) async {
     try {
-      final placemarks = await placemarkFromCoordinates(
+      final placemarks = await _platformGeocoder(
         latitude,
         longitude,
       ).timeout(geocodeTimeout);
-      if (placemarks.isNotEmpty) {
-        final p = placemarks.first;
-        String? pick(List<String?> xs) => xs.firstWhere(
-          (x) => x != null && x.trim().isNotEmpty,
-          orElse: () => null,
-        );
-        final info = PlaceInfo(
-          pick([p.locality, p.subAdministrativeArea, p.administrativeArea]) ??
-              '',
-          pick([p.country]) ?? '',
-        );
-        _placeCache[key] = info;
-        return info;
-      }
+      if (placemarks.isEmpty) return null;
+      final p = placemarks.first;
+      String? pick(List<String?> xs) => xs.firstWhere(
+        (x) => x != null && x.trim().isNotEmpty,
+        orElse: () => null,
+      );
+      final info = PlaceInfo(
+        pick([p.locality, p.subAdministrativeArea, p.administrativeArea]) ?? '',
+        pick([p.country]) ?? '',
+      );
+      return info.isUnknown ? null : info;
     } catch (e) {
       debugPrint('Reverse geocoding failed: $e');
+      return null;
     }
-    return PlaceInfo.unknown;
+  }
+
+  Future<PlaceInfo?> _fromNominatim(double latitude, double longitude) async {
+    // Respect the one-request-per-second limit.
+    final last = _lastNominatimAt;
+    final now = DateTime.now();
+    if (last != null && now.difference(last) < const Duration(seconds: 2)) {
+      return null;
+    }
+    _lastNominatimAt = now;
+    String lang;
+    try {
+      lang = PlatformDispatcher.instance.locale.languageCode;
+    } catch (_) {
+      lang = 'en';
+    }
+    final uri = Uri.https(nominatimHost, '/reverse', {
+      'format': 'jsonv2',
+      'lat': latitude.toStringAsFixed(5),
+      'lon': longitude.toStringAsFixed(5),
+      'zoom': '10',
+      'accept-language': lang,
+    });
+    final client = _client ?? http.Client();
+    try {
+      final response = await client
+          .get(uri, headers: {'User-Agent': userAgent})
+          .timeout(geocodeTimeout);
+      if (response.statusCode != 200) return null;
+      return parseNominatim(response.body);
+    } catch (e) {
+      debugPrint('OpenStreetMap reverse geocoding failed: $e');
+      return null;
+    } finally {
+      if (_client == null) client.close();
+    }
+  }
+
+  /// City/country from a Nominatim `jsonv2` reverse response (public for
+  /// tests). Null when nothing usable is in it.
+  @visibleForTesting
+  static PlaceInfo? parseNominatim(String body) {
+    try {
+      final data = json.decode(body);
+      if (data is! Map) return null;
+      final address = data['address'];
+      if (address is! Map) return null;
+      String? pick(List<String> keys) {
+        for (final k in keys) {
+          final v = address[k];
+          if (v is String && v.trim().isNotEmpty) return v.trim();
+        }
+        return null;
+      }
+
+      final info = PlaceInfo(
+        pick(['city', 'town', 'village', 'municipality', 'county', 'state']) ??
+            '',
+        pick(['country']) ?? '',
+      );
+      return info.isUnknown ? null : info;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  void _savePlace(PlaceInfo place, double latitude, double longitude) {
+    final store = prefs;
+    if (store == null) return;
+    store.setString(kPlaceCity, place.city);
+    store.setString(kPlaceCountry, place.country);
+    store.setDouble(kPlaceLat, latitude);
+    store.setDouble(kPlaceLng, longitude);
+  }
+
+  /// The last place name found, if it was within [savedPlaceRadiusKm].
+  PlaceInfo? savedPlaceNear(double latitude, double longitude) {
+    final store = prefs;
+    if (store == null) return null;
+    final lat = store.getDouble(kPlaceLat);
+    final lng = store.getDouble(kPlaceLng);
+    if (lat == null || lng == null) return null;
+    if (distanceKm(lat, lng, latitude, longitude) > savedPlaceRadiusKm) {
+      return null;
+    }
+    final info = PlaceInfo(
+      store.getString(kPlaceCity) ?? '',
+      store.getString(kPlaceCountry) ?? '',
+    );
+    return info.isUnknown ? null : info;
+  }
+
+  /// Great-circle distance in kilometres.
+  static double distanceKm(double lat1, double lng1, double lat2, double lng2) {
+    const r = 6371.0;
+    double rad(double d) => d * math.pi / 180;
+    final dLat = rad(lat2 - lat1);
+    final dLng = rad(lng2 - lng1);
+    final a =
+        math.pow(math.sin(dLat / 2), 2) +
+        math.cos(rad(lat1)) *
+            math.cos(rad(lat2)) *
+            math.pow(math.sin(dLng / 2), 2);
+    return 2 * r * math.asin(math.sqrt(a.toDouble()));
   }
 
   Future<String> getCityFromPosition(Position position) async =>

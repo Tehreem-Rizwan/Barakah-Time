@@ -16,6 +16,7 @@ import '../widgets/widgets.dart';
 import 'activity_history_page.dart';
 import 'auth/sign_in_page.dart';
 import 'saved_verses_page.dart';
+import 'main_navigation_page.dart';
 import 'main_navigation_scope.dart';
 import 'settings_page.dart';
 
@@ -159,15 +160,17 @@ void accountAuthListener(BuildContext context, AuthState state) {
   final l10n = context.l10n;
   if (state is Unauthenticated) {
     // Signed out / deleted / session ended: clear stale pulse data, then
-    // reset the stack to Sign In so back can't return into the app.
+    // reset the stack to the app itself. An account is optional, so the
+    // user simply keeps using the app without one.
     context.read<PulseBloc>().add(LoadPulseData());
     if (state is AccountDeleted) {
       showAppSnackBar(context, l10n.account_deleted, type: SnackType.success);
     } else if (state is SessionExpired) {
       showAppSnackBar(context, l10n.session_expired, type: SnackType.warning);
     }
+    context.read<AuthBloc>().add(ContinueAsGuest());
     Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute<void>(builder: (_) => const SignInPage()),
+      MaterialPageRoute<void>(builder: (_) => const MainNavigationPage()),
       (route) => false,
     );
     return;

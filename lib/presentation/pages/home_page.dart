@@ -61,9 +61,6 @@ String homeFirstName(UserEntity user, String fallback) {
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
-  Future<void> _refresh(BuildContext context) =>
-      Future.wait([refreshPrayerTimes(context), refreshPulse(context)]);
-
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
@@ -78,72 +75,67 @@ class HomePage extends StatelessWidget {
       child: AppScaffold(
         gradientBackground: true,
         safeAreaTop: false,
-        body: RefreshIndicator(
-          onRefresh: () => _refresh(context),
-          child: CustomScrollView(
-            physics: const AlwaysScrollableScrollPhysics(
-              parent: BouncingScrollPhysics(),
+        // No pull-to-refresh here: prayer times and location update on their
+        // own (app start, midnight, settings changes), and the Prayer Times
+        // page keeps a manual refresh. Clamping physics so pulling down
+        // never opens a blank gap above the turquoise header.
+        body: CustomScrollView(
+          physics: const ClampingScrollPhysics(),
+          slivers: [
+            SliverToBoxAdapter(
+              child: Stack(
+                children: [
+                  // Turquoise tile band behind the greeting and the top of
+                  // the prayer arch.
+                  IslamicHeaderBand(
+                    height: MediaQuery.paddingOf(context).top + 190.h,
+                  ),
+                  Padding(
+                    padding: EdgeInsetsDirectional.only(
+                      top: MediaQuery.paddingOf(context).top + AppSpacing.vLg,
+                      start: AppSpacing.xl,
+                      end: AppSpacing.xl,
+                    ),
+                    child: Column(
+                      children: [
+                        const _HomeHeader(),
+                        SizedBox(height: AppSpacing.vXl),
+                        const _PrayerHeroCard(),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
-            slivers: [
-              SliverToBoxAdapter(
-                child: Stack(
-                  children: [
-                    // Turquoise tile band behind the greeting and the top of
-                    // the prayer arch.
-                    IslamicHeaderBand(
-                      height: MediaQuery.paddingOf(context).top + 190.h,
+            padded(const RamadanHomeCard()),
+            gap(AppSpacing.vXl),
+            padded(
+              SectionHeader(
+                title: l10n.essential_tools,
+                actionLabel: l10n.see_all,
+                onAction:
+                    () => Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const ToolsGridPage()),
                     ),
-                    Padding(
-                      padding: EdgeInsetsDirectional.only(
-                        top: MediaQuery.paddingOf(context).top + AppSpacing.vLg,
-                        start: AppSpacing.xl,
-                        end: AppSpacing.xl,
-                      ),
-                      child: Column(
-                        children: [
-                          const _HomeHeader(),
-                          SizedBox(height: AppSpacing.vXl),
-                          const _PrayerHeroCard(),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
               ),
-              padded(const RamadanHomeCard()),
-              gap(AppSpacing.vXl),
-              padded(
-                SectionHeader(
-                  title: l10n.essential_tools,
-                  actionLabel: l10n.see_all,
-                  onAction:
-                      () => Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => const ToolsGridPage(),
-                        ),
-                      ),
-                ),
+            ),
+            gap(AppSpacing.vMd),
+            padded(const HomeQuickActions()),
+            gap(AppSpacing.vXl),
+            padded(
+              SectionHeader(
+                title: l10n.daily_ayats,
+                icon: Icons.format_quote_rounded,
               ),
-              gap(AppSpacing.vMd),
-              padded(const HomeQuickActions()),
-              gap(AppSpacing.vXl),
-              padded(
-                SectionHeader(
-                  title: l10n.daily_ayats,
-                  icon: Icons.format_quote_rounded,
-                ),
-              ),
-              gap(AppSpacing.vMd),
-              const SliverToBoxAdapter(child: _DailyAyatCarousel()),
-              gap(AppSpacing.vXl),
-              padded(
-                SectionHeader(title: l10n.pulse, icon: Icons.bolt_rounded),
-              ),
-              gap(AppSpacing.vMd),
-              padded(const _PulseSummaryCard()),
-              gap(AppSpacing.vXxl),
-            ],
-          ),
+            ),
+            gap(AppSpacing.vMd),
+            const SliverToBoxAdapter(child: _DailyAyatCarousel()),
+            gap(AppSpacing.vXl),
+            padded(SectionHeader(title: l10n.pulse, icon: Icons.bolt_rounded)),
+            gap(AppSpacing.vMd),
+            padded(const _PulseSummaryCard()),
+            gap(AppSpacing.vXxl),
+          ],
         ),
       ),
     );

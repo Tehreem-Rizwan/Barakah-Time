@@ -8,6 +8,7 @@ import 'package:flutter_compass/flutter_compass.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../core/localization/app_localizations.dart';
+import '../../core/services/geomagnetic_service.dart';
 import '../../core/services/location_service.dart';
 import '../../injection_container.dart';
 import '../blocs/location_bloc.dart';
@@ -25,17 +26,75 @@ class _QiblaPageState extends State<QiblaPage> {
   StreamSubscription<CompassEvent>? _compassSub;
   Timer? _sensorTimeout;
 
-  /// Device heading in degrees from North, or null if unknown.
+  /// Smoothed device heading in degrees from *magnetic* North (Android) or
+  /// true North (iOS), or null if unknown.
   double? _heading;
   double? _accuracy;
+  final HeadingFilter _filter = HeadingFilter();
 
   /// False when the device has no usable compass sensor.
   bool _compassAvailable = true;
+
+  /// Magnetic → true north correction for the current location (degrees).
+  double _declination = 0;
+  String? _declinationKey;
+
+  /// True while a refresh the user asked for is running.
+  bool _refreshing = false;
+
+  late final GeomagneticService _geomagnetic =
+      sl.isRegistered<GeomagneticService>()
+          ? sl<GeomagneticService>()
+          : GeomagneticService();
 
   @override
   void initState() {
     super.initState();
     _listenCompass();
+    // Get a fresh GPS fix in the background so the Qibla is computed from
+    // where the user is now, not a cached location. The compass keeps
+    // showing the last known location meanwhile (no spinner).
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      if (context.read<SettingsBloc>().state.useAutoLocation) {
+        context.read<LocationBloc>().add(
+          FetchLocation(forceRefresh: true, silent: true),
+        );
+      }
+    });
+  }
+
+  /// Backup for when the automatic update didn't work: fetch GPS again.
+  Future<void> _refreshLocation() async {
+    if (_refreshing) return;
+    setState(() => _refreshing = true);
+    _filter.reset();
+    final done = Completer<bool>();
+    context.read<LocationBloc>().add(
+      FetchLocation(forceRefresh: true, silent: true, completer: done),
+    );
+    final ok = await done.future.timeout(
+      const Duration(seconds: 30),
+      onTimeout: () => false,
+    );
+    if (!mounted) return;
+    setState(() => _refreshing = false);
+    showAppSnackBar(
+      context,
+      ok ? context.l10n.location_updated : context.l10n.location_error_message,
+      type: ok ? SnackType.success : SnackType.warning,
+    );
+  }
+
+  void _updateDeclination(double lat, double lng) {
+    final key = '${lat.toStringAsFixed(1)},${lng.toStringAsFixed(1)}';
+    if (key == _declinationKey) return;
+    _declinationKey = key;
+    _geomagnetic.declination(lat, lng).then((value) {
+      if (mounted && key == _declinationKey && value != _declination) {
+        setState(() => _declination = value);
+      }
+    });
   }
 
   void _listenCompass() {
@@ -53,10 +112,11 @@ class _QiblaPageState extends State<QiblaPage> {
       (event) {
         if (!mounted) return;
         _sensorTimeout?.cancel();
+        final raw = event.heading;
         setState(() {
-          _heading = event.heading;
+          _heading = raw == null ? null : _filter.add(raw);
           _accuracy = event.accuracy;
-          _compassAvailable = event.heading != null;
+          _compassAvailable = raw != null;
         });
       },
       onError: (_) {
@@ -88,19 +148,28 @@ class _QiblaPageState extends State<QiblaPage> {
             builder: (context, locationState) {
               double? lat;
               double? lng;
+              String place = '';
               if (!settings.useAutoLocation) {
                 lat = settings.manualLatitude;
                 lng = settings.manualLongitude;
+                place = settings.manualLocation;
               } else if (locationState is LocationLoaded) {
                 lat = locationState.latitude;
                 lng = locationState.longitude;
+                place = locationState.displayName;
               }
 
               if (lat == null || lng == null) {
                 return _buildNoLocation(context, locationState);
               }
+              _updateDeclination(lat, lng);
               final qibla = Qibla(Coordinates(lat, lng)).direction;
-              return _buildCompass(context, qibla);
+              return _buildCompass(
+                context,
+                qibla,
+                place: place,
+                canRefresh: settings.useAutoLocation,
+              );
             },
           );
         },
@@ -151,10 +220,19 @@ class _QiblaPageState extends State<QiblaPage> {
     );
   }
 
-  Widget _buildCompass(BuildContext context, double qibla) {
+  Widget _buildCompass(
+    BuildContext context,
+    double qibla, {
+    required String place,
+    required bool canRefresh,
+  }) {
     final l10n = context.l10n;
     final textTheme = Theme.of(context).textTheme;
-    final heading = _compassAvailable ? (_heading ?? 0) : 0.0;
+    // Heading from true north, the same reference as the Qibla bearing.
+    final heading =
+        _compassAvailable && _heading != null
+            ? (_heading! + _declination) % 360
+            : 0.0;
     // Angle of the Qibla relative to the top of the phone.
     final relative = (qibla - heading) % 360;
     final diff = relative > 180 ? 360 - relative : relative;
@@ -256,7 +334,9 @@ class _QiblaPageState extends State<QiblaPage> {
               color: AppColors.textSecondary,
             ),
           ),
-          SizedBox(height: AppSpacing.vXl),
+          SizedBox(height: AppSpacing.vMd),
+          _buildLocationRow(context, place: place, canRefresh: canRefresh),
+          SizedBox(height: AppSpacing.vMd),
           AppCard(
             width: double.infinity,
             padding: AppSpacing.symmetric(horizontal: 20, vertical: 16),
@@ -319,6 +399,61 @@ class _QiblaPageState extends State<QiblaPage> {
           ),
         ],
       ),
+    );
+  }
+
+  /// The location the Qibla is calculated from, with a small update button
+  /// (automatic location only) for when the background update didn't work.
+  Widget _buildLocationRow(
+    BuildContext context, {
+    required String place,
+    required bool canRefresh,
+  }) {
+    final l10n = context.l10n;
+    final textTheme = Theme.of(context).textTheme;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(
+          Icons.location_on_outlined,
+          size: 18.sp,
+          color: AppColors.textSecondary,
+        ),
+        SizedBox(width: AppSpacing.xs),
+        Flexible(
+          child: Text(
+            place.trim().isEmpty ? l10n.unknown_city : place,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: textTheme.bodyMedium?.copyWith(
+              color: AppColors.textSecondary,
+            ),
+          ),
+        ),
+        if (canRefresh) ...[
+          SizedBox(width: AppSpacing.xs),
+          IconButton(
+            tooltip: l10n.refresh_location,
+            visualDensity: VisualDensity.compact,
+            onPressed: _refreshing ? null : _refreshLocation,
+            icon:
+                _refreshing
+                    ? SizedBox(
+                      width: 18.sp,
+                      height: 18.sp,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: AppColors.secondaryGold,
+                      ),
+                    )
+                    : Icon(
+                      Icons.my_location_rounded,
+                      size: 20.sp,
+                      color: AppColors.secondaryGold,
+                    ),
+          ),
+        ],
+      ],
     );
   }
 

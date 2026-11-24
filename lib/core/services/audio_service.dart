@@ -5,6 +5,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:just_audio/just_audio.dart';
 
+import 'audio_cache.dart';
+
 /// Snapshot of what the app is currently playing.
 ///
 /// UI should derive play/pause icons from this (via [AudioService.statusStream]
@@ -59,6 +61,9 @@ class AudioStatus {
 
 class AudioService {
   final AudioPlayer _player = AudioPlayer();
+
+  /// Saves recitations while they stream so they replay offline.
+  final AudioCache? _cache;
   final FlutterTts _tts = FlutterTts();
 
   final StreamController<AudioStatus> _statusController =
@@ -77,7 +82,11 @@ class AudioService {
   /// (e.g. a TTS completion from a previous item) are ignored.
   int _session = 0;
 
-  AudioService() {
+  AudioService({AudioCache? cache, bool saveForOffline = true})
+    : _cache = saveForOffline && AudioCache.supported
+          ? (cache ?? AudioCache())
+          : null {
+    unawaited(_cache?.trim());
     _configureSession();
     _initTts();
     _player.playerStateStream.listen(_onPlayerState);
@@ -148,6 +157,23 @@ class AudioService {
   Stream<PlayerState> get playerStateStream => _player.playerStateStream;
   Stream<Duration?> get durationStream => _player.durationStream;
   Stream<Duration> get positionStream => _player.positionStream;
+
+  /// Playback speed for recorded audio (recitation and translation). The
+  /// pitch is kept, so the reciter's voice sounds natural. Text-to-speech
+  /// has its own rate and is not affected.
+  double get speed => _player.speed;
+
+  Future<void> setSpeed(double speed) async {
+    try {
+      await _player.setSpeed(speed);
+    } catch (e) {
+      debugPrint('Setting playback speed failed: $e');
+    }
+  }
+
+  /// Index of the playlist item playing (see [playList]), or null.
+  Stream<int?> get currentIndexStream => _player.currentIndexStream;
+  int? get currentIndex => _player.currentIndex;
 
   /// Kept for backwards compatibility: emits whether *anything* is playing.
   Stream<bool> get isPlayingStream =>
@@ -221,12 +247,12 @@ class AudioService {
     );
 
     try {
-      if (urls.length == 1) {
-        await _player.setAudioSource(AudioSource.uri(Uri.parse(urls.first)));
+      final sources = await Future.wait(urls.map(_sourceFor));
+      if (session != _session) return;
+      if (sources.length == 1) {
+        await _player.setAudioSource(sources.first);
       } else {
-        await _player.setAudioSources(
-          urls.map((u) => AudioSource.uri(Uri.parse(u))).toList(),
-        );
+        await _player.setAudioSources(sources);
       }
       if (session != _session) return;
       // play() completes when playback stops; don't await it.
@@ -237,6 +263,27 @@ class AudioService {
       _errorController.add('audio_error_play');
       await _player.stop();
       _setStatus(AudioStatus.idle);
+    }
+  }
+
+  /// Plays a saved copy when there is one (works offline); otherwise streams
+  /// and saves the file at the same time, so it's offline next time.
+  Future<AudioSource> _sourceFor(String url) async {
+    final uri = Uri.parse(url);
+    final cache = _cache;
+    if (cache == null || !(uri.isScheme('https') || uri.isScheme('http'))) {
+      return AudioSource.uri(uri);
+    }
+    try {
+      final file = await cache.fileFor(url);
+      if (await file.exists()) return AudioSource.file(file.path);
+      // Experimental in just_audio, but stable in practice; the version is
+      // pinned in pubspec.lock and covered by the playback tests.
+      // ignore: experimental_member_use
+      return LockCachingAudioSource(uri, cacheFile: file);
+    } catch (e) {
+      debugPrint('Audio cache unavailable: $e');
+      return AudioSource.uri(uri);
     }
   }
 

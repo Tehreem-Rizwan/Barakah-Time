@@ -275,12 +275,10 @@ void main() {
     AppEntryRoute r({
       bool ready = true,
       bool signedIn = false,
-      bool guest = false,
       bool seen = true,
     }) => decideEntryRoute(
       firebaseReady: ready,
       signedIn: signedIn,
-      isGuest: guest,
       hasSeenOnboarding: seen,
     );
 
@@ -288,9 +286,8 @@ void main() {
       expect(r(signedIn: true), AppEntryRoute.main);
       expect(r(signedIn: true, seen: false), AppEntryRoute.main);
       expect(r(seen: false), AppEntryRoute.onboarding);
-      expect(r(guest: true), AppEntryRoute.main);
-      expect(r(), AppEntryRoute.signIn);
-      // Firebase failed: never strand the user on a sign-in form.
+      // An account is optional: after onboarding the app opens directly.
+      expect(r(), AppEntryRoute.main);
       expect(r(ready: false), AppEntryRoute.main);
       expect(r(ready: false, signedIn: true), AppEntryRoute.main);
       expect(r(ready: false, seen: false), AppEntryRoute.onboarding);

@@ -1,12 +1,24 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/services/audio_service.dart';
 import '../../core/localization/app_localizations.dart';
+import '../../data/datasources/local/settings_prefs.dart';
 import '../../injection_container.dart';
+import '../blocs/settings_bloc.dart';
+
+/// "0.75×", "1×", "1.5×" …
+String speedLabel(double speed) {
+  final text =
+      speed == speed.roundToDouble()
+          ? speed.toStringAsFixed(0)
+          : speed.toString().replaceFirst(RegExp(r'0+$'), '');
+  return '$text\u00D7';
+}
 
 /// Mini player shown while recorded audio or text-to-speech is active.
 ///
@@ -29,6 +41,23 @@ class _AudioControlBarState extends State<AudioControlBar> {
   void initState() {
     super.initState();
     _errorSub = _audioService.errorStream.listen(_showError);
+  }
+
+  double get _speed {
+    try {
+      return _audioService.speed;
+    } catch (_) {
+      return 1.0;
+    }
+  }
+
+  void _setSpeed(double speed) {
+    _audioService.setSpeed(speed);
+    // Persist (and sync) the choice; the app applies it on next launch.
+    try {
+      context.read<SettingsBloc>().add(UpdateAudioSpeed(speed));
+    } catch (_) {}
+    setState(() {});
   }
 
   void _showError(String message) {
@@ -153,6 +182,46 @@ class _AudioControlBarState extends State<AudioControlBar> {
                         ],
                       ),
                     ),
+                    if (!status.isTts)
+                      PopupMenuButton<double>(
+                        tooltip: context.l10n.playback_speed,
+                        initialValue: _speed,
+                        onSelected: _setSpeed,
+                        itemBuilder:
+                            (_) => [
+                              for (final s in SettingsPrefs.audioSpeeds)
+                                PopupMenuItem<double>(
+                                  value: s,
+                                  child: Text(
+                                    speedLabel(s),
+                                    textDirection: TextDirection.ltr,
+                                  ),
+                                ),
+                            ],
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 10.w,
+                            vertical: 6.h,
+                          ),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20.r),
+                            border: Border.all(
+                              color: AppColors.secondaryGold.withValues(
+                                alpha: 0.6,
+                              ),
+                            ),
+                          ),
+                          child: Text(
+                            speedLabel(_speed),
+                            textDirection: TextDirection.ltr,
+                            style: TextStyle(
+                              color: AppColors.secondaryGold,
+                              fontSize: 13.sp,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      ),
                     IconButton(
                       tooltip: playing ? context.l10n.pause : context.l10n.play,
                       icon: Icon(

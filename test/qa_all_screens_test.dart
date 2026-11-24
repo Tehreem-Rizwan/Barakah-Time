@@ -215,7 +215,8 @@ class _FakeQuranRepository extends QuranRepository {
         numberInSurah: i,
         juz: 1,
         manzil: 1,
-        page: 1,
+        // Two mushaf pages, to exercise the page grouping.
+        page: i <= 4 ? 2 : 3,
         ruku: 1,
         hizbQuarter: 1,
       ),
@@ -233,6 +234,10 @@ class _FakeAudio implements AudioService {
   Stream<Duration> get positionStream => const Stream.empty();
   @override
   Stream<Duration?> get durationStream => const Stream.empty();
+  @override
+  Stream<int?> get currentIndexStream => const Stream.empty();
+  @override
+  int? get currentIndex => null;
   @override
   String? get currentMediaId => null;
   @override
@@ -603,6 +608,35 @@ final _screens = <_Screen>[
   _Screen('ActivityHistory', () => const ActivityHistoryPage()),
   _Screen('Quran', () => const QuranPage()),
   _Screen('SurahDetail', () => SurahDetailPage(surah: _surahs[1])),
+  _Screen(
+    'SurahDetail(mushaf)',
+    () => SurahDetailPage(surah: _surahs[1]),
+    interact: (tester, ctx, l10n) async {
+      ctx.step = 'mushaf mode';
+      await _tap(tester, find.text(l10n.mushaf));
+      expect(find.text('${l10n.juzN(1)}  ·  ${l10n.pageN(2)}'), findsOneWidget);
+      await _scrollAll(tester, ctx, 'mushaf');
+      ctx.step = 'ayah sheet';
+      await tester.drag(find.byType(Scrollable).last, const Offset(0, 2000));
+      await tester.pumpAndSettle();
+      final page = find.byWidgetPredicate(
+        (w) => w is RichText && w.text.toPlainText().contains('\uFD3F'),
+      );
+      await tester.ensureVisible(page.first);
+      await tester.pumpAndSettle();
+      // Page cards can be taller than the screen: tap the first words
+      // (top right, the text is right-to-left).
+      await tester.tapAt(
+        tester.getTopRight(page.first) + const Offset(-24, 24),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text(l10n.play_from_here), findsOneWidget);
+      await tester.tapAt(const Offset(10, 10));
+      await tester.pumpAndSettle();
+      ctx.step = 'back to translation';
+      await _tap(tester, find.text(l10n.translation).first);
+    },
+  ),
   _Screen('Profile(guest)', () => const ProfilePage()),
   _Screen(
     'Profile(signed in)',

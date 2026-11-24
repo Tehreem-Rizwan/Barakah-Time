@@ -23,6 +23,28 @@ class SettingsPrefs {
   /// Allowed [themeMode] values.
   static const themeModes = ['system', 'light', 'dark'];
 
+  static const quranMode = 'quran_reading_mode';
+
+  static const audioSpeed = 'quran_audio_speed';
+
+  /// Playback speeds offered for recitation and translation audio. Capped
+  /// at 2x: faster than that, tajweed (lengthening, pauses) is lost.
+  static const audioSpeeds = [0.5, 0.75, 1.0, 1.25, 1.5, 2.0];
+
+  /// [raw] if it is one of [audioSpeeds], otherwise null.
+  static double? validSpeed(Object? raw) {
+    if (raw is! num) return null;
+    final v = raw.toDouble();
+    for (final s in audioSpeeds) {
+      if ((s - v).abs() < 1e-6) return s;
+    }
+    return null;
+  }
+
+  /// Allowed [quranMode] values: ayah cards with translation, or Arabic
+  /// only laid out in mushaf pages.
+  static const quranModes = ['translation', 'mushaf'];
+
   /// Prayers whose time the user can shift.
   static const offsetPrayers = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
 
@@ -74,6 +96,8 @@ class SettingsPrefs {
     put('notificationsEnabled', prefs.getBool(notifications));
     put('adhanSoundEnabled', prefs.getBool(adhanSound));
     put('themeMode', prefs.getString(themeMode));
+    put('quranMode', prefs.getString(quranMode));
+    put('audioSpeed', prefs.getDouble(audioSpeed));
     if (prefs.getString(prayerOffsets) != null) {
       map['prayerOffsets'] = readOffsets(prefs);
     }
@@ -118,6 +142,12 @@ class SettingsPrefs {
     if (t is String && themeModes.contains(t)) {
       await prefs.setString(themeMode, t);
     }
+    final q = data['quranMode'];
+    if (q is String && quranModes.contains(q)) {
+      await prefs.setString(quranMode, q);
+    }
+    final speed = validSpeed(data['audioSpeed']);
+    if (speed != null) await prefs.setDouble(audioSpeed, speed);
     if (data['prayerOffsets'] is Map) {
       await prefs.setString(
         prayerOffsets,

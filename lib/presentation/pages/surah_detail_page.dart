@@ -17,6 +17,7 @@ import '../blocs/pulse_bloc.dart';
 import '../blocs/quran_bloc.dart';
 import '../blocs/settings_bloc.dart';
 import '../widgets/widgets.dart';
+import 'mushaf_view.dart';
 import 'quran_page.dart' show NumberBadge;
 
 /// "Continue reading" position, stored in SharedPreferences.
@@ -224,11 +225,197 @@ class _SurahDetailPageState extends State<SurahDetailPage> {
     Share.share(buffer.toString());
   }
 
+  String get _surahMediaId => 'surah_${widget.surah.number}';
+
+  /// Whole-surah playback for the current mode. Mushaf: Arabic only.
+  /// Translation: each ayah followed by its recorded translation, when one
+  /// exists for the language (otherwise Arabic only).
+  ({List<String> urls, String mediaId}) _surahPlaylist(
+    List<Ayah> ayahs,
+    bool mushaf,
+  ) {
+    if (mushaf) {
+      return (
+        urls: ayahs.map((a) => a.audio).whereType<String>().toList(),
+        mediaId: _surahMediaId,
+      );
+    }
+    final urls = <String>[];
+    for (final a in ayahs) {
+      if (a.audio != null) urls.add(a.audio!);
+      final tr = QuranRepository.translationAudioUrl(
+        _translationLang,
+        a.number,
+      );
+      if (tr != null) urls.add(tr);
+    }
+    return (urls: urls, mediaId: '${_surahMediaId}_tr');
+  }
+
+  /// Whether [status] belongs to this surah's playback in the given mode
+  /// (including "play from here" in mushaf mode).
+  bool _isSurahMedia(AudioStatus status, bool mushaf) {
+    final id = status.mediaId;
+    if (id == null) return false;
+    if (!mushaf) return id == '${_surahMediaId}_tr';
+    return id == _surahMediaId || id.startsWith('${_surahMediaId}_from_');
+  }
+
+  void _toggleSurahPlayback(List<Ayah> ayahs, bool mushaf) {
+    final audio = sl<AudioService>();
+    final status = audio.status;
+    if (_isSurahMedia(status, mushaf)) {
+      if (status.isPlaying) {
+        audio.pause();
+        return;
+      }
+      if (status.isPaused) {
+        audio.resume();
+        return;
+      }
+    }
+    final list = _surahPlaylist(ayahs, mushaf);
+    audio.playList(
+      list.urls,
+      title: widget.surah.englishName,
+      artist: 'Mishary Rashid Alafasy',
+      mediaId: list.mediaId,
+    );
+  }
+
+  /// Mushaf mode: recite from ayah [index] to the end of the surah.
+  void _playFrom(List<Ayah> ayahs, int index) {
+    final urls =
+        ayahs.skip(index).map((a) => a.audio).whereType<String>().toList();
+    if (urls.isEmpty) return;
+    QuranLastRead.save(widget.surah.number, ayahs[index].numberInSurah);
+    sl<AudioService>().playList(
+      urls,
+      title: widget.surah.englishName,
+      artist: 'Mishary Rashid Alafasy',
+      mediaId: index == 0 ? _surahMediaId : '${_surahMediaId}_from_$index',
+    );
+  }
+
+  void _setMode(String mode) {
+    context.read<SettingsBloc>().add(UpdateQuranMode(mode));
+    if (_scrollController.hasClients) _scrollController.jumpTo(0);
+  }
+
+  /// Mushaf mode: tapping an ayah shows its translation and actions.
+  void _showAyahSheet(List<Ayah> ayahs, int index) {
+    final ayah = ayahs[index];
+    final l10n = context.l10n;
+    final verseId = '${widget.surah.number}:${ayah.numberInSurah}';
+    final lang = _translationLang;
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      backgroundColor: AppColors.cardDark,
+      builder:
+          (sheetContext) => SafeArea(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.sizeOf(sheetContext).height * 0.75,
+              ),
+              child: SingleChildScrollView(
+                padding: EdgeInsetsDirectional.fromSTEB(
+                  AppSpacing.lg,
+                  0,
+                  AppSpacing.lg,
+                  AppSpacing.vLg,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      '${widget.surah.englishName} · ${l10n.ayah} ${ayah.numberInSurah}',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(sheetContext).textTheme.titleMedium,
+                    ),
+                    SizedBox(height: AppSpacing.vMd),
+                    ArabicText(
+                      ayah.text,
+                      textAlign: TextAlign.center,
+                      fontSize:
+                          context.read<SettingsBloc>().state.quranFontSize.sp,
+                      height: 2.2,
+                    ),
+                    if ((ayah.translation ?? '').isNotEmpty) ...[
+                      SizedBox(height: AppSpacing.vMd),
+                      TranslationText(
+                        ayah.translation!,
+                        isLtr: isLtrLanguage(lang),
+                      ),
+                    ],
+                    SizedBox(height: AppSpacing.vLg),
+                    Wrap(
+                      alignment: WrapAlignment.center,
+                      spacing: AppSpacing.sm,
+                      runSpacing: AppSpacing.vSm,
+                      children: [
+                        FilledButton.icon(
+                          style: dialogActionStyle(
+                            background: AppColors.secondaryGold,
+                            foreground: AppColors.onGold,
+                          ),
+                          onPressed:
+                              ayah.audio == null
+                                  ? null
+                                  : () {
+                                    Navigator.pop(sheetContext);
+                                    _playFrom(ayahs, index);
+                                  },
+                          icon: const Icon(Icons.play_arrow_rounded),
+                          label: Text(l10n.play_from_here),
+                        ),
+                        BlocBuilder<PulseBloc, PulseState>(
+                          bloc: context.read<PulseBloc>(),
+                          builder: (_, state) {
+                            final isSaved =
+                                state is PulseLoaded &&
+                                state.savedVerses.any((v) => v.id == verseId);
+                            return OutlinedButton.icon(
+                              style: dialogActionStyle(),
+                              onPressed: () => _toggleSave(ayah, isSaved),
+                              icon: Icon(
+                                isSaved
+                                    ? Icons.bookmark_rounded
+                                    : Icons.bookmark_border_rounded,
+                              ),
+                              label: Text(
+                                isSaved
+                                    ? l10n.remove_saved_verse
+                                    : l10n.save_verse,
+                              ),
+                            );
+                          },
+                        ),
+                        OutlinedButton.icon(
+                          style: dialogActionStyle(),
+                          onPressed: () => _share(ayah),
+                          icon: const Icon(Icons.share_outlined),
+                          label: Text(l10n.share),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final textTheme = Theme.of(context).textTheme;
     final audioService = sl<AudioService>();
+    final mushaf = context.select<SettingsBloc, bool>(
+      (b) => b.state.quranMode == 'mushaf',
+    );
     return AppScaffold(
       bottomBar: const AudioControlBar(),
       titleWidget: Column(
@@ -272,32 +459,20 @@ class _SurahDetailPageState extends State<SurahDetailPage> {
           future: _ayahsFuture,
           builder: (context, snapshot) {
             if (!snapshot.hasData) return const SizedBox.shrink();
-            final mediaId = 'surah_${widget.surah.number}';
             return StreamBuilder<AudioStatus>(
               stream: audioService.statusStream,
               initialData: audioService.status,
               builder: (context, statusSnapshot) {
                 final status = statusSnapshot.data ?? AudioStatus.idle;
-                final isPlaying = status.isPlayingMedia(mediaId);
+                final isPlaying =
+                    status.isPlaying && _isSurahMedia(status, mushaf);
                 return IconButton(
                   icon: Icon(
                     isPlaying
                         ? Icons.pause_circle_filled_rounded
                         : Icons.play_circle_fill_rounded,
                   ),
-                  onPressed: () {
-                    final urls =
-                        snapshot.data!
-                            .map((a) => a.audio)
-                            .whereType<String>()
-                            .toList();
-                    audioService.playList(
-                      urls,
-                      title: widget.surah.englishName,
-                      artist: 'Mishary Rashid Alafasy',
-                      mediaId: mediaId,
-                    );
-                  },
+                  onPressed: () => _toggleSurahPlayback(snapshot.data!, mushaf),
                   tooltip: isPlaying ? l10n.pause : l10n.play_surah,
                 );
               },
@@ -328,43 +503,91 @@ class _SurahDetailPageState extends State<SurahDetailPage> {
           final showBismillah = arabic_utils.ArabicText.surahHasBismillahPrefix(
             widget.surah.number,
           );
-          final headerCount = 1;
-          final target = widget.initialAyah;
-          if (!_scrolledToInitial &&
-              target != null &&
-              target > 1 &&
-              target <= ayahs.length) {
-            _scrolledToInitial = true;
-            WidgetsBinding.instance.addPostFrameCallback(
-              (_) => _scrollToInitial(
-                ayahs.length + headerCount,
-                target - 1 + headerCount,
+          final header = _SurahHeader(
+            surah: widget.surah,
+            showBismillah: showBismillah,
+            textTheme: textTheme,
+          );
+          return Column(
+            children: [
+              Padding(
+                padding: AppSpacing.only(start: 20, end: 20, top: 4, bottom: 8),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: SegmentedButton<String>(
+                    showSelectedIcon: false,
+                    segments: [
+                      ButtonSegment(
+                        value: 'mushaf',
+                        icon: const Icon(Icons.menu_book_rounded),
+                        label: Text(l10n.mushaf),
+                      ),
+                      ButtonSegment(
+                        value: 'translation',
+                        icon: const Icon(Icons.translate_rounded),
+                        label: Text(l10n.translation),
+                      ),
+                    ],
+                    selected: {mushaf ? 'mushaf' : 'translation'},
+                    onSelectionChanged: (s) => _setMode(s.first),
+                  ),
+                ),
               ),
-            );
-          }
-
-          return ListView.builder(
-            controller: _scrollController,
-            padding: AppSpacing.only(start: 20, end: 20, top: 8, bottom: 40),
-            itemCount: ayahs.length + headerCount,
-            itemBuilder: (context, index) {
-              if (index == 0) {
-                return _SurahHeader(
-                  surah: widget.surah,
-                  showBismillah: showBismillah,
-                  textTheme: textTheme,
-                );
-              }
-              final ayah = ayahs[index - headerCount];
-              return Padding(
-                key: _keyFor(ayah.numberInSurah),
-                padding: EdgeInsetsDirectional.only(bottom: AppSpacing.vLg),
-                child: _buildAyah(context, ayah),
-              );
-            },
+              Expanded(
+                child:
+                    mushaf
+                        ? BlocBuilder<SettingsBloc, SettingsState>(
+                          buildWhen:
+                              (p, c) => p.quranFontSize != c.quranFontSize,
+                          builder:
+                              (context, settings) => MushafView(
+                                surahNumber: widget.surah.number,
+                                ayahs: ayahs,
+                                header: header,
+                                fontSize: settings.quranFontSize.sp,
+                                initialAyah: widget.initialAyah,
+                                scrollController: _scrollController,
+                                onAyahTap: (i) => _showAyahSheet(ayahs, i),
+                              ),
+                        )
+                        : _buildTranslationList(ayahs, header),
+              ),
+            ],
           );
         },
       ),
+    );
+  }
+
+  Widget _buildTranslationList(List<Ayah> ayahs, Widget header) {
+    final headerCount = 1;
+    final target = widget.initialAyah;
+    if (!_scrolledToInitial &&
+        target != null &&
+        target > 1 &&
+        target <= ayahs.length) {
+      _scrolledToInitial = true;
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => _scrollToInitial(
+          ayahs.length + headerCount,
+          target - 1 + headerCount,
+        ),
+      );
+    }
+
+    return ListView.builder(
+      controller: _scrollController,
+      padding: AppSpacing.only(start: 20, end: 20, top: 8, bottom: 40),
+      itemCount: ayahs.length + headerCount,
+      itemBuilder: (context, index) {
+        if (index == 0) return header;
+        final ayah = ayahs[index - headerCount];
+        return Padding(
+          key: _keyFor(ayah.numberInSurah),
+          padding: EdgeInsetsDirectional.only(bottom: AppSpacing.vLg),
+          child: _buildAyah(context, ayah),
+        );
+      },
     );
   }
 
