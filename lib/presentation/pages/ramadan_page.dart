@@ -37,7 +37,7 @@ Future<void> rescheduleRamadanReminders(BuildContext context) async {
     prayer.latitude,
     prayer.longitude,
     DateTime.now(),
-    NotificationService.daysAhead,
+    NotificationService.scheduleDays,
     method: settings.calculationMethod,
     madhab: settings.asrMadhab,
     offsets: settings.prayerOffsets,

@@ -105,6 +105,23 @@ class UpdateThemeMode extends SettingsEvent {
   List<Object?> get props => [mode];
 }
 
+/// [mode] is 'translation' or 'mushaf' (see [SettingsPrefs.quranModes]).
+class UpdateQuranMode extends SettingsEvent {
+  final String mode;
+  const UpdateQuranMode(this.mode);
+  @override
+  List<Object?> get props => [mode];
+}
+
+/// Recitation/translation playback speed (one of
+/// [SettingsPrefs.audioSpeeds]).
+class UpdateAudioSpeed extends SettingsEvent {
+  final double speed;
+  const UpdateAudioSpeed(this.speed);
+  @override
+  List<Object?> get props => [speed];
+}
+
 /// Resets every prayer offset to 0.
 class ResetPrayerOffsets extends SettingsEvent {
   const ResetPrayerOffsets();
@@ -149,6 +166,12 @@ class SettingsState extends Equatable {
   /// 'system' (follow the phone), 'light' or 'dark'.
   final String themeMode;
 
+  /// Quran reader: 'translation' (ayah cards) or 'mushaf' (Arabic pages).
+  final String quranMode;
+
+  /// Recitation/translation playback speed, 1.0 = normal.
+  final double audioSpeed;
+
   const SettingsState({
     this.calculationMethod = CalculationMethods.karachi,
     this.quranFontSize = 24.0,
@@ -163,6 +186,8 @@ class SettingsState extends Equatable {
     this.locationError,
     this.prayerOffsets = const {},
     this.themeMode = 'system',
+    this.quranMode = 'translation',
+    this.audioSpeed = 1.0,
   });
 
   /// Effective Asr madhab: 'shafi' or 'hanafi'.
@@ -184,6 +209,8 @@ class SettingsState extends Equatable {
     bool clearLocationError = false,
     Map<String, int>? prayerOffsets,
     String? themeMode,
+    String? quranMode,
+    double? audioSpeed,
   }) {
     return SettingsState(
       calculationMethod: calculationMethod ?? this.calculationMethod,
@@ -200,6 +227,8 @@ class SettingsState extends Equatable {
           clearLocationError ? null : (locationError ?? this.locationError),
       prayerOffsets: prayerOffsets ?? this.prayerOffsets,
       themeMode: themeMode ?? this.themeMode,
+      quranMode: quranMode ?? this.quranMode,
+      audioSpeed: audioSpeed ?? this.audioSpeed,
     );
   }
 
@@ -218,6 +247,8 @@ class SettingsState extends Equatable {
     locationError,
     prayerOffsets,
     themeMode,
+    quranMode,
+    audioSpeed,
   ];
 }
 
@@ -271,6 +302,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     on<UpdatePrayerOffset>(_onUpdatePrayerOffset);
     on<ResetPrayerOffsets>(_onResetPrayerOffsets);
     on<UpdateThemeMode>(_onUpdateThemeMode);
+    on<UpdateQuranMode>(_onUpdateQuranMode);
+    on<UpdateAudioSpeed>(_onUpdateAudioSpeed);
   }
 
   /// Device region (e.g. 'PK'), or null.
@@ -343,6 +376,15 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
               )
               ? prefs.getString(SettingsPrefs.themeMode)!
               : 'system',
+      quranMode:
+          SettingsPrefs.quranModes.contains(
+                prefs.getString(SettingsPrefs.quranMode),
+              )
+              ? prefs.getString(SettingsPrefs.quranMode)!
+              : 'translation',
+      audioSpeed:
+          SettingsPrefs.validSpeed(prefs.getDouble(SettingsPrefs.audioSpeed)) ??
+          1.0,
     );
   }
 
@@ -522,6 +564,25 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     if (!SettingsPrefs.themeModes.contains(event.mode)) return;
     await prefs.setString(SettingsPrefs.themeMode, event.mode);
     emit(state.copyWith(themeMode: event.mode));
+  }
+
+  Future<void> _onUpdateQuranMode(
+    UpdateQuranMode event,
+    Emitter<SettingsState> emit,
+  ) async {
+    if (!SettingsPrefs.quranModes.contains(event.mode)) return;
+    await prefs.setString(SettingsPrefs.quranMode, event.mode);
+    emit(state.copyWith(quranMode: event.mode));
+  }
+
+  Future<void> _onUpdateAudioSpeed(
+    UpdateAudioSpeed event,
+    Emitter<SettingsState> emit,
+  ) async {
+    final speed = SettingsPrefs.validSpeed(event.speed);
+    if (speed == null) return;
+    await prefs.setDouble(SettingsPrefs.audioSpeed, speed);
+    emit(state.copyWith(audioSpeed: speed));
   }
 
   Future<void> _onResetPrayerOffsets(

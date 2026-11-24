@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:barakah_time/core/services/audio_service.dart';
 import 'package:barakah_time/core/services/app_init_status.dart';
 import 'package:barakah_time/core/services/home_widget_service.dart';
 import 'package:barakah_time/data/repositories/qaza_repository.dart';
@@ -43,11 +44,11 @@ void main() async {
   unawaited(SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge));
   SystemChrome.setSystemUIOverlayStyle(AppTheme.overlayOnLight);
 
-  // Phone UI is portrait-only.
+  // Portrait only (also locked in AndroidManifest / Info.plist so the
+  // screen never rotates, even before Flutter starts).
   unawaited(
     SystemChrome.setPreferredOrientations(const [
       DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
     ]),
   );
 
@@ -219,6 +220,7 @@ class _AppCoordinatorState extends State<_AppCoordinator> {
         }
       },
     );
+    _applyAudioSpeed(context.read<SettingsBloc>().state.audioSpeed);
     // A permission revoked in system settings kills the process, so check
     // on cold start too (onResume doesn't fire for the first launch).
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -232,6 +234,12 @@ class _AppCoordinatorState extends State<_AppCoordinator> {
   void dispose() {
     _lifecycle.dispose();
     super.dispose();
+  }
+
+  void _applyAudioSpeed(double speed) {
+    if (di.sl.isRegistered<AudioService>()) {
+      di.sl<AudioService>().setSpeed(speed);
+    }
   }
 
   void _onResume() {
@@ -264,7 +272,7 @@ class _AppCoordinatorState extends State<_AppCoordinator> {
       prayer.latitude,
       prayer.longitude,
       DateTime.now(),
-      NotificationService.daysAhead,
+      NotificationService.scheduleDays,
       method: settings.calculationMethod,
       madhab: settings.asrMadhab,
       offsets: settings.prayerOffsets,
@@ -360,6 +368,10 @@ class _AppCoordinatorState extends State<_AppCoordinator> {
               (context, state) => context.read<QuranBloc>().add(
                 ChangeQuranLanguage(state.languageCode),
               ),
+        ),
+        BlocListener<SettingsBloc, SettingsState>(
+          listenWhen: (p, c) => p.audioSpeed != c.audioSpeed,
+          listener: (context, state) => _applyAudioSpeed(state.audioSpeed),
         ),
         BlocListener<PrayerBloc, PrayerState>(
           listenWhen: (_, c) => c is PrayerLoaded,

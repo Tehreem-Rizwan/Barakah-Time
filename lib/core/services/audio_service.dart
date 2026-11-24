@@ -158,6 +158,23 @@ class AudioService {
   Stream<Duration?> get durationStream => _player.durationStream;
   Stream<Duration> get positionStream => _player.positionStream;
 
+  /// Playback speed for recorded audio (recitation and translation). The
+  /// pitch is kept, so the reciter's voice sounds natural. Text-to-speech
+  /// has its own rate and is not affected.
+  double get speed => _player.speed;
+
+  Future<void> setSpeed(double speed) async {
+    try {
+      await _player.setSpeed(speed);
+    } catch (e) {
+      debugPrint('Setting playback speed failed: $e');
+    }
+  }
+
+  /// Index of the playlist item playing (see [playList]), or null.
+  Stream<int?> get currentIndexStream => _player.currentIndexStream;
+  int? get currentIndex => _player.currentIndex;
+
   /// Kept for backwards compatibility: emits whether *anything* is playing.
   Stream<bool> get isPlayingStream =>
       statusStream.map((s) => s.isPlaying).distinct();

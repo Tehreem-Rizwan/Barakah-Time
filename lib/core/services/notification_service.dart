@@ -94,6 +94,17 @@ class NotificationService {
 
   static const int daysAhead = 7;
 
+  /// Days of reminders actually scheduled. Android allows many pending
+  /// alarms, so a month keeps the adhan coming even if the app isn't opened
+  /// for weeks (30 days x 5 prayers + Ramadan reminders stays far below
+  /// Android's 500-alarm limit; ids are dayIndex * 10 + prayer, so up to
+  /// 99 days fit the prayers group). iOS allows only 64 pending
+  /// notifications in total, so it keeps [daysAhead].
+  static int get scheduleDays =>
+      !kIsWeb && defaultTargetPlatform == TargetPlatform.android
+          ? 30
+          : daysAhead;
+
   /// v3: the adhan follows the phone's ring/silent mode (notification
   /// audio). v2 used the alarm stream, which played even on silent.
   static const String adhanChannelId = 'prayer_adhan_v3';

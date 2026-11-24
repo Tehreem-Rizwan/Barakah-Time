@@ -22,4 +22,7 @@ class AppConfig {
   /// Google Play listing, used in share/invite messages.
   static const String playStoreUrl =
       'https://play.google.com/store/apps/details?id=com.tehreem.barakah_time';
+
+  /// Where in-app feedback goes (also listed in the privacy policy).
+  static const String supportEmail = 'its.tehreem2830@gmail.com';
 }

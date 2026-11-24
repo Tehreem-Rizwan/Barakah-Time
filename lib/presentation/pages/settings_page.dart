@@ -16,6 +16,7 @@ import '../widgets/widgets.dart';
 import 'about_page.dart';
 import 'prayer_offsets_sheet.dart';
 import 'auth/sign_in_page.dart';
+import 'support_actions.dart';
 import 'profile_page.dart'
     show
         ProfilePage,
@@ -33,6 +34,9 @@ class SettingsPage extends StatelessWidget {
   static const _androidPackageId = 'com.tehreem.barakah_time';
 
   /// No App Store listing yet, so "Rate us" is hidden on Apple platforms.
+  static bool get _isAndroid =>
+      !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
+
   static bool get _canRate =>
       !kIsWeb &&
       defaultTargetPlatform != TargetPlatform.iOS &&
@@ -173,6 +177,13 @@ class SettingsPage extends StatelessWidget {
                       ),
                     ),
                     if (state.notificationsEnabled) const _ExactAlarmHint(),
+                    if (state.notificationsEnabled && _isAndroid)
+                      ActionTile(
+                        icon: Icons.battery_alert_outlined,
+                        title: l10n.adhan_help,
+                        subtitle: l10n.adhan_help_desc,
+                        onTap: () => showAdhanHelp(context),
+                      ),
                   ]),
                   _gap(),
                   _section(l10n.quran, Icons.menu_book_outlined),
@@ -210,6 +221,12 @@ class SettingsPage extends StatelessWidget {
                         subtitle: l10n.settings_support_us,
                         onTap: () => _handleRateUs(context),
                       ),
+                    ActionTile(
+                      icon: Icons.mail_outline_rounded,
+                      title: l10n.send_feedback,
+                      subtitle: l10n.send_feedback_desc,
+                      onTap: () => sendFeedback(context),
+                    ),
                     FutureBuilder<String?>(
                       future: appVersion(),
                       builder:

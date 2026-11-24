@@ -6,6 +6,10 @@ import 'dart:io';
 import 'package:barakah_time/core/services/audio_cache.dart';
 import 'package:barakah_time/core/services/geomagnetic_service.dart';
 import 'package:barakah_time/core/services/location_service.dart';
+import 'package:barakah_time/core/services/notification_service.dart';
+import 'package:barakah_time/data/datasources/remote/adhan_service.dart';
+import 'package:barakah_time/presentation/pages/support_actions.dart';
+import 'package:flutter/foundation.dart';
 import 'package:barakah_time/presentation/blocs/location_bloc.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -237,5 +241,44 @@ void main() {
         expect(fresh.existsSync(), isTrue, reason: 'may still be downloading');
       },
     );
+  });
+
+  group('notification horizon', () {
+    tearDown(() => debugDefaultTargetPlatformOverride = null);
+
+    test('Android schedules a month, iOS stays within its 64 limit', () {
+      debugDefaultTargetPlatformOverride = TargetPlatform.android;
+      expect(NotificationService.scheduleDays, 30);
+      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+      expect(NotificationService.scheduleDays, NotificationService.daysAhead);
+      expect(NotificationService.scheduleDays * 5, lessThanOrEqualTo(64));
+    });
+
+    test('30 days of prayers get unique ids inside the prayers group', () {
+      final now = DateTime(2026, 11, 20, 0, 1);
+      final days = AdhanService().timesForDays(31.52, 74.35, now, 30);
+      final schedule = NotificationService.computeSchedule(days, now);
+      final ids = schedule.map((s) => s.id).toList();
+      expect(ids.toSet().length, ids.length);
+      expect(ids.every((id) => id >= 0 && id < ReminderGroups.size), isTrue);
+      expect(schedule.length, 150);
+    });
+  });
+
+  group('feedback email', () {
+    test('goes to the support address with readable encoding', () {
+      final uri = feedbackEmailUri(version: '1.0.1', os: 'android 14');
+      expect(uri.scheme, 'mailto');
+      final text = uri.toString();
+      expect(text, contains('Barakah%20Time%20feedback%20(v1.0.1)'));
+      expect(text, isNot(contains('+')));
+      expect(Uri.decodeComponent(text), contains('App version: 1.0.1'));
+      expect(Uri.decodeComponent(text), contains('Device: android 14'));
+    });
+
+    test('works without version or device info', () {
+      final uri = feedbackEmailUri();
+      expect(Uri.decodeComponent(uri.toString()), isNot(contains('null')));
+    });
   });
 }

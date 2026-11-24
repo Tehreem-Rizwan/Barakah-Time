@@ -598,6 +598,18 @@ class AppLocalizations {
       'method_singapore': 'Singapore, Malaysia & Indonesia',
       'method_moonsighting': 'Moonsighting Committee Worldwide',
       'unknown_city': 'Unknown location',
+      'playback_speed': 'Playback speed',
+      'mushaf': 'Mushaf',
+      'page_n': 'Page {n}',
+      'juz_n': 'Juz {n}',
+      'mushaf_tap_hint': 'Tap an ayah to see its translation, play or save it',
+      'play_from_here': 'Play from here',
+      'send_feedback': 'Send feedback',
+      'send_feedback_desc': 'Report a problem or suggest an idea',
+      'feedback_no_email_app': 'No email app found. Write to us at {email}',
+      'adhan_help': 'Adhan late or not coming?',
+      'adhan_help_desc': 'Phone settings that can block reminders',
+      'adhan_help_body': 'Some phones (for example Vivo, Oppo, Xiaomi, Infinix and Samsung) stop apps in the background to save battery, which can delay or block the adhan.\n\n1. Open app settings below.\n2. Battery: choose "Unrestricted" or "No restrictions".\n3. If your phone has "Autostart" or "Background activity", turn it on for Barakah Time.\n4. Make sure notifications are allowed.\n\nAfter that, open Barakah Time once so it can set the reminders again.',
       'refresh_location': 'Update location',
       'location_updated': 'Location updated',
       'default_user_name': 'Barakah User',
@@ -1278,6 +1290,18 @@ class AppLocalizations {
       'method_singapore': 'سنغافورة وماليزيا وإندونيسيا',
       'method_moonsighting': 'لجنة رؤية الهلال العالمية',
       'unknown_city': 'موقع غير معروف',
+      'playback_speed': 'سرعة التشغيل',
+      'mushaf': 'المصحف',
+      'page_n': 'صفحة {n}',
+      'juz_n': 'الجزء {n}',
+      'mushaf_tap_hint': 'اضغط على آية لعرض ترجمتها أو تشغيلها أو حفظها',
+      'play_from_here': 'تشغيل من هنا',
+      'send_feedback': 'إرسال ملاحظات',
+      'send_feedback_desc': 'أبلغ عن مشكلة أو اقترح فكرة',
+      'feedback_no_email_app': 'لا يوجد تطبيق بريد. راسلنا على {email}',
+      'adhan_help': 'الأذان متأخر أو لا يصل؟',
+      'adhan_help_desc': 'إعدادات الهاتف التي قد تمنع التنبيهات',
+      'adhan_help_body': 'بعض الهواتف (مثل Vivo وOppo وXiaomi وInfinix وSamsung) توقف التطبيقات في الخلفية لتوفير البطارية، وقد يؤخر ذلك الأذان أو يمنعه.\n\n1. افتح إعدادات التطبيق من الزر أدناه.\n2. البطارية: اختر «غير مقيد» أو «بلا قيود».\n3. إذا كان في هاتفك خيار «التشغيل التلقائي» أو «النشاط في الخلفية» ففعّله لتطبيق Barakah Time.\n4. تأكد من السماح بالإشعارات.\n\nبعد ذلك افتح Barakah Time مرة واحدة ليعيد ضبط التنبيهات.',
       'refresh_location': 'تحديث الموقع',
       'location_updated': 'تم تحديث الموقع',
       'default_user_name': 'مستخدم بركة',
@@ -1967,6 +1991,18 @@ class AppLocalizations {
       'method_singapore': 'سنگاپور، مالزی و اندونزی',
       'method_moonsighting': 'کمیتهٔ جهانی رؤیت هلال',
       'unknown_city': 'مکان نامشخص',
+      'playback_speed': 'سرعت پخش',
+      'mushaf': 'مصحف',
+      'page_n': 'صفحه {n}',
+      'juz_n': 'جزء {n}',
+      'mushaf_tap_hint': 'روی یک آیه بزنید تا ترجمه‌اش را ببینید، پخش یا ذخیره کنید',
+      'play_from_here': 'پخش از اینجا',
+      'send_feedback': 'ارسال بازخورد',
+      'send_feedback_desc': 'گزارش مشکل یا پیشنهاد ایده',
+      'feedback_no_email_app': 'برنامه ایمیل پیدا نشد. به {email} پیام دهید',
+      'adhan_help': 'اذان دیر می‌آید یا نمی‌آید؟',
+      'adhan_help_desc': 'تنظیمات گوشی که ممکن است یادآورها را متوقف کند',
+      'adhan_help_body': 'برخی گوشی‌ها (مثلاً Vivo، Oppo، Xiaomi، Infinix و Samsung) برای صرفه‌جویی در باتری، برنامه‌ها را در پس‌زمینه متوقف می‌کنند و این می‌تواند اذان را دیر کند یا متوقف کند.\n\n۱. از دکمه زیر تنظیمات برنامه را باز کنید.\n۲. باتری: «بدون محدودیت» را انتخاب کنید.\n۳. اگر گوشی شما گزینه «اجرای خودکار» یا «فعالیت در پس‌زمینه» دارد، آن را برای Barakah Time روشن کنید.\n۴. مطمئن شوید اعلان‌ها مجاز هستند.\n\nسپس یک بار Barakah Time را باز کنید تا یادآورها دوباره تنظیم شوند.',
       'refresh_location': 'به‌روزرسانی مکان',
       'location_updated': 'مکان به‌روز شد',
       'default_user_name': 'کاربر برکت',
@@ -2657,6 +2693,18 @@ class AppLocalizations {
       'method_singapore': 'سنگاپور، ملائیشیا اور انڈونیشیا',
       'method_moonsighting': 'مون سائٹنگ کمیٹی ورلڈ وائیڈ',
       'unknown_city': 'نامعلوم مقام',
+      'playback_speed': 'آواز کی رفتار',
+      'mushaf': 'مصحف',
+      'page_n': 'صفحہ {n}',
+      'juz_n': 'پارہ {n}',
+      'mushaf_tap_hint': 'ترجمہ دیکھنے، سننے یا محفوظ کرنے کے لیے کسی آیت پر ٹیپ کریں',
+      'play_from_here': 'یہاں سے چلائیں',
+      'send_feedback': 'رائے بھیجیں',
+      'send_feedback_desc': 'کوئی مسئلہ بتائیں یا مشورہ دیں',
+      'feedback_no_email_app': 'کوئی ای میل ایپ نہیں ملی۔ ہمیں {email} پر لکھیں',
+      'adhan_help': 'اذان دیر سے آتی ہے یا نہیں آتی؟',
+      'adhan_help_desc': 'فون کی وہ سیٹنگز جو یاد دہانی روک سکتی ہیں',
+      'adhan_help_body': 'کچھ فون (جیسے Vivo، Oppo، Xiaomi، Infinix اور Samsung) بیٹری بچانے کے لیے پس منظر میں ایپس بند کر دیتے ہیں، جس سے اذان دیر سے آ سکتی ہے یا رک سکتی ہے۔\n\n1۔ نیچے والے بٹن سے ایپ کی سیٹنگز کھولیں۔\n2۔ بیٹری: "Unrestricted" یا "No restrictions" چنیں۔\n3۔ اگر آپ کے فون میں "Autostart" یا "Background activity" کا آپشن ہے تو Barakah Time کے لیے اسے آن کریں۔\n4۔ یقینی بنائیں کہ نوٹیفکیشنز کی اجازت ہے۔\n\nاس کے بعد ایک بار Barakah Time کھولیں تاکہ یاد دہانیاں دوبارہ لگ جائیں۔',
       'refresh_location': 'مقام اپ ڈیٹ کریں',
       'location_updated': 'مقام اپ ڈیٹ ہو گیا',
       'default_user_name': 'برکت صارف',
@@ -3354,6 +3402,18 @@ class AppLocalizations {
       'method_singapore': 'Singapur, Malezya ve Endonezya',
       'method_moonsighting': 'Dünya Hilal Gözetleme Komitesi',
       'unknown_city': 'Bilinmeyen konum',
+      'playback_speed': 'Oynatma hızı',
+      'mushaf': 'Mushaf',
+      'page_n': 'Sayfa {n}',
+      'juz_n': 'Cüz {n}',
+      'mushaf_tap_hint': 'Mealini görmek, dinlemek veya kaydetmek için bir ayete dokunun',
+      'play_from_here': 'Buradan oynat',
+      'send_feedback': 'Geri bildirim gönder',
+      'send_feedback_desc': 'Bir sorun bildir veya fikir öner',
+      'feedback_no_email_app': 'E-posta uygulaması bulunamadı. Bize {email} adresinden yazın',
+      'adhan_help': 'Ezan geç mi geliyor ya da hiç gelmiyor mu?',
+      'adhan_help_desc': 'Hatırlatıcıları engelleyebilen telefon ayarları',
+      'adhan_help_body': 'Bazı telefonlar (örneğin Vivo, Oppo, Xiaomi, Infinix ve Samsung) pil tasarrufu için arka plandaki uygulamaları durdurur; bu da ezanı geciktirebilir veya engelleyebilir.\n\n1. Aşağıdaki düğmeyle uygulama ayarlarını açın.\n2. Pil: "Kısıtlamasız" seçeneğini seçin.\n3. Telefonunuzda "Otomatik başlatma" veya "Arka plan etkinliği" varsa Barakah Time için açın.\n4. Bildirimlere izin verildiğinden emin olun.\n\nArdından hatırlatıcıların yeniden kurulması için Barakah Time\'ı bir kez açın.',
       'refresh_location': 'Konumu güncelle',
       'location_updated': 'Konum güncellendi',
       'default_user_name': 'Bereket Kullanıcısı',
@@ -3806,6 +3866,19 @@ class AppLocalizations {
   String get continue_as_guest => translate('continue_as_guest');
   String get guest_mode_notice => translate('guest_mode_notice');
   String get refresh_location => translate('refresh_location');
+  String get mushaf => translate('mushaf');
+  String get playback_speed => translate('playback_speed');
+  String pageN(int n) => translate('page_n').replaceAll('{n}', '$n');
+  String juzN(int n) => translate('juz_n').replaceAll('{n}', '$n');
+  String get mushaf_tap_hint => translate('mushaf_tap_hint');
+  String get play_from_here => translate('play_from_here');
+  String get send_feedback => translate('send_feedback');
+  String get send_feedback_desc => translate('send_feedback_desc');
+  String feedbackNoEmailApp(String email) =>
+      translate('feedback_no_email_app').replaceAll('{email}', email);
+  String get adhan_help => translate('adhan_help');
+  String get adhan_help_desc => translate('adhan_help_desc');
+  String get adhan_help_body => translate('adhan_help_body');
   String get location_updated => translate('location_updated');
   String get sign_in_to_sync => translate('sign_in_to_sync');
   String get auth_unavailable_notice => translate('auth_unavailable_notice');
