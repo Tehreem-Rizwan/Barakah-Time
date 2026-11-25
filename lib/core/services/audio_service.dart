@@ -83,9 +83,10 @@ class AudioService {
   int _session = 0;
 
   AudioService({AudioCache? cache, bool saveForOffline = true})
-    : _cache = saveForOffline && AudioCache.supported
-          ? (cache ?? AudioCache())
-          : null {
+    : _cache =
+          saveForOffline && AudioCache.supported
+              ? (cache ?? AudioCache())
+              : null {
     unawaited(_cache?.trim());
     _configureSession();
     _initTts();
@@ -411,6 +412,8 @@ class AudioService {
       }
       await _tts.setLanguage(segment.locale);
       if (session != _session) return;
+      await _useBestVoice(segment.locale);
+      if (session != _session) return;
       final result = await _tts.speak(segment.text);
       if (result == 0) {
         throw Exception('speak returned 0');
@@ -438,6 +441,27 @@ class AudioService {
     } catch (_) {}
   }
 
+  /// Best voice per locale, looked up once (null = keep the default).
+  final Map<String, Map<String, String>?> _bestVoices = {};
+
+  /// Phones usually have a basic and a much more natural "high quality"
+  /// voice per language, but the default is often the basic one. Pick the
+  /// most natural installed voice for [locale].
+  Future<void> _useBestVoice(String locale) async {
+    try {
+      if (!_bestVoices.containsKey(locale)) {
+        final voices = await _tts.getVoices;
+        _bestVoices[locale] =
+            voices is List ? pickBestVoice(voices, locale) : null;
+      }
+      final voice = _bestVoices[locale];
+      if (voice != null) await _tts.setVoice(voice);
+    } catch (e) {
+      debugPrint('Choosing a TTS voice failed: $e');
+      _bestVoices[locale] = null;
+    }
+  }
+
   Future<bool> _isVoiceAvailable(String locale) async {
     try {
       final r = await _tts.isLanguageAvailable(locale);
@@ -445,6 +469,51 @@ class AudioService {
     } catch (_) {
       return true; // unknown: try speaking anyway
     }
+  }
+
+  /// The most natural voice in [voices] (as returned by flutter_tts) for
+  /// [locale], or null if none matches. Installed (offline) voices win over
+  /// network ones of similar quality, so speech also works offline; voices
+  /// not downloaded yet are skipped. Public for tests.
+  @visibleForTesting
+  static Map<String, String>? pickBestVoice(List voices, String locale) {
+    final lang = locale.split(RegExp('[-_]')).first.toLowerCase();
+    final region =
+        locale.contains(RegExp('[-_]'))
+            ? locale.split(RegExp('[-_]')).last.toUpperCase()
+            : '';
+    int quality(String? q) => switch ((q ?? '').toLowerCase()) {
+      'very high' || 'premium' || '3' => 5,
+      'high' || 'enhanced' || '2' => 4,
+      'normal' || 'default' || '1' => 3,
+      'low' => 2,
+      'very low' => 1,
+      _ => 3,
+    };
+    Map<String, String>? best;
+    var bestScore = -1 << 30;
+    for (final raw in voices) {
+      if (raw is! Map) continue;
+      final name = raw['name']?.toString();
+      final vLocale = raw['locale']?.toString() ?? '';
+      if (name == null || name.isEmpty) continue;
+      final parts = vLocale.split(RegExp('[-_]'));
+      if (parts.first.toLowerCase() != lang) continue;
+      final features = raw['features']?.toString() ?? '';
+      if (features.contains('notInstalled')) continue;
+      var score = quality(raw['quality']?.toString()) * 10;
+      if (raw['network_required']?.toString() == '1') score -= 15;
+      if (region.isNotEmpty &&
+          parts.length > 1 &&
+          parts.last.toUpperCase() == region) {
+        score += 1;
+      }
+      if (score > bestScore) {
+        bestScore = score;
+        best = {'name': name, 'locale': vLocale};
+      }
+    }
+    return best;
   }
 
   String _ttsLocale(String languageCode) {

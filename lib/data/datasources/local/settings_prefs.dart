@@ -27,6 +27,22 @@ class SettingsPrefs {
 
   static const audioSpeed = 'quran_audio_speed';
 
+  static const quranFont = 'quran_font';
+
+  /// Quran fonts (all free Google Fonts, downloaded on first use so the
+  /// app itself doesn't grow).
+  static const quranFonts = [
+    'amiri',
+    'amiriQuran',
+    'scheherazadeNew',
+    'notoNaskhArabic',
+  ];
+
+  /// Optional reminders (off by default): night recitations an hour after
+  /// Isha, and Surah Al-Kahf on Friday morning.
+  static const nightReminder = 'night_recitation_reminder';
+  static const kahfReminder = 'kahf_friday_reminder';
+
   /// Playback speeds offered for recitation and translation audio. Capped
   /// at 2x: faster than that, tajweed (lengthening, pauses) is lost.
   static const audioSpeeds = [0.5, 0.75, 1.0, 1.25, 1.5, 2.0];
@@ -98,6 +114,9 @@ class SettingsPrefs {
     put('themeMode', prefs.getString(themeMode));
     put('quranMode', prefs.getString(quranMode));
     put('audioSpeed', prefs.getDouble(audioSpeed));
+    put('quranFont', prefs.getString(quranFont));
+    put('nightReminder', prefs.getBool(nightReminder));
+    put('kahfReminder', prefs.getBool(kahfReminder));
     if (prefs.getString(prayerOffsets) != null) {
       map['prayerOffsets'] = readOffsets(prefs);
     }
@@ -148,6 +167,12 @@ class SettingsPrefs {
     }
     final speed = validSpeed(data['audioSpeed']);
     if (speed != null) await prefs.setDouble(audioSpeed, speed);
+    final font = data['quranFont'];
+    if (font is String && quranFonts.contains(font)) {
+      await prefs.setString(quranFont, font);
+    }
+    await boolean('nightReminder', nightReminder);
+    await boolean('kahfReminder', kahfReminder);
     if (data['prayerOffsets'] is Map) {
       await prefs.setString(
         prayerOffsets,

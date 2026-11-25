@@ -121,4 +121,29 @@ void main() {
       expect(other.getString(SettingsPrefs.quranMode), 'mushaf');
     });
   });
+
+  group('Quran font setting', () {
+    setUp(() => SharedPreferences.setMockInitialValues({}));
+
+    test('defaults to Amiri, persists, rejects unknown, syncs', () async {
+      final prefs = await SharedPreferences.getInstance();
+      final bloc = SettingsBloc(prefs, countryCode: 'PK');
+      addTearDown(bloc.close);
+      expect(bloc.state.quranFont, 'amiri');
+
+      bloc.add(const UpdateQuranFont('scheherazadeNew'));
+      await bloc.stream.firstWhere((s) => s.quranFont == 'scheherazadeNew');
+      expect(prefs.getString(SettingsPrefs.quranFont), 'scheherazadeNew');
+
+      bloc.add(const UpdateQuranFont('comic'));
+      await Future<void>.delayed(Duration.zero);
+      expect(bloc.state.quranFont, 'scheherazadeNew');
+
+      expect(SettingsPrefs.toCloud(prefs)['quranFont'], 'scheherazadeNew');
+      SharedPreferences.setMockInitialValues({});
+      final other = await SharedPreferences.getInstance();
+      await SettingsPrefs.applyCloud(other, {'quranFont': 'amiriQuran'});
+      expect(other.getString(SettingsPrefs.quranFont), 'amiriQuran');
+    });
+  });
 }

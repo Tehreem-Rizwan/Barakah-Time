@@ -82,6 +82,10 @@ class QuranRepository {
         _ => null,
       };
 
+  /// MP3 of ayah [globalAyahNumber] (1..6236) recited by Mishary Alafasy.
+  static String arabicAudioUrl(int globalAyahNumber) =>
+      'https://cdn.islamic.network/quran/audio/128/$audioEdition/$globalAyahNumber.mp3';
+
   /// MP3 of the translation of ayah [globalAyahNumber] (1..6236) read by a
   /// person, or null when there is none for [languageCode] (then use TTS).
   static String? translationAudioUrl(

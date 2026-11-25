@@ -34,11 +34,17 @@ import 'injection_container.dart' as di;
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'core/localization/app_localizations.dart';
+import 'core/utils/recitations.dart';
 
 const Duration _initTimeout = Duration(seconds: 15);
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Release builds write nothing to the device log: anyone with USB
+  // debugging could otherwise read the app's messages with adb/flutter logs.
+  // Debug and profile builds keep logging for development.
+  silenceLogsInRelease();
 
   // Draw behind transparent status/navigation bars (no grey scrim).
   unawaited(SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge));
@@ -291,6 +297,15 @@ class _AppCoordinatorState extends State<_AppCoordinator> {
       notifications,
       settings.languageCode,
     );
+    notifications.scheduleGroup(
+      ReminderGroups.recitations,
+      Recitations.reminders(
+        days,
+        AppLocalizations(Locale(settings.languageCode)),
+        night: settings.nightReminder,
+        kahf: settings.kahfReminder,
+      ),
+    );
   }
 
   /// Keeps the home-screen widget's week of prayer times current.
@@ -359,6 +374,8 @@ class _AppCoordinatorState extends State<_AppCoordinator> {
               (p, c) =>
                   p.notificationsEnabled != c.notificationsEnabled ||
                   p.adhanSoundEnabled != c.adhanSoundEnabled ||
+                  p.nightReminder != c.nightReminder ||
+                  p.kahfReminder != c.kahfReminder ||
                   p.languageCode != c.languageCode,
           listener: (context, _) => _reschedule(),
         ),
@@ -397,4 +414,13 @@ class _AppCoordinatorState extends State<_AppCoordinator> {
       child: widget.child,
     );
   }
+}
+
+/// Replaces [debugPrint] with a no-op when [release] (default: release
+/// mode). Framework error reports also go through [debugPrint], so they are
+/// silenced too. Public for tests.
+@visibleForTesting
+void silenceLogsInRelease({bool release = kReleaseMode}) {
+  if (!release) return;
+  debugPrint = (String? message, {int? wrapWidth}) {};
 }

@@ -1,10 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_fonts.dart';
+import '../blocs/settings_bloc.dart';
 
-/// Quranic / Arabic text in Amiri, always laid out right-to-left regardless
+/// The Quran font chosen in Settings (rebuilds the caller when it changes).
+/// Amiri when no [SettingsBloc] is above [context] (e.g. in some tests).
+String quranFontOf(BuildContext context) {
+  try {
+    return context.select<SettingsBloc, String>((b) => b.state.quranFont);
+  } catch (_) {
+    return 'amiri';
+  }
+}
+
+/// Quranic / Arabic text in the chosen Quran font, always right-to-left regardless
 /// of the app locale.
 ///
 /// [fontSize] is used as-is (pass an `.sp` value); defaults to `24.sp`.
@@ -44,7 +56,8 @@ class ArabicText extends StatelessWidget {
       maxLines: maxLines,
       overflow: overflow,
       locale: const Locale('ar'),
-      style: AppFonts.amiri(
+      style: AppFonts.quran(
+        quranFontOf(context),
         TextStyle(
           fontSize: fontSize ?? 24.sp,
           color: color ?? AppColors.textMain,

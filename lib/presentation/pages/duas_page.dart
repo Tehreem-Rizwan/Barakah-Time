@@ -8,6 +8,7 @@ import '../../core/services/audio_service.dart';
 import '../../core/utils/arabic_text.dart' as arabic_utils;
 import '../../injection_container.dart';
 import '../../core/constants/content_translations.dart';
+import '../../data/repositories/quran_repository.dart';
 import '../widgets/widgets.dart';
 
 class DuasPage extends StatefulWidget {
@@ -161,6 +162,25 @@ class _DuaCard extends StatelessWidget {
                     onPressed: () {
                       if (isPlaying) {
                         audioService.stop();
+                      } else if (dua['ayah'] != null) {
+                        // A full Quran ayah: Alafasy's recitation, then the
+                        // translation read by a person when one exists.
+                        final ayah = int.parse(dua['ayah']!);
+                        final lang =
+                            Localizations.localeOf(context).languageCode;
+                        final translation = QuranRepository.translationAudioUrl(
+                          lang,
+                          ayah,
+                        );
+                        audioService.playList(
+                          [
+                            QuranRepository.arabicAudioUrl(ayah),
+                            if (translation != null) translation,
+                          ],
+                          title: title,
+                          artist: 'Mishary Rashid Alafasy',
+                          mediaId: mediaId,
+                        );
                       } else {
                         final lang =
                             Localizations.localeOf(context).languageCode;
@@ -380,6 +400,8 @@ const List<Map<String, String>> kDuas = [
   {
     'key': 'dua_ayatul_kursi',
     'reference': '2:255',
+    // Global ayah number: played as the real recitation, not text-to-speech.
+    'ayah': '262',
     'arabic':
         'اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ ۚ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ ۚ لَهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ ۗ مَنْ ذَا الَّذِي يَشْفَعُ عِنْدَهُ إِلَّا بِإِذْنِهِ ۚ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ ۖ وَلَا يُحِيطُونَ بِشَيْءٍ مِنْ عِلْمِهِ إِلَّا بِمَا شَاءَ ۚ وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالْأَرْضَ ۖ وَلَا يَئُودُهُ حِفْظُهُمَا ۚ وَهُوَ الْعَلِيُّ الْعَظِيمُ',
     'transliteration':
