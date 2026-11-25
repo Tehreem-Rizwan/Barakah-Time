@@ -13,6 +13,7 @@ import '../../domain/entities/spiritual_activity.dart';
 import '../../domain/entities/spiritual_pulse.dart';
 import '../blocs/pulse_bloc.dart';
 import '../widgets/widgets.dart';
+import 'challenges_card.dart';
 
 /// Points needed on a day for it to count as "active" in the charts.
 const int kActiveDayPoints = 50;
@@ -156,6 +157,8 @@ class _PulseContent extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              ChallengesCard(today: state.todayActivities),
+              gap,
               _TodayPrayersCard(state: state),
               gap,
               _StreakCard(pulse: pulse),

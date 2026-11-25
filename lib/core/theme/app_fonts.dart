@@ -25,6 +25,26 @@ abstract final class AppFonts {
           ? GoogleFonts.amiri(textStyle: style)
           : (style ?? const TextStyle());
 
+  /// Quran / Arabic text in the font the user chose (see
+  /// `SettingsPrefs.quranFonts`). Unknown values use Amiri.
+  static TextStyle quran(String font, [TextStyle? style]) {
+    if (!useGoogleFonts) return style ?? const TextStyle();
+    return switch (font) {
+      'amiriQuran' => GoogleFonts.amiriQuran(textStyle: style),
+      'scheherazadeNew' => GoogleFonts.scheherazadeNew(textStyle: style),
+      'notoNaskhArabic' => GoogleFonts.notoNaskhArabic(textStyle: style),
+      _ => GoogleFonts.amiri(textStyle: style),
+    };
+  }
+
+  /// Display names for the Quran font picker (font names aren't translated).
+  static const quranFontNames = {
+    'amiri': 'Amiri',
+    'amiriQuran': 'Amiri Quran',
+    'scheherazadeNew': 'Scheherazade',
+    'notoNaskhArabic': 'Noto Naskh',
+  };
+
   /// Applies the locale-appropriate UI font family to [base].
   ///
   /// - ar / fa → Noto Naskh Arabic (Latin falls back to Outfit)

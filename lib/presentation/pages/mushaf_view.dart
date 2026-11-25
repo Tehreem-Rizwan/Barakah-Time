@@ -364,7 +364,8 @@ class _MushafPageCardState extends State<_MushafPageCard> {
             textDirection: TextDirection.rtl,
             textAlign: TextAlign.justify,
             locale: const Locale('ar'),
-            style: AppFonts.amiri(
+            style: AppFonts.quran(
+              quranFontOf(context),
               TextStyle(
                 fontSize: widget.fontSize,
                 height: 2.2,

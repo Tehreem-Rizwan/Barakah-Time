@@ -62,6 +62,8 @@ import 'package:barakah_time/presentation/pages/ramadan_page.dart';
 import 'package:barakah_time/presentation/pages/saved_verses_page.dart';
 import 'package:barakah_time/presentation/pages/settings_page.dart';
 import 'package:barakah_time/presentation/pages/surah_detail_page.dart';
+import 'package:barakah_time/presentation/pages/recitation_card.dart';
+import 'package:barakah_time/presentation/pages/challenges_card.dart';
 import 'package:barakah_time/presentation/pages/tasbeeh_page.dart';
 import 'package:barakah_time/presentation/pages/tools_grid_page.dart';
 import 'package:barakah_time/presentation/pages/zakat_calculator_page.dart';
@@ -559,6 +561,26 @@ final _screens = <_Screen>[
       await _tap(tester, find.text(l10n.close).last);
     },
   ),
+  _Screen(
+    'Settings(Quran font)',
+    () => const SettingsPage(),
+    interact: (tester, ctx, l10n) async {
+      ctx.step = 'open font sheet';
+      await tester.scrollUntilVisible(
+        find.text(l10n.quran_font),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await _tap(tester, find.text(l10n.quran_font));
+      expect(find.text('Scheherazade'), findsOneWidget);
+      await _scrollAll(tester, ctx, 'font sheet');
+      ctx.step = 'pick Scheherazade';
+      await tester.ensureVisible(find.text('Scheherazade'));
+      await tester.tap(find.text('Scheherazade'));
+      await tester.pumpAndSettle();
+      expect(find.text('Scheherazade'), findsOneWidget); // tile subtitle
+    },
+  ),
   _Screen('About', () => const AboutPage()),
   _Screen(
     'Onboarding',
@@ -603,6 +625,64 @@ final _screens = <_Screen>[
     'Qibla(no sensor)',
     () => const QiblaPage(),
     settle: const Duration(seconds: 4),
+  ),
+  _Screen(
+    'RecitationCard(Thu night)',
+    () => Scaffold(
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        // Thursday 22:00: both the night and the Friday (Al-Kahf) cards.
+        child: RecitationCard(clock: () => DateTime(2026, 11, 26, 22)),
+      ),
+    ),
+    interact: (tester, ctx, l10n) async {
+      expect(find.text(l10n.night_rec_title), findsOneWidget);
+      expect(find.text(l10n.friday_rec_title), findsOneWidget);
+      // The Friday card comes first: tick Al-Kahf, then Ayat al-Kursi.
+      ctx.step = 'tick al-kahf';
+      await _tap(tester, find.byTooltip(l10n.mark_done).first);
+      expect(find.text('1/1'), findsOneWidget);
+      ctx.step = 'tick ayat al-kursi';
+      await _tap(tester, find.byTooltip(l10n.mark_done).first);
+      expect(find.text('1/7'), findsOneWidget);
+    },
+  ),
+  _Screen(
+    'ChallengesCard(all done)',
+    () => Scaffold(
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: ChallengesCard(
+          today: [
+            for (final p in ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'])
+              SpiritualActivity(
+                id: p,
+                type: 'prayer',
+                subType: p,
+                timestamp: DateTime(2026, 11, 24),
+                points: 15,
+              ),
+            SpiritualActivity(
+              id: 'q',
+              type: 'quran',
+              timestamp: DateTime(2026, 11, 24),
+              points: 20,
+            ),
+            SpiritualActivity(
+              id: 'd',
+              type: 'dhikr',
+              timestamp: DateTime(2026, 11, 24),
+              points: 5,
+            ),
+          ],
+        ),
+      ),
+    ),
+    interact: (tester, ctx, l10n) async {
+      await tester.pumpAndSettle();
+      expect(find.text('3/3'), findsOneWidget);
+      expect(find.text(l10n.perfectDaysWeek(1)), findsOneWidget);
+    },
   ),
   _Screen('SavedVerses', () => const SavedVersesPage()),
   _Screen('ActivityHistory', () => const ActivityHistoryPage()),

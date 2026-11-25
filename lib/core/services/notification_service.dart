@@ -60,6 +60,7 @@ abstract final class ReminderGroups {
   static const int prayers = 0;
   static const int ramadan = 1000;
   static const int memorials = 2000;
+  static const int recitations = 3000;
 }
 
 /// Payload of prayer notifications: `prayer:<key>` (e.g. `prayer:fajr`).

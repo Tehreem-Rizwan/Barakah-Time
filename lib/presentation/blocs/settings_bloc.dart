@@ -122,6 +122,24 @@ class UpdateAudioSpeed extends SettingsEvent {
   List<Object?> get props => [speed];
 }
 
+/// Optional night-recitation / Friday Al-Kahf reminders.
+class ToggleRecitationReminder extends SettingsEvent {
+  /// 'night' or 'kahf'.
+  final String which;
+  final bool enabled;
+  const ToggleRecitationReminder(this.which, this.enabled);
+  @override
+  List<Object?> get props => [which, enabled];
+}
+
+/// One of [SettingsPrefs.quranFonts].
+class UpdateQuranFont extends SettingsEvent {
+  final String font;
+  const UpdateQuranFont(this.font);
+  @override
+  List<Object?> get props => [font];
+}
+
 /// Resets every prayer offset to 0.
 class ResetPrayerOffsets extends SettingsEvent {
   const ResetPrayerOffsets();
@@ -172,6 +190,13 @@ class SettingsState extends Equatable {
   /// Recitation/translation playback speed, 1.0 = normal.
   final double audioSpeed;
 
+  /// Font for Quran / Arabic text (see [SettingsPrefs.quranFonts]).
+  final String quranFont;
+
+  /// Reminders for the night recitations / Surah Al-Kahf (off by default).
+  final bool nightReminder;
+  final bool kahfReminder;
+
   const SettingsState({
     this.calculationMethod = CalculationMethods.karachi,
     this.quranFontSize = 24.0,
@@ -188,6 +213,9 @@ class SettingsState extends Equatable {
     this.themeMode = 'system',
     this.quranMode = 'translation',
     this.audioSpeed = 1.0,
+    this.quranFont = 'amiri',
+    this.nightReminder = false,
+    this.kahfReminder = false,
   });
 
   /// Effective Asr madhab: 'shafi' or 'hanafi'.
@@ -211,6 +239,9 @@ class SettingsState extends Equatable {
     String? themeMode,
     String? quranMode,
     double? audioSpeed,
+    String? quranFont,
+    bool? nightReminder,
+    bool? kahfReminder,
   }) {
     return SettingsState(
       calculationMethod: calculationMethod ?? this.calculationMethod,
@@ -229,6 +260,9 @@ class SettingsState extends Equatable {
       themeMode: themeMode ?? this.themeMode,
       quranMode: quranMode ?? this.quranMode,
       audioSpeed: audioSpeed ?? this.audioSpeed,
+      quranFont: quranFont ?? this.quranFont,
+      nightReminder: nightReminder ?? this.nightReminder,
+      kahfReminder: kahfReminder ?? this.kahfReminder,
     );
   }
 
@@ -249,6 +283,9 @@ class SettingsState extends Equatable {
     themeMode,
     quranMode,
     audioSpeed,
+    quranFont,
+    nightReminder,
+    kahfReminder,
   ];
 }
 
@@ -304,6 +341,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     on<UpdateThemeMode>(_onUpdateThemeMode);
     on<UpdateQuranMode>(_onUpdateQuranMode);
     on<UpdateAudioSpeed>(_onUpdateAudioSpeed);
+    on<UpdateQuranFont>(_onUpdateQuranFont);
+    on<ToggleRecitationReminder>(_onToggleRecitationReminder);
   }
 
   /// Device region (e.g. 'PK'), or null.
@@ -385,6 +424,14 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       audioSpeed:
           SettingsPrefs.validSpeed(prefs.getDouble(SettingsPrefs.audioSpeed)) ??
           1.0,
+      quranFont:
+          SettingsPrefs.quranFonts.contains(
+                prefs.getString(SettingsPrefs.quranFont),
+              )
+              ? prefs.getString(SettingsPrefs.quranFont)!
+              : 'amiri',
+      nightReminder: prefs.getBool(SettingsPrefs.nightReminder) ?? false,
+      kahfReminder: prefs.getBool(SettingsPrefs.kahfReminder) ?? false,
     );
   }
 
@@ -583,6 +630,29 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     if (speed == null) return;
     await prefs.setDouble(SettingsPrefs.audioSpeed, speed);
     emit(state.copyWith(audioSpeed: speed));
+  }
+
+  Future<void> _onUpdateQuranFont(
+    UpdateQuranFont event,
+    Emitter<SettingsState> emit,
+  ) async {
+    if (!SettingsPrefs.quranFonts.contains(event.font)) return;
+    await prefs.setString(SettingsPrefs.quranFont, event.font);
+    emit(state.copyWith(quranFont: event.font));
+  }
+
+  Future<void> _onToggleRecitationReminder(
+    ToggleRecitationReminder event,
+    Emitter<SettingsState> emit,
+  ) async {
+    switch (event.which) {
+      case 'night':
+        await prefs.setBool(SettingsPrefs.nightReminder, event.enabled);
+        emit(state.copyWith(nightReminder: event.enabled));
+      case 'kahf':
+        await prefs.setBool(SettingsPrefs.kahfReminder, event.enabled);
+        emit(state.copyWith(kahfReminder: event.enabled));
+    }
   }
 
   Future<void> _onResetPrayerOffsets(

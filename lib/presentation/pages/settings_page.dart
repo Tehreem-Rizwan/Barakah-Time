@@ -7,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/localization/app_localizations.dart';
 import '../../core/services/notification_service.dart';
+import '../../data/datasources/local/settings_prefs.dart';
 import '../../core/utils/calculation_methods.dart';
 import '../../domain/entities/prayer_times.dart';
 import '../../domain/entities/user.dart';
@@ -176,6 +177,56 @@ class SettingsPage extends StatelessWidget {
                         ),
                       ),
                     ),
+                    ActionTile(
+                      icon: Icons.nightlight_outlined,
+                      title: l10n.night_reminder,
+                      subtitle: l10n.night_reminder_desc,
+                      enabled: state.notificationsEnabled,
+                      onTap:
+                          () => context.read<SettingsBloc>().add(
+                            ToggleRecitationReminder(
+                              'night',
+                              !state.nightReminder,
+                            ),
+                          ),
+                      trailing: Transform.scale(
+                        scale: 0.8,
+                        child: Switch(
+                          value: state.nightReminder,
+                          onChanged:
+                              state.notificationsEnabled
+                                  ? (value) => context.read<SettingsBloc>().add(
+                                    ToggleRecitationReminder('night', value),
+                                  )
+                                  : null,
+                        ),
+                      ),
+                    ),
+                    ActionTile(
+                      icon: Icons.menu_book_outlined,
+                      title: l10n.kahf_reminder,
+                      subtitle: l10n.kahf_reminder_desc,
+                      enabled: state.notificationsEnabled,
+                      onTap:
+                          () => context.read<SettingsBloc>().add(
+                            ToggleRecitationReminder(
+                              'kahf',
+                              !state.kahfReminder,
+                            ),
+                          ),
+                      trailing: Transform.scale(
+                        scale: 0.8,
+                        child: Switch(
+                          value: state.kahfReminder,
+                          onChanged:
+                              state.notificationsEnabled
+                                  ? (value) => context.read<SettingsBloc>().add(
+                                    ToggleRecitationReminder('kahf', value),
+                                  )
+                                  : null,
+                        ),
+                      ),
+                    ),
                     if (state.notificationsEnabled) const _ExactAlarmHint(),
                     if (state.notificationsEnabled && _isAndroid)
                       ActionTile(
@@ -193,6 +244,14 @@ class SettingsPage extends StatelessWidget {
                       title: l10n.quran_font_size,
                       subtitle: '${state.quranFontSize.toInt()}',
                       onTap: () => _showFontSizeDialog(context),
+                    ),
+                    ActionTile(
+                      icon: Icons.font_download_outlined,
+                      title: l10n.quran_font,
+                      subtitle:
+                          AppFonts.quranFontNames[state.quranFont] ?? 'Amiri',
+                      onTap:
+                          () => _showQuranFontSheet(context, state.quranFont),
                     ),
                   ]),
                   _gap(),
@@ -526,6 +585,101 @@ class SettingsPage extends StatelessWidget {
                 settingsBloc.add(const ToggleLocationMode(false));
               }
             },
+          ),
+    );
+  }
+
+  /// Font picker with a Bismillah preview in each font.
+  void _showQuranFontSheet(BuildContext context, String current) {
+    final l10n = context.l10n;
+    final bloc = context.read<SettingsBloc>();
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      backgroundColor: AppColors.cardDark,
+      builder:
+          (sheetContext) => SafeArea(
+            child: SingleChildScrollView(
+              padding: EdgeInsetsDirectional.fromSTEB(
+                AppSpacing.lg,
+                0,
+                AppSpacing.lg,
+                AppSpacing.vLg,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    l10n.quran_font,
+                    style: Theme.of(sheetContext).textTheme.titleLarge,
+                  ),
+                  SizedBox(height: AppSpacing.vXs),
+                  Text(
+                    l10n.quran_font_note,
+                    style: Theme.of(sheetContext).textTheme.bodySmall?.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                  SizedBox(height: AppSpacing.vMd),
+                  for (final font in SettingsPrefs.quranFonts)
+                    Padding(
+                      padding: EdgeInsetsDirectional.only(
+                        bottom: AppSpacing.vSm,
+                      ),
+                      child: AppCard(
+                        onTap: () {
+                          bloc.add(UpdateQuranFont(font));
+                          Navigator.pop(sheetContext);
+                        },
+                        border: Border.all(
+                          color:
+                              font == current
+                                  ? AppColors.secondaryGold
+                                  : AppColors.glassStroke,
+                          width: font == current ? 2 : 1,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    AppFonts.quranFontNames[font]!,
+                                    style:
+                                        Theme.of(
+                                          sheetContext,
+                                        ).textTheme.titleSmall,
+                                  ),
+                                ),
+                                if (font == current)
+                                  Icon(
+                                    Icons.check_circle_rounded,
+                                    color: AppColors.secondaryGold,
+                                  ),
+                              ],
+                            ),
+                            Text(
+                              'بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ',
+                              textAlign: TextAlign.center,
+                              textDirection: TextDirection.rtl,
+                              style: AppFonts.quran(
+                                font,
+                                TextStyle(
+                                  fontSize: 24.sp,
+                                  height: 1.9,
+                                  color: AppColors.textMain,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
           ),
     );
   }

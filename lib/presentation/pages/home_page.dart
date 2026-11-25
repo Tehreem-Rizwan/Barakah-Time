@@ -9,6 +9,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../core/constants/daily_ayats.dart';
 import '../../core/localization/app_localizations.dart';
 import '../../core/services/audio_service.dart';
+import '../../data/repositories/quran_repository.dart';
 import '../../domain/entities/prayer_times.dart';
 import '../../domain/entities/spiritual_pulse.dart';
 import '../../domain/entities/badge.dart';
@@ -29,6 +30,7 @@ import 'pulse_page.dart';
 import 'qibla_page.dart';
 import 'quran_page.dart';
 import 'ramadan_page.dart';
+import 'recitation_card.dart';
 import 'tasbeeh_page.dart';
 import 'tools_grid_page.dart';
 
@@ -107,6 +109,7 @@ class HomePage extends StatelessWidget {
                 ],
               ),
             ),
+            padded(const RecitationCard()),
             padded(const RamadanHomeCard()),
             gap(AppSpacing.vXl),
             padded(
@@ -847,10 +850,19 @@ class _AyahSheetBody extends StatelessWidget {
                       if (playing) {
                         audio.stop();
                       } else {
-                        audio.playArabicThenTranslation(
-                          ayat.arabic,
-                          ayat.translation,
-                          title: l10n.daily_ayats,
+                        // Real recitation of the full ayah, then its
+                        // translation read by a person when available.
+                        final translation = QuranRepository.translationAudioUrl(
+                          l10n.locale.languageCode,
+                          ayat.ayah,
+                        );
+                        audio.playList(
+                          [
+                            QuranRepository.arabicAudioUrl(ayat.ayah),
+                            if (translation != null) translation,
+                          ],
+                          title: '${l10n.daily_ayats} · ${ayat.surah}',
+                          artist: 'Mishary Rashid Alafasy',
                           mediaId: mediaId,
                         );
                       }
