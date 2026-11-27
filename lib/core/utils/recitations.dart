@@ -139,9 +139,9 @@ abstract final class Recitations {
   ) {
     final windows = <RecitationWindow>[];
     DateTime at(int hour) => DateTime(now.year, now.month, now.day, hour);
-    final isha = today?.isha ?? at(_fallbackNightStart);
-    final fajr = today?.fajr ?? at(_fallbackNightEnd);
-    final maghrib = today?.maghrib ?? at(_fallbackMaghrib);
+    final isha = _onDay(now, today?.isha) ?? at(_fallbackNightStart);
+    final fajr = _onDay(now, today?.fajr) ?? at(_fallbackNightEnd);
+    final maghrib = _onDay(now, today?.maghrib) ?? at(_fallbackMaghrib);
     final weekday = now.weekday;
     final fridayEve = weekday == DateTime.thursday && !now.isBefore(maghrib);
     final friday = weekday == DateTime.friday && now.isBefore(maghrib);
@@ -151,6 +151,15 @@ abstract final class Recitations {
     }
     return windows;
   }
+
+  /// [time]'s clock time on [now]'s date. Prayer times can be from another
+  /// day (e.g. the app stayed open past midnight before they refreshed);
+  /// the clock time differs by only a minute or two between days, so this
+  /// keeps the windows right.
+  static DateTime? _onDay(DateTime now, DateTime? time) =>
+      time == null
+          ? null
+          : DateTime(now.year, now.month, now.day, time.hour, time.minute);
 
   /// Stable key of the window instance [now] belongs to, so ticks survive
   /// midnight: a night is keyed by the evening it started, a Friday by the
@@ -168,7 +177,7 @@ abstract final class Recitations {
     switch (w) {
       case RecitationWindow.night:
         final fajr =
-            today?.fajr ??
+            _onDay(now, today?.fajr) ??
             DateTime(now.year, now.month, now.day, _fallbackNightEnd);
         final evening =
             now.isBefore(fajr) ? day.subtract(const Duration(days: 1)) : day;

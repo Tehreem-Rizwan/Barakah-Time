@@ -7,6 +7,7 @@ import 'package:barakah_time/core/services/audio_cache.dart';
 import 'package:barakah_time/core/services/geomagnetic_service.dart';
 import 'package:barakah_time/core/services/location_service.dart';
 import 'package:barakah_time/core/services/notification_service.dart';
+import 'package:barakah_time/domain/entities/prayer_times.dart';
 import 'package:barakah_time/data/datasources/remote/adhan_service.dart';
 import 'package:barakah_time/presentation/pages/support_actions.dart';
 import 'package:flutter/foundation.dart';
@@ -262,6 +263,47 @@ void main() {
       expect(ids.toSet().length, ids.length);
       expect(ids.every((id) => id >= 0 && id < ReminderGroups.size), isTrue);
       expect(schedule.length, 150);
+    });
+  });
+
+  group('no duplicate prayer notifications', () {
+    test(
+      'the same prayer time keeps its id when scheduled from another day',
+      () {
+        final days = AdhanService().timesForDays(
+          31.52,
+          74.35,
+          DateTime(2026, 11, 25),
+          30,
+        );
+        final fromToday = NotificationService.computeSchedule(
+          days,
+          DateTime(2026, 11, 25, 0, 1),
+        );
+        // A reschedule starting tomorrow (e.g. after midnight).
+        final fromTomorrow = NotificationService.computeSchedule(
+          days.sublist(1),
+          DateTime(2026, 11, 26, 0, 1),
+        );
+        final byTime = {for (final s in fromToday) s.time: s.id};
+        for (final s in fromTomorrow) {
+          expect(byTime[s.time], s.id, reason: '${s.prayer} ${s.time}');
+        }
+      },
+    );
+
+    test('ids are unique for 100 days and stay in the prayers group', () {
+      final ids = <int>{};
+      for (var d = 0; d < 100; d++) {
+        for (final p in PrayerName.values) {
+          final id = NotificationService.prayerNotificationId(
+            DateTime(2026, 11, 25).add(Duration(days: d)),
+            p,
+          );
+          expect(id, inInclusiveRange(0, ReminderGroups.size - 1));
+          expect(ids.add(id), isTrue);
+        }
+      }
     });
   });
 
