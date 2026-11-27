@@ -62,9 +62,14 @@ class UpdateMadhab extends SettingsEvent {
 
 class ToggleNotifications extends SettingsEvent {
   final bool enabled;
-  const ToggleNotifications(this.enabled);
+
+  /// Open Android's "Alarms & reminders" screen after enabling (when exact
+  /// alarms aren't allowed yet). The first-run prompt asks for that itself,
+  /// after explaining why.
+  final bool askExactAlarms;
+  const ToggleNotifications(this.enabled, {this.askExactAlarms = true});
   @override
-  List<Object?> get props => [enabled];
+  List<Object?> get props => [enabled, askExactAlarms];
 }
 
 /// Plays the adhan (instead of the default sound) for prayer reminders.
@@ -580,7 +585,9 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     await prefs.setBool(_kNotifications, true);
     // Android 12+: ask for exact alarms (opens a system screen when not yet
     // allowed). Reminders still work, inexactly, if the user declines.
-    await notificationService?.requestExactAlarmsPermission();
+    if (event.askExactAlarms) {
+      await notificationService?.requestExactAlarmsPermission();
+    }
   }
 
   Future<void> _onToggleAdhanSound(

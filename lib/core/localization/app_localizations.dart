@@ -598,6 +598,8 @@ class AppLocalizations {
       'method_singapore': 'Singapore, Malaysia & Indonesia',
       'method_moonsighting': 'Moonsighting Committee Worldwide',
       'unknown_city': 'Unknown location',
+      'exact_alarm_prompt_title': 'Adhan exactly on time',
+      'exact_alarm_prompt_body': 'To play the adhan exactly when each prayer begins, allow "Alarms & reminders" for Barakah Time on the next screen.',
       'daily_challenges': 'Today\'s challenges',
       'challenges_hint': 'They complete themselves as you use the app',
       'challenge_prayers': 'Pray all five prayers',
@@ -1321,6 +1323,8 @@ class AppLocalizations {
       'method_singapore': 'سنغافورة وماليزيا وإندونيسيا',
       'method_moonsighting': 'لجنة رؤية الهلال العالمية',
       'unknown_city': 'موقع غير معروف',
+      'exact_alarm_prompt_title': 'الأذان في وقته تماماً',
+      'exact_alarm_prompt_body': 'لتشغيل الأذان عند دخول وقت كل صلاة تماماً، اسمح بـ«المنبهات والتذكيرات» لتطبيق Barakah Time في الشاشة التالية.',
       'daily_challenges': 'تحديات اليوم',
       'challenges_hint': 'تكتمل تلقائياً أثناء استخدامك للتطبيق',
       'challenge_prayers': 'صلِّ الصلوات الخمس',
@@ -2053,6 +2057,8 @@ class AppLocalizations {
       'method_singapore': 'سنگاپور، مالزی و اندونزی',
       'method_moonsighting': 'کمیتهٔ جهانی رؤیت هلال',
       'unknown_city': 'مکان نامشخص',
+      'exact_alarm_prompt_title': 'اذان دقیقاً سر وقت',
+      'exact_alarm_prompt_body': 'برای پخش اذان دقیقاً در آغاز وقت هر نماز، در صفحه بعد «زنگ‌ها و یادآورها» را برای Barakah Time مجاز کنید.',
       'daily_challenges': 'چالش‌های امروز',
       'challenges_hint': 'با استفاده از برنامه خودکار کامل می‌شوند',
       'challenge_prayers': 'هر پنج نماز را بخوانید',
@@ -2786,6 +2792,8 @@ class AppLocalizations {
       'method_singapore': 'سنگاپور، ملائیشیا اور انڈونیشیا',
       'method_moonsighting': 'مون سائٹنگ کمیٹی ورلڈ وائیڈ',
       'unknown_city': 'نامعلوم مقام',
+      'exact_alarm_prompt_title': 'اذان بالکل وقت پر',
+      'exact_alarm_prompt_body': 'ہر نماز کا وقت شروع ہوتے ہی اذان بجانے کے لیے اگلی اسکرین پر Barakah Time کو "Alarms & reminders" کی اجازت دیں۔',
       'daily_challenges': 'آج کے چیلنج',
       'challenges_hint': 'ایپ استعمال کرتے ہوئے خود مکمل ہوتے ہیں',
       'challenge_prayers': 'پانچوں نمازیں پڑھیں',
@@ -3526,6 +3534,8 @@ class AppLocalizations {
       'method_singapore': 'Singapur, Malezya ve Endonezya',
       'method_moonsighting': 'Dünya Hilal Gözetleme Komitesi',
       'unknown_city': 'Bilinmeyen konum',
+      'exact_alarm_prompt_title': 'Ezan tam vaktinde',
+      'exact_alarm_prompt_body': 'Ezanın her namaz vakti girdiği anda okunması için sonraki ekranda Barakah Time\'a "Alarmlar ve hatırlatıcılar" izni verin.',
       'daily_challenges': 'Bugünün hedefleri',
       'challenges_hint': 'Uygulamayı kullandıkça kendiliğinden tamamlanır',
       'challenge_prayers': 'Beş vakit namazı kılın',
@@ -4022,6 +4032,8 @@ class AppLocalizations {
   String get guest_mode_notice => translate('guest_mode_notice');
   String get refresh_location => translate('refresh_location');
   String get mushaf => translate('mushaf');
+  String get exact_alarm_prompt_title => translate('exact_alarm_prompt_title');
+  String get exact_alarm_prompt_body => translate('exact_alarm_prompt_body');
   String get daily_challenges => translate('daily_challenges');
   String get challenges_hint => translate('challenges_hint');
   String get challenge_prayers => translate('challenge_prayers');

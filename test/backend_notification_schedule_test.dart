@@ -50,9 +50,18 @@ void main() {
     expect(schedule.length, 32); // maghrib + isha today, then 6 full days
     expect(schedule.first.prayer, PrayerName.maghrib);
     expect(schedule.every((s) => s.time.isAfter(afterAsr)), isTrue);
-    // ids are stable: dayIndex * 10 + prayer index
-    expect(schedule.first.id, PrayerName.maghrib.index);
-    expect(schedule[2].id, 10 + PrayerName.fajr.index);
+    // ids come from the prayer's own date and name
+    expect(
+      schedule.first.id,
+      NotificationService.prayerNotificationId(
+        days[0].date,
+        PrayerName.maghrib,
+      ),
+    );
+    expect(
+      schedule[2].id,
+      NotificationService.prayerNotificationId(days[1].date, PrayerName.fajr),
+    );
   });
 
   test('exactly at a prayer time it is not re-scheduled', () {

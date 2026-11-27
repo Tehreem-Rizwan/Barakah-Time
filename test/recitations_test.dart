@@ -64,6 +64,23 @@ void main() {
     });
   });
 
+  test(
+    'stale prayer times (from another day) still give the right windows',
+    () {
+      // Times for Friday, but the clock says Thursday 22:00.
+      final w = Recitations.activeWindows(
+        DateTime(2026, 11, 26, 22),
+        _times(_fri),
+      );
+      expect(w, [RecitationWindow.friday, RecitationWindow.night]);
+      // Times for Thursday, clock says Friday 10:00.
+      expect(
+        Recitations.activeWindows(DateTime(2026, 11, 27, 10), _times(_thu)),
+        [RecitationWindow.friday],
+      );
+    },
+  );
+
   group('window keys', () {
     test('a night keeps its key across midnight', () {
       final evening = Recitations.windowKey(

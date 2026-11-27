@@ -6,6 +6,7 @@ import '../../core/localization/app_localizations.dart';
 import '../widgets/widgets.dart';
 import '../../core/services/notification_service.dart';
 import '../../injection_container.dart';
+import 'first_run_prompts.dart';
 import 'home_page.dart';
 import 'main_navigation_scope.dart';
 import 'prayer_times_page.dart';
@@ -51,6 +52,8 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
         _handleNotification(notifications.takeLaunchPayload());
+        // First use: ask for notification permission (adhan) once.
+        unawaited(FirstRunPrompts.run(context));
       });
     }
   }

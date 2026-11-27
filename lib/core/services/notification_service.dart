@@ -13,7 +13,7 @@ import '../localization/app_localizations.dart';
 /// One prayer reminder to schedule.
 @immutable
 class ScheduledPrayer {
-  /// Notification id: `dayIndex * 10 + prayer.index` (0..69).
+  /// Notification id, see [NotificationService.prayerNotificationId].
   final int id;
   final PrayerName prayer;
   final DateTime time;
@@ -54,7 +54,7 @@ class ExtraReminder {
 }
 
 /// Notification id ranges, so each group can be replaced on its own.
-/// Prayers use 0..69 (see [ScheduledPrayer.id]).
+/// Prayers use 0..999 (see [NotificationService.prayerNotificationId]).
 abstract final class ReminderGroups {
   static const int size = 1000;
   static const int prayers = 0;
@@ -98,7 +98,7 @@ class NotificationService {
   /// Days of reminders actually scheduled. Android allows many pending
   /// alarms, so a month keeps the adhan coming even if the app isn't opened
   /// for weeks (30 days x 5 prayers + Ramadan reminders stays far below
-  /// Android's 500-alarm limit; ids are dayIndex * 10 + prayer, so up to
+  /// Android's 500-alarm limit; ids come from the prayer's date, so up to
   /// 99 days fit the prayers group). iOS allows only 64 pending
   /// notifications in total, so it keeps [daysAhead].
   static int get scheduleDays =>
@@ -309,6 +309,18 @@ class NotificationService {
 
   /// Pure: reminders for [days] (consecutive days, as computed by
   /// `AdhanService.timesForDays`), skipping times not after [now].
+  /// Id of the notification for [prayer] on [date]: derived from the date
+  /// itself, so one prayer time always maps to the same id however many
+  /// times (or from whichever day) it is scheduled. Android replaces a
+  /// notification with the same id, so a prayer can never notify twice.
+  /// Unique for 100 consecutive days and always inside the prayers group.
+  static int prayerNotificationId(DateTime date, PrayerName prayer) {
+    final day = DateTime.utc(date.year, date.month, date.day);
+    final daysSinceEpoch =
+        day.millisecondsSinceEpoch ~/ Duration.millisecondsPerDay;
+    return (daysSinceEpoch % 100) * 10 + prayer.index;
+  }
+
   static List<ScheduledPrayer> computeSchedule(
     List<DailyPrayerTimes> days,
     DateTime now,
@@ -317,7 +329,7 @@ class NotificationService {
       for (final prayer in PrayerName.values)
         if (days[d].timeOf(prayer).isAfter(now))
           ScheduledPrayer(
-            id: d * 10 + prayer.index,
+            id: prayerNotificationId(days[d].date, prayer),
             prayer: prayer,
             time: days[d].timeOf(prayer),
             dayIndex: d,
